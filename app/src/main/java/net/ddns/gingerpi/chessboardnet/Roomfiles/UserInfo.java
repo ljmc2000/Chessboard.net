@@ -15,12 +15,13 @@ import org.json.JSONObject;
 @Entity
 public class UserInfo {
     @PrimaryKey
+    @NonNull
     public final String id;
     @NonNull
     public final String username;
     public final String token;
 
-    public UserInfo(String id, @NonNull String username, String token)
+    public UserInfo(@NonNull String id, @NonNull String username, String token)
     {
         this.id=id;
         this.username=username;

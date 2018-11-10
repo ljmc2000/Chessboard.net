@@ -3,4 +3,5 @@
     <string name="HTTPAPIurl">http://localhost:5000/</string>
     <string name="DB_NAME">LocalCache.db</string>
     <string name="WelcomeMessage">Welcome to Chessboard.Net</string>
+    <string name="loginBanner">You must login or sign up to use Chessboard.Net</string>
 </resources>
