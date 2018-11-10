@@ -1,7 +1,7 @@
 from flask import Flask,jsonify,request
 from pymongo import MongoClient
 from bson.json_util import dumps
-import bcrypt,secrets
+import bcrypt,secrets,datetime
 
 app=Flask(__name__)
 db=MongoClient().ChessboardNet
@@ -25,15 +25,20 @@ def create_user():
 
 @app.route("/signin",methods=["POST"])
 def get_login_token():
+	#0 success
+	#1 fail
+	#-1 exception
+
 	try:
 		username=request.form.get("username")
 		password=request.form.get("password")
 		userdetails=db.users.find_one({"username":username})
 		if bcrypt.checkpw(password.encode(),userdetails["passhash"]):
-			login_token=secrets.token_urlsafe(16)
-			db.user_tokens.insert({"_id":login_token,"user_id":userdetails["_id"]})
-			return jsonify({"status":"success","token":login_token})
+			login_token=secrets.token_urlsafe(32)
+			expires=datetime.datetime.now()+datetime.timedelta(days=365)
+			db.user_tokens.insert({"_id":login_token,"user_id":userdetails["_id"],"expires":expires})
+			return jsonify({"status":"0","id":str(userdetails["_id"]),"token":login_token})
 		else:
-			return jsonify({"status":"fail"})
+			return jsonify({"status":"1"})
 	except:
-		return jsonify({"status":"exception"})
+		return jsonify({"status":"-1"})
