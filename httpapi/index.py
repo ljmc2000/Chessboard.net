@@ -4,8 +4,9 @@ from bson.json_util import dumps
 import bcrypt,secrets,datetime
 
 app=Flask(__name__)
-db=MongoClient().ChessboardNet
-
+db=MongoClient(serverSelectionTimeoutMS=1)
+db.server_info()
+db=db.ChessboardNet
 
 @app.route("/")
 def hello_world():
