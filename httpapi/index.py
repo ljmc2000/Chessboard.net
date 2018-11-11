@@ -15,13 +15,13 @@ def hello_world():
 @app.route("/signup",methods=["POST"])
 def create_user():
 	try:
-		username=request.form.get("username")
-		password=request.form.get("password")
+		username=request.json.get("username")
+		password=request.json.get("password")
 		passhash=bcrypt.hashpw(password.encode(),bcrypt.gensalt())
 		db.users.insert({"username":username,"passhash":passhash})
-		return "success"
+		return "0"
 	except:
-		return "failure"
+		return "-1"
 
 @app.route("/signin",methods=["POST"])
 def get_login_token():
@@ -30,8 +30,8 @@ def get_login_token():
 	#-1 exception
 
 	try:
-		username=request.form.get("username")
-		password=request.form.get("password")
+		username=request.json.get("username")
+		password=request.json.get("password")
 		userdetails=db.users.find_one({"username":username})
 		if bcrypt.checkpw(password.encode(),userdetails["passhash"]):
 			login_token=secrets.token_urlsafe(32)

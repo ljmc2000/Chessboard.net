@@ -16,12 +16,12 @@ import org.json.JSONObject;
 public class UserInfo {
     @PrimaryKey
     @NonNull
-    public final String id;
+    public String id;
     @NonNull
-    public final String username;
-    public final String token;
+    public String username;
+    public String token;
 
-    public UserInfo(@NonNull String id, @NonNull String username, String token)
+    public UserInfo(String id,String username, String token)
     {
         this.id=id;
         this.username=username;

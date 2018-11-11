@@ -8,18 +8,12 @@ import java.util.List;
 
 @Dao
 public interface UserInfoDao {
-    @Query("Select username from userinfo limit 1")
-    String getUsername();
-
-    @Query("Select token from userinfo limit 1")
-    String getToken();
-
-    @Query("Select username from userinfo limit 1")
-    String getUserID();
+    @Query("Select * from userinfo limit 1")
+    public UserInfo fetch();
 
     @Insert
-    void insert(UserInfo userinfo);
+    public void insert(UserInfo userinfo);
 
-    @Delete
-    void delete(UserInfo userinfo);
+    @Query("delete from userinfo")
+    public void clear();
 }
