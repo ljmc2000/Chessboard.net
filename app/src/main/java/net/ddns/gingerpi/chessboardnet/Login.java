@@ -7,50 +7,21 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.android.volley.Cache;
-import com.android.volley.Network;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.BasicNetwork;
-import com.android.volley.toolbox.DiskBasedCache;
-import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-
-import net.ddns.gingerpi.chessboardnet.Roomfiles.CacheDatabase;
-import net.ddns.gingerpi.chessboardnet.Roomfiles.UserInfo;
-
 import org.json.JSONObject;
+
+import net.ddns.gingerpi.chessboardnet.Roomfiles.SaveToken;
+
 
 public class Login extends Activity {
 
     String token;
     String id;
-
-    class saveToken extends Thread {
-        Context context;
-        String id;
-        String username;
-        String token;
-
-        @Override
-        public void run() {
-            CacheDatabase
-                    .getInstance(this.context)
-                    .getUserInfoDao()
-                    .insert(new UserInfo(id,username,token));
-        }
-
-        public saveToken(Context context,String id,String username, String token){
-            this.context=context;
-            this.id=id;
-            this.username=username;
-            this.token=token;
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +35,7 @@ public class Login extends Activity {
         EditText username=(EditText) findViewById(R.id.loginUsername);
         EditText password=(EditText) findViewById(R.id.loginPassword);
         String url=getResources().getString(R.string.HTTPAPIurl)+"/signin";
+        Log.d("#url",url);
         final String uname=username.getText().toString();
         JSONObject payload=new JSONObject();
         try{
@@ -85,8 +57,10 @@ public class Login extends Activity {
                         case 0: { //success
                             id = response.getString("id");
                             token = response.getString("token");
-                            saveToken t = new saveToken(getApplicationContext(),id,uname,token);
+                            SaveToken t = new SaveToken(getApplicationContext(),id,uname,token);
                             t.start();
+                            t.join();
+                            finish();
                             break;
                         }
 
@@ -101,12 +75,13 @@ public class Login extends Activity {
                         }
                     }
                 } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), "Failed to connect to the Authentication server", Toast.LENGTH_SHORT).show();
                     Log.e("#HTTPAPI", e.toString());
                 }
             }
         };
 
-        Response.ErrorListener errorListner = new Response.ErrorListener() {
+        Response.ErrorListener errorListener = new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("#HTTPAPI",error.toString());
@@ -114,7 +89,7 @@ public class Login extends Activity {
         };
 
         RequestQueue queue = Volley.newRequestQueue(this);
-        JsonObjectRequest login=new JsonObjectRequest(Request.Method.POST,url,payload,responseListener ,errorListner);
+        JsonObjectRequest login=new JsonObjectRequest(Request.Method.POST,url,payload,responseListener ,errorListener);
         queue.add(login);
     }
 }
