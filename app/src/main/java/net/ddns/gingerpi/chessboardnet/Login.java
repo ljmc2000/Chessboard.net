@@ -23,6 +23,13 @@ public class Login extends Activity {
     String token;
     String id;
 
+    Response.ErrorListener errorListener = new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Log.e("#HTTPAPI",error.toString());
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,9 +41,8 @@ public class Login extends Activity {
     public void login(View view){
         EditText username=(EditText) findViewById(R.id.loginUsername);
         EditText password=(EditText) findViewById(R.id.loginPassword);
-        String url=getResources().getString(R.string.HTTPAPIurl)+"/signin";
-        Log.d("#url",url);
         final String uname=username.getText().toString();
+        String url=getResources().getString(R.string.HTTPAPIurl)+"/signin";
         JSONObject payload=new JSONObject();
         try{
             payload.put("username",username.getText().toString() );
@@ -47,7 +53,7 @@ public class Login extends Activity {
             Log.e("#JsonError",e.toString());
         }
 
-        Response.Listener responseListener = new Response.Listener<JSONObject>() {
+        Response.Listener loginResponseListener = new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -81,15 +87,67 @@ public class Login extends Activity {
             }
         };
 
-        Response.ErrorListener errorListener = new Response.ErrorListener() {
+        RequestQueue queue = Volley.newRequestQueue(this);
+        JsonObjectRequest login=new JsonObjectRequest(Request.Method.POST,url,payload,loginResponseListener ,errorListener);
+        queue.add(login);
+    }
+
+    public void register(View view){
+        EditText username=(EditText) findViewById(R.id.registerUsername);
+        EditText password1=(EditText) findViewById(R.id.registerPassword1);
+        EditText password2=(EditText) findViewById(R.id.registerPassword2);
+        final String uname=username.getText().toString();
+        String url=getResources().getString(R.string.HTTPAPIurl)+"/signup";
+        String p1=password1.getText().toString();
+        String p2=password2.getText().toString();
+
+        if(!p1.contentEquals(p2)) {
+            Toast.makeText(getApplicationContext(), "Passwords do not match", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        JSONObject payload=new JSONObject();
+        try{
+            payload.put("username",uname);
+            payload.put("password",p1);
+        }
+
+        catch (Exception e){
+            Log.e("#JsonError",e.toString());
+        }
+
+        Response.Listener registerResponseListener = new Response.Listener<JSONObject>() {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("#HTTPAPI",error.toString());
+            public void onResponse(JSONObject response) {
+                try {
+                    int status = response.getInt("status");
+
+                    switch (status) {
+                        case 0: {   //success
+                            id = response.getString("id");
+                            token = response.getString("token");
+                            SaveToken t = new SaveToken(getApplicationContext(), id, uname, token);
+                            t.start();
+                            t.join();
+                            finish();
+                            break;
+                        }
+
+                        case -1: {   //sever side exception
+                            Toast.makeText(getApplicationContext(), "Existing username found: try another", Toast.LENGTH_SHORT).show();
+                            break;
+                        }
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), "Failed to connect to the Authentication server", Toast.LENGTH_SHORT).show();
+                    Log.e("#HTTPAPI", e.toString());
+                }
             }
         };
 
         RequestQueue queue = Volley.newRequestQueue(this);
-        JsonObjectRequest login=new JsonObjectRequest(Request.Method.POST,url,payload,responseListener ,errorListener);
+        JsonObjectRequest login=new JsonObjectRequest(Request.Method.POST,url,payload,registerResponseListener ,errorListener);
         queue.add(login);
     }
 }

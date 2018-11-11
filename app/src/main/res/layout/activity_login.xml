@@ -45,7 +45,7 @@
         android:text="@string/loginBanner" />
 
     <EditText
-        android:id="@+id/password3"
+        android:id="@+id/registerPassword2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/registerPassword1"
@@ -83,7 +83,7 @@
         android:id="@+id/regPassword2Label"
         android:layout_width="72dp"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/password3"
+        android:layout_alignBottom="@+id/registerPassword2"
         android:layout_toStartOf="@+id/loginUsername"
         android:text="Repeat password" />
 

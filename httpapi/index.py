@@ -3,6 +3,8 @@ from pymongo import MongoClient
 from bson.json_util import dumps
 import bcrypt,secrets,datetime
 
+TOKEN_LEN=32	#how many bytes (characters? citation needed) required for login token
+
 app=Flask(__name__)
 db=MongoClient(serverSelectionTimeoutMS=1)
 db.server_info()
@@ -19,10 +21,13 @@ def create_user():
 		username=request.json.get("username")
 		password=request.json.get("password")
 		passhash=bcrypt.hashpw(password.encode(),bcrypt.gensalt())
-		db.users.insert({"username":username,"passhash":passhash})
-		return "0"
+		userid=db.users.insert({"username":username,"passhash":passhash})
+		login_token=secrets.token_urlsafe(TOKEN_LEN)
+		expires=datetime.datetime.now()+datetime.timedelta(days=365)
+		db.user_tokens.insert({"_id":login_token,"user_id":userid,"expires":expires})
+		return jsonify({"status":"0","token":login_token,"id":str(userid)})
 	except:
-		return "-1"
+		return jsonify({"status":"-1"})
 
 @app.route("/signin",methods=["POST"])
 def get_login_token():
@@ -35,7 +40,7 @@ def get_login_token():
 		password=request.json.get("password")
 		userdetails=db.users.find_one({"username":username})
 		if bcrypt.checkpw(password.encode(),userdetails["passhash"]):
-			login_token=secrets.token_urlsafe(32)
+			login_token=secrets.token_urlsafe(TOKEN_LEN)
 			expires=datetime.datetime.now()+datetime.timedelta(days=365)
 			db.user_tokens.insert({"_id":login_token,"user_id":userdetails["_id"],"expires":expires})
 			return jsonify({"status":"0","id":str(userdetails["_id"]),"token":login_token})
