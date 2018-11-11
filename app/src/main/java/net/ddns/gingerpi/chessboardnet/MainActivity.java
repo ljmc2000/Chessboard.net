@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
 
         else {
             //once logged in
-            TextView usernameBox = (TextView) findViewById(R.id.UsernameBox);
+            TextView usernameBox = (TextView) findViewById(R.id.usernameBox);
             usernameBox.setText("logged in as " + request.getUsername());
         }
     }

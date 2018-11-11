@@ -2,36 +2,120 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relativeLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".MainActivity"
-    android:id="@+id/relativeLayout">
+    tools:context=".MainActivity">
 
     <TextView
         android:id="@+id/WelcomeBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_weight="1"
         android:text="@string/WelcomeMessage"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="16dp" />
-
-    <TextView
-        android:id="@+id/UsernameBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="logout"
-        android:text="Logout"
+    <LinearLayout
+        android:layout_width="296dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:layout_editor_absoluteY="0dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/WelcomeBox">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/usernameBox"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
+
+            <Button
+                android:id="@+id/logoutButton"
+                android:layout_width="188dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:layout_marginStart="24dp"
+                android:layout_weight="1"
+                android:onClick="logout"
+                android:text="Logout"
+                app:layout_constraintStart_toEndOf="@+id/WelcomeBox"
+                app:layout_constraintTop_toTopOf="parent" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/playOnlineHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="32dp"
+            android:contentDescription="@string/playOnlineHint"
+            android:text="@string/playOnline"
+            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+            app:layout_constraintEnd_toEndOf="@+id/WelcomeBox"
+            app:layout_constraintHorizontal_bias="0.521"
+            app:layout_constraintStart_toStartOf="@+id/WelcomeBox"
+            app:layout_constraintTop_toBottomOf="@+id/WelcomeBox" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/playOnlineHeader">
+
+            <Button
+                android:id="@+id/playWithAnybody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/challengeStranger"
+                tools:layout_editor_absoluteX="52dp"
+                tools:layout_editor_absoluteY="126dp" />
+
+            <Button
+                android:id="@+id/playWithAnybody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/challengeFriend"
+                tools:layout_editor_absoluteX="196dp"
+                tools:layout_editor_absoluteY="126dp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/matchStatsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="@string/statsbutton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
+        <Button
+            android:id="@+id/settingsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settingsbutton" />
+
+    </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>
