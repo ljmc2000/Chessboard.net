@@ -1,3 +1,4 @@
 Manifest-Version: 1.0
 Created-By: 1.8.0_192 (Oracle Corporation)
 Main-Class: net.ddns.gingerpi.chessboardnetServer.Control
+Class-Path: bson-3.8.1.jar mongodb-driver-3.8.1.jar mongodb-driver-core-3.8.1.jar

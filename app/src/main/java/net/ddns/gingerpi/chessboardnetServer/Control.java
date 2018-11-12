@@ -2,6 +2,9 @@ package net.ddns.gingerpi.chessboardnetServer;
 import static net.ddns.gingerpi.chessboardnetServer.ChessPacket.messageType.*;
 import java.net.*;
 import java.io.*;
+import org.bson.*;
+import com.mongodb.client.*;
+import com.mongodb.MongoClient;
 
 class Control
 {
@@ -13,6 +16,12 @@ class Control
 		{
 			int port=7000;
 			ServerSocket myServerSocket=new ServerSocket(port);
+
+			MongoClient mongoClient = new MongoClient();
+			MongoDatabase db = mongoClient.getDatabase("ChessboardNet");
+			MongoCollection<Document> users = db.getCollection("users");
+			Document user=users.find().first();
+			System.out.println(user.toJson());
 
 
 			System.out.println("Server listening on port "+port);
