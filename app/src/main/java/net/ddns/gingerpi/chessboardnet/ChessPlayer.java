@@ -35,4 +35,9 @@ public class ChessPlayer extends Activity {
         messageInput.setText("");
         conmanager.sendIMessage(s);
     }
+
+    public void surrender(View view){
+        conmanager.surrender();
+        finish();
+    }
 }

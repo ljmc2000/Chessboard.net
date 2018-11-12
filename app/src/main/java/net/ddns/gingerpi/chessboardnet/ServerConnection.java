@@ -1,5 +1,6 @@
 package net.ddns.gingerpi.chessboardnet;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import java.io.ObjectInputStream;
@@ -11,6 +12,7 @@ import net.ddns.gingerpi.chessboardnetServer.ChessPacket;
 import static net.ddns.gingerpi.chessboardnetServer.ChessPacket.messageType.*;
 
 public class ServerConnection extends Thread {
+    Socket mycon;
     ObjectOutputStream out;
     ObjectInputStream in;
     InetAddress address;
@@ -33,17 +35,17 @@ public class ServerConnection extends Thread {
 
     public void run() {
         try {
-            Socket mycon = new Socket(this.address, port);
+            mycon = new Socket(this.address, port);
             ObjectOutputStream out = new ObjectOutputStream(mycon.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(mycon.getInputStream());
 
-            while (true) {
+            while (mycon.isConnected()) {
                 if (sendMessage != null) {
                     out.writeObject(sendMessage);
                     sendMessage=null;
 
                 } else {
-                    out.writeObject(new ChessPacket());
+                    out.writeObject(new ChessPacket(ack));
                 }
 
                 recievedMessage = (ChessPacket) in.readObject();
@@ -61,6 +63,13 @@ public class ServerConnection extends Thread {
                         imout.setText(recievedMessage.getMessage());
                         break;
                     }
+
+                    case end: {
+                        out.writeObject(new ChessPacket(end,"AcKSurrender"));
+                        imout.setText("Opponent has surrendered");
+                        mycon.close();
+                        break;
+                    }
                 }
             }
         }
@@ -72,5 +81,9 @@ public class ServerConnection extends Thread {
 
     public void sendIMessage(String s){
         this.sendMessage=new ChessPacket(im,s);
+    }
+
+    public void surrender(){
+        this.sendMessage=new ChessPacket(end,"surrender");
     }
 }

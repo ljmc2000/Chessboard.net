@@ -14,4 +14,5 @@
     <string name="settingsbutton">Change user preferences</string>
     <string name="exit">Exit</string>
     <string name="send">Send</string>
+    <string name="surrender">Surrender</string>
 </resources>

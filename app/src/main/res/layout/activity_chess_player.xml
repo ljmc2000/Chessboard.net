@@ -2,10 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     tools:context=".ChessPlayer">
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="surrender"
+        android:text="Button" />
 
     <ImageView
         android:id="@+id/ChessBoard"
@@ -14,23 +21,12 @@
         android:layout_weight="90"
         android:src="@drawable/chessboard" />
 
-    <ScrollView
+    <TextView
+        android:id="@+id/Messages"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="33dp"
-        android:layout_weight="10">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/Messages"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-    </ScrollView>
+        android:layout_height="wrap_content"
+        android:layout_weight="10"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
 
     <LinearLayout
         android:layout_width="match_parent"
