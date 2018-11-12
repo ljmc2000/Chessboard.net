@@ -1,6 +1,7 @@
 package net.ddns.gingerpi.chessboardnetServer;
+import java.io.Serializable;
 
-class ChessPacket
+public class ChessPacket implements Serializable
 {
 	public enum messageType {ack,chessMove,im};
 
@@ -17,5 +18,15 @@ class ChessPacket
 	public ChessPacket()
 	{
 		this.header=messageType.ack;
+	}
+
+	public messageType getHeader()
+	{
+		return this.header;
+	}
+
+	public String getMessage()
+	{
+		return this.message;
 	}
 }

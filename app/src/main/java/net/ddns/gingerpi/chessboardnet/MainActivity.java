@@ -34,6 +34,11 @@ public class MainActivity extends Activity {
         startActivity(login);
     }
 
+    public void startGame(View view){
+        Intent startgame=new Intent(this,ChessPlayer.class);
+        startActivity(startgame);
+    }
+
     void checkLogin() {
         //if not logged in
         GetUserInfo request= new GetUserInfo(this);
