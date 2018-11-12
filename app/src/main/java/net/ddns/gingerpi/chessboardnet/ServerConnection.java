@@ -76,6 +76,7 @@ public class ServerConnection extends Thread {
 
         catch(Exception e){
             Log.e("#Network",e.toString());
+
         }
     }
 

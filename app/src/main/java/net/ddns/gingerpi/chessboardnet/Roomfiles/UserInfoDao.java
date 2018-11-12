@@ -8,7 +8,7 @@ import java.util.List;
 
 @Dao
 public interface UserInfoDao {
-    @Query("Select * from userinfo limit 1")
+    @Query("Select * from userinfo where token not null")
     public UserInfo fetch();
 
     @Insert
