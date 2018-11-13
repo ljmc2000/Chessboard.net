@@ -19,9 +19,11 @@ class Control
 
 			MongoClient mongoClient = new MongoClient();
 			MongoDatabase db = mongoClient.getDatabase("ChessboardNet");
+			/*
 			MongoCollection<Document> users = db.getCollection("users");
 			Document user=users.find().first();
 			System.out.println(user.toJson());
+			*/
 
 
 			System.out.println("Server listening on port "+port);
@@ -40,8 +42,8 @@ class Control
 					ObjectOutputStream out2=new ObjectOutputStream(connection2.getOutputStream());
 					ObjectInputStream in2=new ObjectInputStream(connection2.getInputStream());
 
-					ChessGameInstance p1Thread = new ChessGameInstance(connection1,out2,in1);
-					ChessGameInstance p2Thread = new ChessGameInstance(connection2,out1,in2);
+					ChessGameInstance p1Thread = new ChessGameInstance(connection1,out2,in1,db);
+					ChessGameInstance p2Thread = new ChessGameInstance(connection2,out1,in2,db);
 					p1Thread.start();
 					p2Thread.start();
 					remainingConnections--;

@@ -3,28 +3,29 @@ package net.ddns.gingerpi.chessboardnet;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import net.ddns.gingerpi.chessboardnet.Roomfiles.DeleteUserInfo;
 import net.ddns.gingerpi.chessboardnet.Roomfiles.GetUserInfo;
+import net.ddns.gingerpi.chessboardnet.Roomfiles.UserInfo;
 
 public class MainActivity extends Activity {
+
+    String loginToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        checkLogin();
+        loginToken=checkLogin();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        checkLogin();
+        loginToken=checkLogin();
     }
 
     public void logout(View view) {
@@ -36,10 +37,11 @@ public class MainActivity extends Activity {
 
     public void startGame(View view){
         Intent startgame=new Intent(this,ChessPlayer.class);
+        startgame.putExtra("loginToken", loginToken);
         startActivity(startgame);
     }
 
-    void checkLogin() {
+    String checkLogin() {
         //if not logged in
         GetUserInfo request= new GetUserInfo(this);
         try {
@@ -59,5 +61,7 @@ public class MainActivity extends Activity {
             TextView usernameBox = (TextView) findViewById(R.id.usernameBox);
             usernameBox.setText("logged in as " + request.getUsername());
         }
+
+        return request.getToken();
     }
 }

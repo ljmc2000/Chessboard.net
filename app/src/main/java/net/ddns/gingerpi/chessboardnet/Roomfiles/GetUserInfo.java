@@ -33,7 +33,7 @@ public class GetUserInfo extends Thread {
         return this.result.id;
     }
 
-    public String token() {
+    public String getToken() {
         return this.result.token;
     }
 }

@@ -1,6 +1,5 @@
 package net.ddns.gingerpi.chessboardnet;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 
 import java.io.ObjectInputStream;
@@ -17,14 +16,17 @@ public class ServerConnection extends Thread {
     ObjectInputStream in;
     InetAddress address;
     int port;
+    String loginToken;
+    String opponent;    //the opponents UID
     TextView imout;
     ChessPacket sendMessage;
     ChessPacket recievedMessage;
 
-    public ServerConnection(String url,int port,TextView imout){
+    public ServerConnection(String url,int port,String token,TextView imout){
         try {
             this.imout = imout;
             this.address = InetAddress.getByName(url);
+            this.loginToken=token;
             this.port = port;
         }
 
@@ -38,6 +40,11 @@ public class ServerConnection extends Thread {
             mycon = new Socket(this.address, port);
             ObjectOutputStream out = new ObjectOutputStream(mycon.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(mycon.getInputStream());
+
+            out.writeObject(new ChessPacket(signin,loginToken));
+            recievedMessage=(ChessPacket) in.readObject();
+            opponent=recievedMessage.getMessage();
+            Log.d("#opponent",opponent.toString());
 
             while (mycon.isConnected()) {
                 if (sendMessage != null) {

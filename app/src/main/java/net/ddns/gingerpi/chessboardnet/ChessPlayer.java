@@ -7,10 +7,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.net.*;
-import java.io.*;
 
 public class ChessPlayer extends Activity {
 
@@ -39,7 +35,7 @@ public class ChessPlayer extends Activity {
         });
 
         try{
-            conmanager=new ServerConnection(getResources().getString(R.string.Server),getResources().getInteger(R.integer.serverPort),(TextView) findViewById(R.id.Messages));
+            conmanager=new ServerConnection(getResources().getString(R.string.Server),getResources().getInteger(R.integer.serverPort),getIntent().getExtras().getString("loginToken"),(TextView) findViewById(R.id.Messages));
             conmanager.start();
         }
 
