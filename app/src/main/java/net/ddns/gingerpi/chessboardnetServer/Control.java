@@ -14,6 +14,7 @@ class Control
 	{
 		try
 		{
+			final String serverAddress="192.168.0.1";
 			int port=7000;
 			ServerSocket myServerSocket=new ServerSocket(port);
 

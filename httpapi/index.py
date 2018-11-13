@@ -1,9 +1,11 @@
 from flask import Flask,jsonify,request
 from pymongo import MongoClient
 from bson.json_util import dumps
+from bson.objectid import ObjectId
 import bcrypt,secrets,datetime
 
 TOKEN_LEN=32	#how many bytes (characters? citation needed) required for login token
+servers=["192.168.0.1"]	#servers available
 
 app=Flask(__name__)
 db=MongoClient(serverSelectionTimeoutMS=1)
@@ -48,3 +50,43 @@ def get_login_token():
 			return jsonify({"status":"1"})
 	except:
 		return jsonify({"status":"-1"})
+
+lobby={}	#in the from {"uid","last time they sent a request"}
+@app.route("/lobby",methods=["POST"])
+def lobby():
+	'''add player to the user to the lobby for 60 seconds'''
+	#remove players from queue if they stop sending join requests
+	for person in lobby:
+		if lobby[person]<datetime.datetime.now()-datetime.timedelta(seconds=60):
+			lobby.pop(person)
+
+	#add player to lobby
+	token=request.json.get("token")
+	user=db.user_tokens.find_one({"_id":token})
+	userid=user["user_id"]
+	if db.ongoing_matches.find_one({"$or":[{"player1":userid},{"player2":userid}]}):	#check they are not already in match
+		return jsonify({"status":1})
+	lobby[userid]=datetime.datetime.now()
+
+	#Match players up
+	while len(lobby)>1:
+		p1=lobby.popitem()[0]
+		p2=lobby.popitem()[0]
+		lowest=-1
+		for server in servers:
+			players_on_server=db.ongoing_matches.count({"server":server})
+			if players_on_server>lowest:
+				lowest=players_on_server
+		db.ongoing_matches.insert({"player1":p1,"player2":p2,"server":lowest})
+
+	return jsonify({"status":0})
+
+@app.route("/getmatch",methods=["POST"])
+def getmatch():
+	token=request.json.get("token")
+	user=db.user_tokens.find_one({"_id":token})
+	userid=user["user_id"]
+
+	returnme=db.ongoing_matches.find_one({"$or":[{"player1":userid},{"player2":userid}]})
+	return app.response_class(response=dumps(returnme),status=200,mimetype="application/json")
+
