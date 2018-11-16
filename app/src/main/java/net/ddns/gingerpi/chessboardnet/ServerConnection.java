@@ -67,7 +67,12 @@ public class ServerConnection extends Thread {
                     }
 
                     case im: {
-                        imout.setText(recievedMessage.getMessage());
+                        imout.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                imout.append(recievedMessage.getMessage()+"\n");
+                            }
+                        });
                         break;
                     }
 
