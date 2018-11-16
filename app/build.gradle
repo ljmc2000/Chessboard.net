@@ -33,7 +33,7 @@ dependencies {
     implementation 'com.android.support:design:28.0.0'
 
     //make server work
-    compile 'org.mongodb:mongodb-driver:3.8.1'
-    compile 'org.mongodb:mongodb-driver-core:3.8.1'
+    implementation 'org.mongodb:mongodb-driver:3.8.1'
+    implementation 'org.mongodb:mongodb-driver-core:3.8.1'
 
 }

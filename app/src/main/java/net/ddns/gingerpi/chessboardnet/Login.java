@@ -13,15 +13,39 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import org.json.JSONObject;
 
-import net.ddns.gingerpi.chessboardnet.Roomfiles.SaveToken;
+import net.ddns.gingerpi.chessboardnet.Roomfiles.CacheDatabase;
+import net.ddns.gingerpi.chessboardnet.Roomfiles.UserInfo;
+
+import org.json.JSONObject;
 
 
 public class Login extends Activity {
 
     String token;
     String id;
+
+    public class SaveToken extends Thread {
+        Context context;
+        String id;
+        String username;
+        String token;
+
+        @Override
+        public void run() {
+            CacheDatabase
+                    .getInstance(this.context)
+                    .getUserInfoDao()
+                    .insert(new UserInfo(id,username,token));
+        }
+
+        public SaveToken(Context context,String id,String username, String token){
+            this.context=context;
+            this.id=id;
+            this.username=username;
+            this.token=token;
+        }
+    }
 
     Response.ErrorListener errorListener = new Response.ErrorListener() {
         @Override

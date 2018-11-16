@@ -1,18 +1,70 @@
 package net.ddns.gingerpi.chessboardnet;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import net.ddns.gingerpi.chessboardnet.Roomfiles.DeleteUserInfo;
-import net.ddns.gingerpi.chessboardnet.Roomfiles.GetUserInfo;
+import net.ddns.gingerpi.chessboardnet.Roomfiles.CacheDatabase;
 import net.ddns.gingerpi.chessboardnet.Roomfiles.UserInfo;
 
 public class MainActivity extends Activity {
 
     String loginToken;
+
+    public class GetUserInfo extends Thread {
+        Context context;
+        UserInfo result;
+
+        @Override
+        public void run() {
+            this.result=
+                    CacheDatabase
+                            .getInstance(this.context)
+                            .getUserInfoDao()
+                            .fetch();
+        }
+
+        public GetUserInfo(Context context){
+            this.context=context;
+        }
+
+        public String getUsername() {
+            try {
+                return this.result.username;
+            }
+
+            catch(Exception e){
+                return null;
+            }
+        }
+
+        public String getID() {
+            return this.result.id;
+        }
+
+        public String getToken() {
+            return this.result.token;
+        }
+    }
+    public class DeleteUserInfo extends Thread {
+
+        Context context;
+
+        @Override
+        public void run(){
+            CacheDatabase
+                    .getInstance(this.context)
+                    .getUserInfoDao()
+                    .clear();
+        }
+
+        public DeleteUserInfo(Context context){
+            this.context=context;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
