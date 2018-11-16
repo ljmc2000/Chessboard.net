@@ -51,6 +51,13 @@ def get_login_token():
 	except:
 		return jsonify({"status":"-1"})
 
+@app.route("/signout",methods=["POST"])
+def destroy_login_token():
+	token=request.json.get("token")
+	db.user_tokens.remove({"_id":token})
+	return jsonify({"status":0})
+
+
 lobby={}	#in the from {"uid","last time they sent a request"}
 @app.route("/lobby",methods=["POST"])
 def lobby():

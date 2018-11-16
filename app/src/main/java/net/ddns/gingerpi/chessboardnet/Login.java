@@ -105,7 +105,7 @@ public class Login extends Activity {
                         }
                     }
                 } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), "Failed to connect to the Authentication server", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Failed to Authenticate", Toast.LENGTH_SHORT).show();
                     Log.e("#HTTPAPI", e.toString());
                 }
             }

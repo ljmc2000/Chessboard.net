@@ -4,15 +4,25 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 
 import net.ddns.gingerpi.chessboardnet.Roomfiles.CacheDatabase;
 import net.ddns.gingerpi.chessboardnet.Roomfiles.UserInfo;
 
+import org.json.JSONObject;
+
 public class MainActivity extends Activity {
 
-    String loginToken;
+    String loginToken="";
 
     public class GetUserInfo extends Thread {
         Context context;
@@ -46,7 +56,13 @@ public class MainActivity extends Activity {
         }
 
         public String getToken() {
-            return this.result.token;
+            try{
+                return this.result.token;
+            }
+
+            catch (NullPointerException e){
+                return null;
+            }
         }
     }
     public class DeleteUserInfo extends Thread {
@@ -66,6 +82,13 @@ public class MainActivity extends Activity {
         }
     }
 
+    Response.ErrorListener errorListener = new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Log.e("#HTTPAPI",error.toString());
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +106,19 @@ public class MainActivity extends Activity {
     public void logout(View view) {
         DeleteUserInfo request=new DeleteUserInfo(getApplicationContext());
         request.start();
+
+        String url=getResources().getString(R.string.HTTPAPIurl)+"/signout";
+        JSONObject payload=new JSONObject();
+        try{
+            payload.put("token",loginToken);
+        }
+        catch (Exception ex){
+            Log.e("#jsonerror",ex.toString());
+        }
+        JsonObjectRequest logout=new JsonObjectRequest(Request.Method.POST,url,payload,null ,errorListener);
+        RequestQueue queue = Volley.newRequestQueue(this);
+        queue.add(logout);
+
         Intent login = new Intent(this,Login.class);
         startActivity(login);
     }
