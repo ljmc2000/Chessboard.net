@@ -19,13 +19,15 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="90"
+        android:scrollbars="none"
         android:src="@drawable/chessboard" />
 
     <TextView
         android:id="@+id/Messages"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="10"
+        android:scrollbars="vertical"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
 
     <LinearLayout

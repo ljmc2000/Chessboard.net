@@ -2,6 +2,7 @@ package net.ddns.gingerpi.chessboardnet;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -35,7 +36,9 @@ public class ChessPlayer extends Activity {
         });
 
         try{
-            conmanager=new ServerConnection(getResources().getString(R.string.Server),getResources().getInteger(R.integer.serverPort),getIntent().getExtras().getString("loginToken"),(TextView) findViewById(R.id.Messages));
+            TextView imout=(TextView) findViewById(R.id.Messages);
+            imout.setMovementMethod(new ScrollingMovementMethod());
+            conmanager=new ServerConnection(getResources().getString(R.string.Server),getResources().getInteger(R.integer.serverPort),getIntent().getExtras().getString("loginToken"),imout);
             conmanager.start();
         }
 
