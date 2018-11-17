@@ -7,8 +7,8 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
-import net.ddns.gingerpi.chessboardnetServer.ChessPacket;
-import static net.ddns.gingerpi.chessboardnetServer.ChessPacket.messageType.*;
+import net.ddns.gingerpi.chessboardnetCommon.ChessPacket;
+import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.*;
 
 public class ServerConnection extends Thread {
     Socket mycon;
