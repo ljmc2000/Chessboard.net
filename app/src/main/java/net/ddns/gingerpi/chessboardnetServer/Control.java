@@ -1,10 +1,12 @@
 package net.ddns.gingerpi.chessboardnetServer;
-import static net.ddns.gingerpi.chessboardnetServer.ChessPacket.messageType.*;
 import java.net.*;
 import java.io.*;
 import org.bson.*;
 import com.mongodb.client.*;
 import com.mongodb.MongoClient;
+
+import  net.ddns.gingerpi.chessboardnetCommon.*;
+import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.*;
 
 class Control
 {

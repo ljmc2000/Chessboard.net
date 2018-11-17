@@ -1,4 +1,4 @@
-package net.ddns.gingerpi.chessboardnetServer;
+package net.ddns.gingerpi.chessboardnetCommon;
 import java.io.Serializable;
 
 public class ChessPacket implements Serializable

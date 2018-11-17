@@ -7,7 +7,8 @@ import com.mongodb.client.*;
 import com.mongodb.MongoClient;
 import com.mongodb.BasicDBObject;
 
-import static net.ddns.gingerpi.chessboardnetServer.ChessPacket.messageType.*;
+import net.ddns.gingerpi.chessboardnetCommon.*;
+import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.*;
 
 class ChessGameInstance extends Thread
 {
