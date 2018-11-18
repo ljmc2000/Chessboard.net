@@ -19,7 +19,7 @@ class UserConnection extends Thread
 	ObjectOutputStream out;
 	ObjectInputStream in;
 	MongoDatabase db;
-	ChessPacket message;
+	ChessPacket messageIn,messageOut;
 
 	public UserConnection(Socket s,ObjectOutputStream out, ObjectInputStream in,ObjectId opponent,MongoDatabase db)
 	{
@@ -30,48 +30,45 @@ class UserConnection extends Thread
 		this.db=db;
 	}
 
-	public boolean putMessage(ChessPacket message)
+	public void putMessage(ChessPacket message)
 	{
-		try
-		{
-			out.writeObject(message);
-			return true;
-		}
-
-		catch (Exception e)
-		{
-			return false;
-		}
+		this.messageOut=message;
 	}
 
 	public void run()
 	{
 		try
 		{
+			messageOut=new ChessPacket(ack);
+
 			connection: while(true)
 			{
-				message=(ChessPacket) in.readObject();
 				//deal with the server side stuff
-				switch(message.getHeader())
+				messageIn=(ChessPacket) in.readObject();
+
+				switch(messageIn.getHeader())
 				{
 					case ack:
 					{
-						out.writeObject(message);
+						out.writeObject(messageOut);
+						if(messageOut.getHeader() != ack)
+							this.messageOut=new ChessPacket(ack);
 						break;
 					}
 
 					case im:
 					{
 						UserConnection otherPlayer = Control.clients.get(opponent);
-						otherPlayer.putMessage(message);
+						otherPlayer.putMessage(messageIn);
+						out.writeObject(new ChessPacket(ack));
 						break;
 					}
 
 					case end:
 					{
-						System.out.println("user has disconnected; Reason: "+message.getMessage());
-						out.writeObject(message);
+						System.out.println("user has disconnected; Reason: "+messageIn.getMessage());
 						s.close();
+						Control.releaseConnection();
 						break connection;
 					}
 				}

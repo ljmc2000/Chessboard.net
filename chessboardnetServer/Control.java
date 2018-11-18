@@ -58,7 +58,7 @@ class Control
 					List<ObjectId> innerfieldsArray= new ArrayList<>();
 					innerfieldsArray.add(userid);
 					Document match=ongoingMatches.find(in("players",innerfieldsArray)).first();
-					ArrayList<ObjectId> players=(ArrayList) match.get("players");
+					ArrayList<ObjectId> players=(ArrayList<ObjectId>) match.get("players");
 					ObjectId opponentid=players.get(0);
 					if (opponentid.toString().equals(userid.toString()))
 						opponentid=players.get(1);
