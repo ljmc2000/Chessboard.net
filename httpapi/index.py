@@ -5,7 +5,6 @@ from bson.objectid import ObjectId
 import bcrypt,secrets,datetime
 
 TOKEN_LEN=32	#how many bytes (characters? citation needed) required for login token
-servers=["192.168.0.1"]	#servers available
 
 app=Flask(__name__)
 db=MongoClient(serverSelectionTimeoutMS=1)
@@ -79,21 +78,55 @@ def lobby():
 	while len(lobby)>1:
 		p1=lobby.popitem()[0]
 		p2=lobby.popitem()[0]
-		lowest=-1
-		for server in servers:
+
+		lowest=99999999	#nice big number, intmax would be better
+		for server in db.servers.distinct("hostname"):
 			players_on_server=db.ongoing_matches.count({"server":server})
-			if players_on_server>lowest:
+			if players_on_server<lowest:
 				lowest=players_on_server
-		db.ongoing_matches.insert({"players":[p1,p2],"server":lowest})
+				freeServer=server
+		db.ongoing_matches.insert({"players":[p1,p2],"server":server})
 
 	return jsonify({"status":0})
 
 @app.route("/getmatch",methods=["POST"])
 def getmatch():
-	token=request.json.get("token")
-	user=db.user_tokens.find_one({"_id":token})
-	userid=user["user_id"]
+	try:
+		token=request.json.get("token")
+		user=db.user_tokens.find_one({"_id":token})
+		userid=user["user_id"]
 
-	returnme=db.ongoing_matches.find_one({"players":{"$in":[userid]}})
-	return app.response_class(response=dumps(returnme),status=200,mimetype="application/json")
+		returnme=db.ongoing_matches.find_one({"players":{"$in":[userid]}})
+		if returnme==None:
+			return jsonify({"status":1})
+		else:
+			returnme["status"]=0
 
+			returnme["players"].remove(userid)
+			returnme["opponent"]=str(returnme["players"][0])
+			returnme.pop("players")
+
+			returnme.pop("_id")
+
+			return app.response_class(response=dumps(returnme),status=200,mimetype="application/json")
+	except:
+		return jsonify({"status":-1})
+
+
+@app.route("/userinfo",methods=["POST"])
+def getUserInfo():
+	try:
+		token=request.json.get("token")
+		userid=ObjectId(request.json.get("userid"))
+
+		if not db.user_tokens.find_one({"_id":token}):
+			return jsonify({"status":1,"message":"Access Prohibited"})
+
+		else:
+			user=db.users.find_one({"_id":userid})
+			user.pop("passhash")
+			user["userid"]=str(user.pop("_id"))
+			user["status"]=0
+			return app.response_class(response=dumps(user),status=200,mimetype="application/json")
+	except:
+		return jsonify({"status":-1})
