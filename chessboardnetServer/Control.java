@@ -2,17 +2,8 @@ package net.ddns.gingerpi.chessboardnetServer;
 import java.net.*;
 import java.io.*;
 
-
-import org.bson.*;
 import org.bson.types.ObjectId;
-import com.mongodb.client.*;
-import com.mongodb.MongoClient;
-import com.mongodb.BasicDBObject;
-import static com.mongodb.client.model.Filters.*;
-
 import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
 
 import  net.ddns.gingerpi.chessboardnetCommon.*;
 import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.*;
@@ -28,12 +19,7 @@ class Control
 		{
 			int port=7000;
 			ServerSocket myServerSocket=new ServerSocket(port);
-
-			MongoClient mongoClient = new MongoClient();
-			MongoDatabase db = mongoClient.getDatabase("ChessboardNet");
-			MongoCollection<Document> userTokens = db.getCollection("user_tokens");
-			MongoCollection<Document> ongoingMatches=db.getCollection("ongoing_matches");
-
+			MongoDataManager db = new MongoDataManager();
 
 			System.out.println("Server listening on port "+port);
 			//for the rest of runtime
@@ -49,22 +35,13 @@ class Control
 
 					//login
 					String token=(String) in.readObject();
-					BasicDBObject fields = new BasicDBObject();
-					fields.put("_id",token);
-					Document user=userTokens.find(fields).first();
-					ObjectId userid=(ObjectId) user.get("user_id");
+					ObjectId userid=db.getUserId(token);
 
 					//get opponent
-					List<ObjectId> innerfieldsArray= new ArrayList<>();
-					innerfieldsArray.add(userid);
-					Document match=ongoingMatches.find(in("players",innerfieldsArray)).first();
-					ArrayList<ObjectId> players=(ArrayList<ObjectId>) match.get("players");
-					ObjectId opponentid=players.get(0);
-					if (opponentid.toString().equals(userid.toString()))
-						opponentid=players.get(1);
+					ObjectId opponentid=db.getOpponentId(userid);
 
-
-					UserConnection pThread = new UserConnection(connection,out,in,opponentid,db);
+					//start the network handler thread for user
+					UserConnection pThread = new UserConnection(connection,out,in,userid,opponentid,db);
 					clients.put(userid,pThread);
 					pThread.start();
 					remainingConnections--;

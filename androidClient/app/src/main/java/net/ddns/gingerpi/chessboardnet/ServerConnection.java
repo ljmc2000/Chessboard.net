@@ -74,7 +74,12 @@ public class ServerConnection extends Thread {
 
                     case end: {
                         out.writeObject(new ChessPacket(end,"AcKSurrender"));
-                        imout.setText("Opponent has surrendered");
+                        imout.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                imout.append("Opponent has surrendered"+"\n");
+                            }
+                        });
                         mycon.close();
                         break;
                     }

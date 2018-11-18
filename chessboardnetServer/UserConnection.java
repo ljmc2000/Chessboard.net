@@ -2,11 +2,7 @@ package net.ddns.gingerpi.chessboardnetServer;
 import java.net.*;
 import java.io.*;
 
-import org.bson.*;
 import org.bson.types.ObjectId;
-import com.mongodb.client.*;
-import com.mongodb.MongoClient;
-import com.mongodb.BasicDBObject;
 
 import net.ddns.gingerpi.chessboardnetCommon.*;
 import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.*;
@@ -14,18 +10,19 @@ import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.*;
 class UserConnection extends Thread
 {
 	Socket s;
-	String userID;
+	ObjectId userID;
 	ObjectId opponent;
 	ObjectOutputStream out;
 	ObjectInputStream in;
-	MongoDatabase db;
+	MongoDataManager db;
 	ChessPacket messageIn,messageOut;
 
-	public UserConnection(Socket s,ObjectOutputStream out, ObjectInputStream in,ObjectId opponent,MongoDatabase db)
+	public UserConnection(Socket s,ObjectOutputStream out, ObjectInputStream in,ObjectId userId,ObjectId opponent,MongoDataManager db)
 	{
 		this.s=s;
 		this.out=out;
 		this.in=in;
+		this.userID=userId;
 		this.opponent=opponent;
 		this.db=db;
 	}
@@ -66,7 +63,13 @@ class UserConnection extends Thread
 
 					case end:
 					{
+						//end the game and record the result
+						db.endGame(opponent,messageIn.getMessage());
+
+						//disconnect other player
 						System.out.println("user has disconnected; Reason: "+messageIn.getMessage());
+						UserConnection otherPlayer = Control.clients.get(opponent);
+						otherPlayer.putMessage(messageIn);
 						s.close();
 						Control.releaseConnection();
 						break connection;
