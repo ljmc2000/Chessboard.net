@@ -71,7 +71,7 @@ def lobby():
 	token=request.json.get("token")
 	user=db.user_tokens.find_one({"_id":token})
 	userid=user["user_id"]
-	if db.ongoing_matches.find_one({"$or":[{"player1":userid},{"player2":userid}]}):	#check they are not already in match
+	if db.ongoing_matches.find_one({"players":{"$in":userid}}):	#check they are not already in match
 		return jsonify({"status":1})
 	lobby[userid]=datetime.datetime.now()
 
@@ -84,7 +84,7 @@ def lobby():
 			players_on_server=db.ongoing_matches.count({"server":server})
 			if players_on_server>lowest:
 				lowest=players_on_server
-		db.ongoing_matches.insert({"player1":p1,"player2":p2,"server":lowest})
+		db.ongoing_matches.insert({"players":[p1,p2],"server":lowest})
 
 	return jsonify({"status":0})
 
@@ -94,6 +94,6 @@ def getmatch():
 	user=db.user_tokens.find_one({"_id":token})
 	userid=user["user_id"]
 
-	returnme=db.ongoing_matches.find_one({"$or":[{"player1":userid},{"player2":userid}]})
+	returnme=db.ongoing_matches.find_one({"players":{"$in":[userid]}})
 	return app.response_class(response=dumps(returnme),status=200,mimetype="application/json")
 

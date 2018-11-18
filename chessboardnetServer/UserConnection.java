@@ -3,6 +3,7 @@ import java.net.*;
 import java.io.*;
 
 import org.bson.*;
+import org.bson.types.ObjectId;
 import com.mongodb.client.*;
 import com.mongodb.MongoClient;
 import com.mongodb.BasicDBObject;
@@ -10,22 +11,37 @@ import com.mongodb.BasicDBObject;
 import net.ddns.gingerpi.chessboardnetCommon.*;
 import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.*;
 
-class ChessGameInstance extends Thread
+class UserConnection extends Thread
 {
 	Socket s;
 	String userID;
-	String opponentUsername;
+	ObjectId opponent;
 	ObjectOutputStream out;
 	ObjectInputStream in;
 	MongoDatabase db;
 	ChessPacket message;
 
-	public ChessGameInstance(Socket s,ObjectOutputStream out, ObjectInputStream in,MongoDatabase db)
+	public UserConnection(Socket s,ObjectOutputStream out, ObjectInputStream in,ObjectId opponent,MongoDatabase db)
 	{
 		this.s=s;
 		this.out=out;
 		this.in=in;
+		this.opponent=opponent;
 		this.db=db;
+	}
+
+	public boolean putMessage(ChessPacket message)
+	{
+		try
+		{
+			out.writeObject(message);
+			return true;
+		}
+
+		catch (Exception e)
+		{
+			return false;
+		}
 	}
 
 	public void run()
@@ -44,20 +60,10 @@ class ChessGameInstance extends Thread
 						break;
 					}
 
-					case signin:
-					{
-						MongoCollection<Document> user_tokens = db.getCollection("user_tokens");
-						BasicDBObject request=new BasicDBObject();
-						request.put("_id",message.getMessage());
-						Document user=user_tokens.find(request).first();
-						out.writeObject(new ChessPacket(opponent,user.get("user_id").toString()));
-						break;
-					}
-
 					case im:
 					{
-						System.out.println(message.getMessage());
-						out.writeObject(message);
+						UserConnection otherPlayer = Control.clients.get(opponent);
+						otherPlayer.putMessage(message);
 						break;
 					}
 

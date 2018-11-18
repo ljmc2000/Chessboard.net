@@ -1,9 +1,18 @@
 package net.ddns.gingerpi.chessboardnetServer;
 import java.net.*;
 import java.io.*;
+
+
 import org.bson.*;
+import org.bson.types.ObjectId;
 import com.mongodb.client.*;
 import com.mongodb.MongoClient;
+import com.mongodb.BasicDBObject;
+import static com.mongodb.client.model.Filters.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 import  net.ddns.gingerpi.chessboardnetCommon.*;
 import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.*;
@@ -11,22 +20,19 @@ import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.*;
 class Control
 {
 	static int remainingConnections=100;
+	public static HashMap<ObjectId,UserConnection> clients = new HashMap<ObjectId,UserConnection>();
 
 	public static void main(String[] args)
 	{
 		try
 		{
-			final String serverAddress="192.168.0.1";
 			int port=7000;
 			ServerSocket myServerSocket=new ServerSocket(port);
 
 			MongoClient mongoClient = new MongoClient();
 			MongoDatabase db = mongoClient.getDatabase("ChessboardNet");
-			/*
-			MongoCollection<Document> users = db.getCollection("users");
-			Document user=users.find().first();
-			System.out.println(user.toJson());
-			*/
+			MongoCollection<Document> userTokens = db.getCollection("user_tokens");
+			MongoCollection<Document> ongoingMatches=db.getCollection("ongoing_matches");
 
 
 			System.out.println("Server listening on port "+port);
@@ -35,20 +41,32 @@ class Control
 			{
 				if(remainingConnections>0)
 				{
-					Socket connection1 = myServerSocket.accept();
-					System.out.println("Connection from "+connection1.getRemoteSocketAddress());
-					Socket connection2 = myServerSocket.accept();
-					System.out.println("Connection from "+connection2.getRemoteSocketAddress());
-					System.out.println("Beginning Game: "+(remainingConnections-1)+" Connections remain");
-					ObjectOutputStream out1=new ObjectOutputStream(connection1.getOutputStream());
-					ObjectInputStream in1=new ObjectInputStream(connection1.getInputStream());
-					ObjectOutputStream out2=new ObjectOutputStream(connection2.getOutputStream());
-					ObjectInputStream in2=new ObjectInputStream(connection2.getInputStream());
+					//connect
+					Socket connection = myServerSocket.accept();
+					System.out.println("Connection from "+connection.getRemoteSocketAddress());
+					ObjectOutputStream out=new ObjectOutputStream(connection.getOutputStream());
+					ObjectInputStream in=new ObjectInputStream(connection.getInputStream());
 
-					ChessGameInstance p1Thread = new ChessGameInstance(connection1,out2,in1,db);
-					ChessGameInstance p2Thread = new ChessGameInstance(connection2,out1,in2,db);
-					p1Thread.start();
-					p2Thread.start();
+					//login
+					String token=(String) in.readObject();
+					BasicDBObject fields = new BasicDBObject();
+					fields.put("_id",token);
+					Document user=userTokens.find(fields).first();
+					ObjectId userid=(ObjectId) user.get("user_id");
+
+					//get opponent
+					List<ObjectId> innerfieldsArray= new ArrayList<>();
+					innerfieldsArray.add(userid);
+					Document match=ongoingMatches.find(in("players",innerfieldsArray)).first();
+					ArrayList<ObjectId> players=(ArrayList) match.get("players");
+					ObjectId opponentid=players.get(0);
+					if (opponentid.toString().equals(userid.toString()))
+						opponentid=players.get(1);
+
+
+					UserConnection pThread = new UserConnection(connection,out,in,opponentid,db);
+					clients.put(userid,pThread);
+					pThread.start();
 					remainingConnections--;
 				}
 

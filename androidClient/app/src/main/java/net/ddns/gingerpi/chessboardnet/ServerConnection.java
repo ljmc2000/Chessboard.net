@@ -17,8 +17,7 @@ public class ServerConnection extends Thread {
     InetAddress address;
     int port;
     String loginToken;
-    String opponent;    //the opponents UID
-    TextView imout;
+    TextView imout;     //object to display instant messages
     ChessPacket sendMessage;
     ChessPacket recievedMessage;
 
@@ -38,13 +37,10 @@ public class ServerConnection extends Thread {
     public void run() {
         try {
             mycon = new Socket(this.address, port);
-            ObjectOutputStream out = new ObjectOutputStream(mycon.getOutputStream());
-            ObjectInputStream in = new ObjectInputStream(mycon.getInputStream());
+            out = new ObjectOutputStream(mycon.getOutputStream());
+            in = new ObjectInputStream(mycon.getInputStream());
 
-            out.writeObject(new ChessPacket(signin,loginToken));
-            recievedMessage=(ChessPacket) in.readObject();
-            opponent=recievedMessage.getMessage();
-            Log.d("#opponent",opponent.toString());
+            out.writeObject(loginToken);
 
             while (mycon.isConnected()) {
                 if (sendMessage != null) {

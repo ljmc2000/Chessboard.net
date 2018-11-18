@@ -3,7 +3,7 @@ import java.io.Serializable;
 
 public class ChessPacket implements Serializable
 {
-	public enum messageType {ack,chessMove,im,end,fullserver,signin,opponent};
+	public enum messageType {ack,chessMove,im,end,fullserver};
 
 	messageType header;
 	//Chessmove move
