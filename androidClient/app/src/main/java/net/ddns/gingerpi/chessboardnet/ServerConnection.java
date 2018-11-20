@@ -17,15 +17,17 @@ public class ServerConnection extends Thread {
     InetAddress address;
     int port;
     String loginToken;
+    ChessPlayer.OpponentInfo opponentInfo;
     TextView imout;     //object to display instant messages
     ChessPacket sendMessage;
     ChessPacket recievedMessage;
 
-    public ServerConnection(String url,int port,String token,TextView imout){
+    public ServerConnection(String url, int port, ChessPlayer.OpponentInfo opponentInfo, String token, TextView imout){
         try {
             this.imout = imout;
             this.address = InetAddress.getByName(url);
             this.loginToken=token;
+            this.opponentInfo=opponentInfo;
             this.port = port;
         }
 
@@ -66,7 +68,13 @@ public class ServerConnection extends Thread {
                         imout.post(new Runnable() {
                             @Override
                             public void run() {
-                                imout.append(recievedMessage.getMessage()+"\n");
+                                try {
+                                    imout.append(opponentInfo.getUsername() + ": " + recievedMessage.getMessage() + "\n");
+                                }
+
+                                catch(Exception e){
+                                    imout.append("Unknown user: " + recievedMessage.getMessage() + "\n");
+                                }
                             }
                         });
                         break;

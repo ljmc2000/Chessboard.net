@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">Chessboard.Net</string>
     <string name="HTTPAPIurl">http://192.168.0.1:5000</string>
-    <string name="Server">192.168.0.1</string>
-    <integer name="serverPort">7000</integer>
     <string name="DB_NAME">LocalCache.db</string>
     <string name="WelcomeMessage">Welcome to Chessboard.Net</string>
     <string name="loginBanner">You must login or sign up to use Chessboard.Net</string>

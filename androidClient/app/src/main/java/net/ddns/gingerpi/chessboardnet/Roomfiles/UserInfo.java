@@ -1,5 +1,6 @@
 package net.ddns.gingerpi.chessboardnet.Roomfiles;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
@@ -17,5 +18,9 @@ public class UserInfo {
         this.id=id;
         this.username=username;
         this.token=token;
+    }
+
+    public String toString(){
+        return id+" :: "+username;
     }
 }

@@ -3,6 +3,7 @@ package net.ddns.gingerpi.chessboardnet;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
@@ -116,7 +117,7 @@ public class MainActivity extends Activity {
     }
 
     class getOpponentInfo extends Thread{
-        String url=getResources().getString(R.string.HTTPAPIurl);
+        String url=getResources().getString(R.string.HTTPAPIurl)+"/userinfo";
         RequestFuture<JSONObject> future = RequestFuture.newFuture();
         JSONObject payload=new JSONObject();
         JSONObject response;
@@ -137,6 +138,8 @@ public class MainActivity extends Activity {
                         response.getString("userid"),
                         response.getString("username"),
                         null);
+
+                Log.d("#inserting_user",opponent.toString());
 
                 CacheDatabase
                     .getInstance(getApplicationContext())
@@ -171,12 +174,15 @@ public class MainActivity extends Activity {
 
         @Override
         public void run(){
+            int retries=10;
+            Looper.prepare();
             do {
                 matchCheck=new JsonObjectRequest(Request.Method.POST,url,payload,future ,errorListener);
                 queue.add(matchCheck);
                 try {
-                    response=future.get(15,TimeUnit.SECONDS);
+                    response=future.get(3,TimeUnit.SECONDS);
                     status=response.getInt("status");
+                    Thread.sleep(3000);    //minimise number of requests
                 }
 
                 catch (Exception e) {
@@ -184,7 +190,8 @@ public class MainActivity extends Activity {
                     status=-1;
                     break;
                 }
-            } while (status == 1);
+                retries--;
+            } while (status == 1 && retries>0);
 
             switch(status){
                 case 0: {
@@ -205,9 +212,57 @@ public class MainActivity extends Activity {
                     break;
                 }
 
+                case 1: {
+                    Toast.makeText(getApplicationContext(), "Timed out waiting for opponent", Toast.LENGTH_SHORT);
+                    break;
+                }
                 case -1: {
-                    Looper.prepare();
                     Toast.makeText(getApplicationContext(), "Error communicating with the lobby", Toast.LENGTH_SHORT);
+                    break;
+                }
+            }
+        }
+    }
+
+    class JoinLobby extends Thread{
+
+        @Override
+        public void run() {
+            Looper.prepare();
+            int status;
+            String url = getResources().getString(R.string.HTTPAPIurl) + "/lobby";
+            JSONObject payload = new JSONObject();
+            JSONObject response;
+            RequestFuture<JSONObject> future = RequestFuture.newFuture();
+
+            try {
+                payload.put("token", loginToken);
+                JsonObjectRequest lobby = new JsonObjectRequest(Request.Method.POST, url, payload, future, errorListener);
+                queue.add(lobby);
+                response = future.get(5,TimeUnit.SECONDS);
+                status = response.getInt("status");
+            }
+
+            catch (Exception e) {
+                status=-1;
+                Log.e("#JsonError", e.toString());
+            }
+
+            switch (status) {
+                case 0: {
+                    Toast.makeText(getApplicationContext(), "Queueing for match", Toast.LENGTH_SHORT).show();
+                    new MatchChecker().start();
+                    break;
+                }
+
+                case 1: {
+                    Toast.makeText(getApplicationContext(), "already in Match", Toast.LENGTH_SHORT).show();
+                    new MatchChecker().start();
+                    break;
+                }
+
+                case -1: {
+                    Toast.makeText(getApplicationContext(), "Error connecting to the match making system", Toast.LENGTH_SHORT).show();
                     break;
                 }
             }
@@ -234,47 +289,13 @@ public class MainActivity extends Activity {
     }
 
     public void joinLobby(View view){
-        String url=getResources().getString(R.string.HTTPAPIurl)+"/lobby";
-        JSONObject payload=new JSONObject();
-        try{
-            payload.put("token",loginToken);
-        }
-
-        catch (Exception e){
-            Log.e("#JsonError",e.toString());
-        }
-
-        Response.Listener lobbyResponseListener = new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    int status = response.getInt("status");
-
-                    switch (status) {
-                        case 0: {
-                            Toast.makeText(getApplicationContext(), "Queueing for match", Toast.LENGTH_SHORT).show();
-                            break;
-                        }
-
-                        case 1: {
-                            Toast.makeText(getApplicationContext(), "already in Match", Toast.LENGTH_SHORT).show();
-                            break;
-                        }
-                    }
-                } catch (Exception e) {
-                    Log.e("#HTTPAPI", e.toString());
-                }
-            }
-        };
-
-        JsonObjectRequest lobby=new JsonObjectRequest(Request.Method.POST,url,payload,lobbyResponseListener ,errorListener);
-        queue.add(lobby);
-        new MatchChecker().start();
+        new JoinLobby().start();
     }
 
     public void startGame(String hostname,int port){
         Intent startgame=new Intent(this,ChessPlayer.class);
         startgame.putExtra("loginToken", loginToken);
+        startgame.putExtra("opponentid",opponentid);
         startgame.putExtra("hostname", hostname);
         startgame.putExtra("port",port);
         startActivity(startgame);

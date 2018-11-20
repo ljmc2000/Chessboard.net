@@ -8,6 +8,9 @@ public interface UserInfoDao {
     @Query("Select * from userinfo where token not null")
     public UserInfo fetch();
 
+    @Query("select * from userinfo where (id = :id)")
+    public UserInfo getOpponentInfo(String id);
+
     @Insert
     public void insert(UserInfo userinfo);
 
