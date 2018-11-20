@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -14,19 +15,25 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
 
 import net.ddns.gingerpi.chessboardnet.Roomfiles.CacheDatabase;
 import net.ddns.gingerpi.chessboardnet.Roomfiles.UserInfo;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.concurrent.TimeUnit;
+
 
 public class MainActivity extends Activity {
 
     RequestQueue queue;
     String loginToken="";
-    String server="";
-    String opponent="";
+    String serverHostname="";
+    int serverPort;
+    String opponentid="";
 
     public class GetUserInfo extends Thread {
         Context context;
@@ -108,6 +115,105 @@ public class MainActivity extends Activity {
         loginToken=checkLogin();
     }
 
+    class getOpponentInfo extends Thread{
+        String url=getResources().getString(R.string.HTTPAPIurl);
+        RequestFuture<JSONObject> future = RequestFuture.newFuture();
+        JSONObject payload=new JSONObject();
+        JSONObject response;
+        UserInfo opponent;
+
+        @Override
+        public void run(){
+            try{
+                payload.put("token",loginToken);
+                payload.put("userid",opponentid);
+
+                JsonObjectRequest opponentInfo=new JsonObjectRequest(Request.Method.POST,url,payload,future ,errorListener);
+                queue.add(opponentInfo);
+                response=future.get(15,TimeUnit.SECONDS);
+
+                //put into database
+                opponent=new UserInfo(
+                        response.getString("userid"),
+                        response.getString("username"),
+                        null);
+
+                CacheDatabase
+                    .getInstance(getApplicationContext())
+                    .getUserInfoDao()
+                    .insert(opponent);
+            }
+            catch (JSONException e) {
+                Log.e("#JsonError",e.toString());
+            }
+            catch (Exception e){
+                Log.e("#HTTPAPI",e.toString());
+            }
+        }
+    }
+
+    class MatchChecker extends Thread{
+        String url=getResources().getString(R.string.HTTPAPIurl)+"/getmatch";
+        int status=0;
+
+        JSONObject payload=new JSONObject();
+        JSONObject response;
+        RequestFuture<JSONObject> future = RequestFuture.newFuture();
+        JsonObjectRequest matchCheck;
+
+        public MatchChecker(){
+            try {
+                payload.put("token",loginToken);
+            } catch (JSONException e) {
+                Log.e("#JsonError",e.toString());
+            }
+        }
+
+        @Override
+        public void run(){
+            do {
+                matchCheck=new JsonObjectRequest(Request.Method.POST,url,payload,future ,errorListener);
+                queue.add(matchCheck);
+                try {
+                    response=future.get(15,TimeUnit.SECONDS);
+                    status=response.getInt("status");
+                }
+
+                catch (Exception e) {
+                    Log.e("#HTTPAPI",e.toString());
+                    status=-1;
+                    break;
+                }
+            } while (status == 1);
+
+            switch(status){
+                case 0: {
+                    try {
+                        serverHostname=response.getString("hostname");
+                        serverPort=response.getInt("port");
+                        opponentid=response.getString("opponentid");
+                        //get opponent info
+                        new getOpponentInfo().start();
+                        //connect to server
+                        startGame(serverHostname,serverPort);
+                    }
+
+                    catch(Exception e){
+                        Log.e("#HTTPAPI", e.toString());
+                    }
+
+                    break;
+                }
+
+                case -1: {
+                    Looper.prepare();
+                    Toast.makeText(getApplicationContext(), "Error communicating with the lobby", Toast.LENGTH_SHORT);
+                    break;
+                }
+            }
+        }
+    }
+
     public void logout(View view) {
         DeleteUserInfo request=new DeleteUserInfo(getApplicationContext());
         request.start();
@@ -127,7 +233,7 @@ public class MainActivity extends Activity {
         startActivity(login);
     }
 
-    public void getGame(View view){
+    public void joinLobby(View view){
         String url=getResources().getString(R.string.HTTPAPIurl)+"/lobby";
         JSONObject payload=new JSONObject();
         try{
@@ -163,11 +269,14 @@ public class MainActivity extends Activity {
 
         JsonObjectRequest lobby=new JsonObjectRequest(Request.Method.POST,url,payload,lobbyResponseListener ,errorListener);
         queue.add(lobby);
+        new MatchChecker().start();
     }
 
-    public void startGame(View view){
+    public void startGame(String hostname,int port){
         Intent startgame=new Intent(this,ChessPlayer.class);
         startgame.putExtra("loginToken", loginToken);
+        startgame.putExtra("hostname", hostname);
+        startgame.putExtra("port",port);
         startActivity(startgame);
     }
 
@@ -188,7 +297,7 @@ public class MainActivity extends Activity {
 
         else {
             //once logged in
-            TextView usernameBox = (TextView) findViewById(R.id.usernameBox);
+            TextView usernameBox = findViewById(R.id.usernameBox);
             usernameBox.setText("logged in as " + request.getUsername());
         }
 

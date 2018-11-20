@@ -38,7 +38,8 @@ public class ChessPlayer extends Activity {
         try{
             TextView imout=(TextView) findViewById(R.id.Messages);
             imout.setMovementMethod(new ScrollingMovementMethod());
-            conmanager=new ServerConnection(getResources().getString(R.string.Server),getResources().getInteger(R.integer.serverPort),getIntent().getExtras().getString("loginToken"),imout);
+            Bundle extras=getIntent().getExtras();
+            conmanager=new ServerConnection(extras.getString("hostname"),extras.getInt("port"),extras.getString("loginToken"),imout);
             conmanager.start();
         }
 

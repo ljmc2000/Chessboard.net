@@ -80,11 +80,12 @@ def joinLobby():
 		p2=lobby.popitem()[0]
 
 		lowest=99999999	#nice big number, intmax would be better
-		for server in db.servers.distinct("hostname"):
+		for server in db.servers.distinct("_id"):
 			players_on_server=db.ongoing_matches.count({"server":server})
 			if players_on_server<lowest:
 				lowest=players_on_server
 				freeServer=server
+
 		db.ongoing_matches.insert({"players":[p1,p2],"server":server})
 
 	return jsonify({"status":0})
@@ -102,8 +103,12 @@ def getmatch():
 		else:
 			returnme["status"]=0
 
+			server=db.servers.find_one(returnme.pop("server"))
+			returnme["hostname"]=server["hostname"]
+			returnme["port"]=server["port"]
+
 			returnme["players"].remove(userid)
-			returnme["opponent"]=str(returnme["players"][0])
+			returnme["opponentid"]=str(returnme["players"][0])
 			returnme.pop("players")
 
 			returnme.pop("_id")
