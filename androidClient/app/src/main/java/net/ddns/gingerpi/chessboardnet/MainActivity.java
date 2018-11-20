@@ -3,7 +3,6 @@ package net.ddns.gingerpi.chessboardnet;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
@@ -245,7 +244,7 @@ public class MainActivity extends Activity {
 
             catch (Exception e) {
                 status=-1;
-                Log.e("#JsonError", e.toString());
+                Log.e("#LobbyError", e.toString());
             }
 
             switch (status) {
