@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -22,7 +23,10 @@ import org.json.JSONObject;
 
 public class MainActivity extends Activity {
 
+    RequestQueue queue;
     String loginToken="";
+    String server="";
+    String opponent="";
 
     public class GetUserInfo extends Thread {
         Context context;
@@ -95,6 +99,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         loginToken=checkLogin();
+        queue=Volley.newRequestQueue(this);
     }
 
     @Override
@@ -116,11 +121,48 @@ public class MainActivity extends Activity {
             Log.e("#jsonerror",ex.toString());
         }
         JsonObjectRequest logout=new JsonObjectRequest(Request.Method.POST,url,payload,null ,errorListener);
-        RequestQueue queue = Volley.newRequestQueue(this);
         queue.add(logout);
 
         Intent login = new Intent(this,Login.class);
         startActivity(login);
+    }
+
+    public void getGame(View view){
+        String url=getResources().getString(R.string.HTTPAPIurl)+"/lobby";
+        JSONObject payload=new JSONObject();
+        try{
+            payload.put("token",loginToken);
+        }
+
+        catch (Exception e){
+            Log.e("#JsonError",e.toString());
+        }
+
+        Response.Listener lobbyResponseListener = new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    int status = response.getInt("status");
+
+                    switch (status) {
+                        case 0: {
+                            Toast.makeText(getApplicationContext(), "Queueing for match", Toast.LENGTH_SHORT).show();
+                            break;
+                        }
+
+                        case 1: {
+                            Toast.makeText(getApplicationContext(), "already in Match", Toast.LENGTH_SHORT).show();
+                            break;
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.e("#HTTPAPI", e.toString());
+                }
+            }
+        };
+
+        JsonObjectRequest lobby=new JsonObjectRequest(Request.Method.POST,url,payload,lobbyResponseListener ,errorListener);
+        queue.add(lobby);
     }
 
     public void startGame(View view){

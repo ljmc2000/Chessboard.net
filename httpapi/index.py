@@ -59,7 +59,7 @@ def destroy_login_token():
 
 lobby={}	#in the from {"uid","last time they sent a request"}
 @app.route("/lobby",methods=["POST"])
-def lobby():
+def joinLobby():
 	'''add player to the user to the lobby for 60 seconds'''
 	#remove players from queue if they stop sending join requests
 	for person in lobby:
@@ -70,7 +70,7 @@ def lobby():
 	token=request.json.get("token")
 	user=db.user_tokens.find_one({"_id":token})
 	userid=user["user_id"]
-	if db.ongoing_matches.find_one({"players":{"$in":userid}}):	#check they are not already in match
+	if db.ongoing_matches.find_one({"players":{"$in":[userid]}}):	#check they are not already in match
 		return jsonify({"status":1})
 	lobby[userid]=datetime.datetime.now()
 
