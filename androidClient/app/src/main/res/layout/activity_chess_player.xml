@@ -19,6 +19,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="90"
+        android:background="#000000"
+        android:padding="1dp"
         android:scrollbars="none"
         android:src="@drawable/chessboard" />
 
