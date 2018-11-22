@@ -7,6 +7,8 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -65,18 +67,8 @@ public class ChessPlayer extends Activity {
         int color2=getResources().getColor(R.color.chessTileLight);
         final ChessBoardAdapter chessBoardAdapter=new ChessBoardAdapter(this,color1,color2,squareSize);
         chessBoard.setAdapter(chessBoardAdapter);
-        chessBoard.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
-            public void onItemClick(AdapterView<?> parent, View v, int position, long id)
-            {
-                // make and display the toast message here
-                Context button_context = getApplicationContext();
-                CharSequence b1_text = chessBoardAdapter.getItem(position).toString();
-                int display_for = Toast.LENGTH_SHORT;
-                Toast my_toast = Toast.makeText(button_context,b1_text,display_for);
-                my_toast.show();
-            }
-        });
+        chessBoard.setOnItemClickListener(chessBoardAdapter.getOnItemClickListener);
+        chessBoard.setColumnWidth(squareSize);
 
         //deal with instant messages
         imout=(TextView) findViewById(R.id.Messages);
