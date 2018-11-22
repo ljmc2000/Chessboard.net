@@ -3,6 +3,6 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#ff4081</color>
-    <color name="chessTileDark">#FF7FED</color>
-    <color name="chessTileLight">#C5C0E6</color>
+    <color name="chessTileDark">#4900BA</color>
+    <color name="chessTileLight">#CCCCCC</color>
 </resources>

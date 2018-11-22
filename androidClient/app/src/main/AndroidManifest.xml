@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Login" />
-        <activity android:name=".ChessPlayer"></activity>
+        <activity android:name=".ChessPlayer" android:screenOrientation="landscape"></activity>
     </application>
 
 </manifest>
