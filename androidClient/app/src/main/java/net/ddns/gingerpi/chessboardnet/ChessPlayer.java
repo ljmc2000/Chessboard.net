@@ -1,13 +1,17 @@
 package net.ddns.gingerpi.chessboardnet;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import net.ddns.gingerpi.chessboardnet.Roomfiles.CacheDatabase;
 import net.ddns.gingerpi.chessboardnet.Roomfiles.UserInfo;
@@ -43,6 +47,8 @@ public class ChessPlayer extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chess_player);
+
+        //get opponent info from room
         OpponentInfo opponentInfo=new OpponentInfo(getIntent().getExtras().getString("opponentid"));
         opponentInfo.start();
         try {
@@ -51,6 +57,28 @@ public class ChessPlayer extends Activity {
             e.printStackTrace();
         }
 
+        //generate chessboard
+        final GridView chessBoard = (GridView) findViewById(R.id.chessboard);
+        int squareSize=this.getWindowManager().getDefaultDisplay().getWidth()/16;
+        Log.d("#squaresize",Integer.toString(squareSize));
+        int color1=getResources().getColor(R.color.chessTileDark);
+        int color2=getResources().getColor(R.color.chessTileLight);
+        final ChessBoardAdapter chessBoardAdapter=new ChessBoardAdapter(this,color1,color2,squareSize);
+        chessBoard.setAdapter(chessBoardAdapter);
+        chessBoard.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id)
+            {
+                // make and display the toast message here
+                Context button_context = getApplicationContext();
+                CharSequence b1_text = chessBoardAdapter.getItem(position).toString();
+                int display_for = Toast.LENGTH_SHORT;
+                Toast my_toast = Toast.makeText(button_context,b1_text,display_for);
+                my_toast.show();
+            }
+        });
+
+        //deal with instant messages
         imout=(TextView) findViewById(R.id.Messages);
         EditText edittext = (EditText) findViewById(R.id.messageInput);
         edittext.setOnKeyListener(new View.OnKeyListener() {
