@@ -41,6 +41,8 @@ public class Pawn extends ChessPiece
 
 		switch(difference)
 		{
+			case 020:
+				return moveCount==0 && !attacking;
 			case 010:
 				return !attacking;
 
