@@ -1,6 +1,7 @@
 package net.ddns.gingerpi.chessboardnet;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
@@ -22,7 +23,8 @@ public class ChessBoardAdapter extends BaseAdapter{
         this.tileColor=new int[]{color1,color2};
         this.tileSize=tileSize;
         for(int i=0; i<dimensions; i++)
-            squareContents[i]=i;
+            squareContents[i]=-1;
+        squareContents[0]=R.drawable.doodle_black_pawn;
     }
 
     @Override
@@ -47,6 +49,8 @@ public class ChessBoardAdapter extends BaseAdapter{
             square.setBackgroundColor(tileColor[position%2]);
         else
             square.setBackgroundColor(tileColor[(position+1)%2]);
+        if(squareContents[position]!=-1)
+            square.setImageDrawable(mContext.getResources().getDrawable(squareContents[position], null));
 
         square.setLayoutParams(new ViewGroup.LayoutParams(tileSize,tileSize));
         square.setPadding(0,0,0,0);
