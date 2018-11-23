@@ -30,7 +30,7 @@ public class Pawn extends ChessPiece
 	}
 
 	@Override
-	public boolean checkLegal(int chessMove)
+	public boolean checkLegal(int chessMove,boolean attacking)
 	{
 		if(color)
 			chessMove=invertMove(chessMove);
@@ -39,16 +39,17 @@ public class Pawn extends ChessPiece
 		int destination=chessMove%64;
 		int difference=destination-origin;
 
-		System.out.println(difference);
-
-		if(difference==010)
-			return true;
-		else if(difference==010+1 || difference==010-1)
+		switch(difference)
 		{
-			System.out.println("please implement captureing pieces for pawns");
-			return divineInterventionCheck(chessMove);
-		}
+			case 010:
+				return !attacking;
 
-		return false;
+			case 007:	//010-1
+			case 011:	//010+1
+				return divineInterventionCheck(chessMove) && attacking;
+
+			default:
+				return false;
+		}
 	}
 }

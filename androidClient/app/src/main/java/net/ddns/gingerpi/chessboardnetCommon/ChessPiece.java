@@ -9,8 +9,8 @@ public abstract class ChessPiece
 	int killCount;
 	boolean color;	//true for one player, false for the other
 
-	public abstract ArrayList<Integer> getLegalMoves(int position);	//list all possible moves the piece could take from it's current position
-	public abstract boolean checkLegal(int chessMove);		//check a move is chess legal
+	public abstract ArrayList<Integer> getLegalMoves(int position);		//list all possible moves the piece could take from it's current position
+	public abstract boolean checkLegal(int chessMove,boolean attacking);	//check a move is chess legal
 
 	public ChessPiece(boolean color)
 	{
@@ -53,9 +53,9 @@ public abstract class ChessPiece
 		int origin=chessMove/64;
 		int destination=chessMove%64;
 
-		if(origin%2 == destination%2)
-			return true;
-		else
-			return false;
+		origin=(origin/8)+(origin%8);
+		destination=(destination/8)+(destination%8);
+
+		return origin%2 == destination%2;
 	}
 }
