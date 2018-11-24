@@ -9,8 +9,8 @@ public abstract class ChessPiece
 	int killCount;
 	boolean color;	//true for one player, false for the other
 
-	public abstract ArrayList<Integer> getLegalMoves(int position);		//list all possible moves the piece could take from it's current position
-	public abstract boolean checkLegal(int chessMove,boolean attacking);	//check a move is chess legal
+	public abstract ArrayList<Integer> getLegalMoves(int position,ChessBoard map);	//list all possible moves the piece could take from it's current position
+	public abstract boolean checkLegal(int chessMove,boolean attacking);		//check a move is chess legal
 
 	public ChessPiece(boolean color)
 	{
@@ -36,6 +36,11 @@ public abstract class ChessPiece
 	public void addMove()
 	{
 		moveCount++;
+	}
+
+	public boolean getColor()
+	{
+		return color;
 	}
 
 	public int invertMove(int chessMove)	//return the same move if made from the other side of the board

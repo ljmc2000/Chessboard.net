@@ -14,7 +14,7 @@ public class Rook extends ChessPiece
 	}
 
 	@Override
-        public ArrayList<Integer> getLegalMoves(int position)//,ChessBoard chessBoard)
+        public ArrayList<Integer> getLegalMoves(int position,ChessBoard chessBoard)
 	{
 		ArrayList<Integer> returnme=new ArrayList<Integer>();
 		return returnme;

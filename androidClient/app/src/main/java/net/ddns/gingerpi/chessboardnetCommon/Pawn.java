@@ -14,14 +14,31 @@ public class Pawn extends ChessPiece
 	}
 
 	@Override
-	public ArrayList<Integer> getLegalMoves(int position)//,ChessBoard chessBoard)
+	public ArrayList<Integer> getLegalMoves(int position,ChessBoard chessBoard)
 	{
 		ArrayList<Integer> returnme=new ArrayList<Integer>();
 
+		int direction;
 		if(color)
-			returnme.add(position+010);
+			direction=1;
 		else
-			returnme.add(position-010);
+			direction=-1;
+
+
+		returnme.add(position+(010*direction));
+		if(moveCount==0)
+			returnme.add(position+(020*direction));
+
+		ChessPiece target=chessBoard.getItem(position+011);	//010+1
+		if(target!=null)
+			if(divineInterventionCheck((position*0100)+(position+011)))
+				if(target.getColor()!=color)
+					 returnme.add(position+011);
+		target=chessBoard.getItem(position+007);	//010-1
+		if(target!=null)
+			if(divineInterventionCheck((position*0100)+(position+007)))
+				if(target.getColor()!=color)
+					returnme.add(position+011);
 
 		return returnme;
 	}
