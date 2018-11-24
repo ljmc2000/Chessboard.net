@@ -24,12 +24,12 @@ public class Knight extends ChessPiece
 			if(x<6) returnme.add(position+012);
 		if(y<6)
 			if(x>0) returnme.add(position+015);
-			if(x>7) returnme.add(position+017);
+			if(x<7) returnme.add(position+017);
 		if(y>1)
 			if(x<6) returnme.add(position-006);
 			if(x>1) returnme.add(position-0012);
 		if(y>0)
-			if(x>7) returnme.add(position-015);
+			if(x<7) returnme.add(position-015);
 			if(x>0) returnme.add(position-017);
 
 		return returnme;
@@ -40,8 +40,8 @@ public class Knight extends ChessPiece
 		int origin=chessMove/64;
 		int destination=chessMove%64;
 		int difference=destination-origin;
-		int x=difference/64;
-		int y=difference%64;
+		int x=origin/8;
+		int y=origin%8;
 
 		switch(difference)
 		{
@@ -52,13 +52,13 @@ public class Knight extends ChessPiece
 			case  015:	//+2-1
 				return x>0 && y<6;
 			case  017:	//+2+1
-				return x>7 && y<6;
+				return x<7 && y<6;
 			case -006:	//-1+2
 				return x<6 && y>1;
 			case -012:	//-1-2
 				return x>1 && y>1;
 			case -015:	//-2+1
-				return x>7 && y>0;
+				return x<7 && y>0;
 			case -017:	//-2-1
 				return x>0 && y>0;
 		}
