@@ -5,14 +5,14 @@ public class ChessBoard
 {
 	boolean whosTurn=false;	//switches every time someone makes a move
 	ChessPiece[] map={
-			new Rook(true),new Knight(true),new Bishop(true),null,null,new Bishop(true),new Knight(true),new Rook(true),
+			new Rook(true),new Knight(true),new Bishop(true),new Queen(true),null,new Bishop(true),new Knight(true),new Rook(true),
 			new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),
 			null,null,null,null,null,null,null,null,
 			null,null,null,null,null,null,null,null,
 			null,null,null,null,null,null,null,null,
 			null,null,null,null,null,null,null,null,
 			new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),
-			new Rook(false),new Knight(false),new Bishop(false),null,null,new Bishop(false),new Knight(false),new Rook(false)
+			new Rook(false),new Knight(false),new Bishop(false),new Queen(false),null,new Bishop(false),new Knight(false),new Rook(false)
 	};
 
 	public ChessPiece getItem(int position)
