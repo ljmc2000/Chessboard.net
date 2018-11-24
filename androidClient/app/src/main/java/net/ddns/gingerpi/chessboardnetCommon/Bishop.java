@@ -22,47 +22,47 @@ public class Bishop extends ChessPiece
 		final ArrayList<Integer> returnme=new ArrayList<Integer>();
 
 		//down right
-		i=position;
+		i=position+011;	//+1+1
 		while(i<64)
 		{
-			i+=011;	//+1+1
 			if(!divineInterventionCheck(sPosition+i))
 				break;
 			if(!chessBoard.addMoveToList(returnme,i,color))
 				break;
+			i+=011;
 		}
 
 		//down left
-		i=position;
+		i=position+007;	//+1-1
 		while(i<64)
 		{
-			i+=007;	//+1-1
 			if(!divineInterventionCheck(sPosition+i))
 				break;
 			if(!chessBoard.addMoveToList(returnme,i,color))
 				break;
+			i+=007;
 		}
 
 		//up right
-		i=position;
+		i=position-007;	//-1+1
 		while(i>0)
 		{
-			i-=007;	//-1+1
 			if(!divineInterventionCheck(sPosition+i))
 				break;
 			if(!chessBoard.addMoveToList(returnme,i,color))
 				break;
+			i-=007;
 		}
 
 		//up left
-		i=position;
+		i=position-011;	//-1-1
 		while(i>0)
 		{
-			i-=011;	//-1-1
 			if(!divineInterventionCheck(sPosition+i))
 				break;
 			if(!chessBoard.addMoveToList(returnme,i,color))
 				break;
+			i-=011;
 		}
 
 		return returnme;
