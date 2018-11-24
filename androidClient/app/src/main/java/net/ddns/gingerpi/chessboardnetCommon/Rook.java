@@ -73,4 +73,12 @@ public class Rook extends ChessPiece
 
 		return ((origin/8) == (destination/8)) || ((origin%8) == (destination%8));
 	}
+
+	public String toString()
+	{
+		if(color)
+			return "R";
+		else
+			return "r";
+	}
 }

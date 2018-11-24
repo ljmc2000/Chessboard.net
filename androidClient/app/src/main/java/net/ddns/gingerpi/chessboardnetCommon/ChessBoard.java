@@ -5,7 +5,7 @@ public class ChessBoard
 {
 	ChessPiece[] map={
 			new Rook(true),null,null,null,null,null,null,new Rook(true),
-			null,new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),
+			new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),
 			null,null,null,null,null,null,null,null,
 			null,null,null,null,null,null,null,null,
 			null,null,null,null,null,null,null,null,
@@ -38,5 +38,26 @@ public class ChessBoard
 		{
 			return false;
 		}
+	}
+
+	public String toString()
+	{
+		String returnme="";
+		int i,j;
+
+		for(i=0; i<0100; i+=010)
+		{
+			for(j=0; j<8; j++)
+			{
+				if (map[i+j]!=null)
+					returnme+=map[i+j].toString();
+				else
+					returnme+=" ";
+			}
+
+			returnme+="\n";
+		}
+
+		return returnme;
 	}
 }
