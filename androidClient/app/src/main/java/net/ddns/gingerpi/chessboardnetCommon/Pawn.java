@@ -1,7 +1,6 @@
 package net.ddns.gingerpi.chessboardnetCommon;
 import java.util.ArrayList;
 
-//this class uses base 8 mathamatics as it makes dealing with chess co-ordinates easier
 public class Pawn extends ChessPiece
 {
 	public Pawn(boolean color)
@@ -9,11 +8,9 @@ public class Pawn extends ChessPiece
 		super(color);
 	}
 
-	public Pawn(boolean color,int moveCount,int killCount)
+	public Pawn(boolean color,int moveCount, int killCount)
 	{
-		super(color);
-		this.moveCount=moveCount;
-		this.killCount=killCount;
+		super(color,moveCount,killCount);
 	}
 
 	@Override

@@ -20,6 +20,14 @@ public abstract class ChessPiece
 		this.color=color;
 	}
 
+	public ChessPiece(boolean color,int moveCount, int killCount)
+	{
+		this.name="steve";
+		this.moveCount=0;
+		this.killCount=0;
+		this.color=color;
+	}
+
 	public void addKill()
 	{
 		killCount++;
