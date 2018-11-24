@@ -17,20 +17,26 @@ public class Knight extends ChessPiece
 	public ArrayList<Integer> getLegalMoves(int position,ChessBoard chessBoard)
 	{
 		final ArrayList<Integer> returnme=new ArrayList<Integer>();
-		int x=position/64;
-		int y=position%64;
+		int x=position%8;
+		int y=position/8;
+
+		System.out.print(x);
+		System.out.print(",");
+		System.out.print(y);
+		System.out.println();
+
 		if(y<7)
-			if(x>1) returnme.add(position+006);
-			if(x<6) returnme.add(position+012);
+			if(x>1 && position+006<64) returnme.add(position+006);
+			if(x<6 && position+012<64) returnme.add(position+012);
 		if(y<6)
-			if(x>0) returnme.add(position+015);
-			if(x<7) returnme.add(position+017);
+			if(x>0 && position+017<64) returnme.add(position+017);
+			if(x<7 && position+021<64) returnme.add(position+021);
 		if(y>1)
-			if(x<6) returnme.add(position-006);
-			if(x>1) returnme.add(position-0012);
+			if(x<6 && position-006>0) returnme.add(position-006);
+			if(x>1 && position-006>0) returnme.add(position-0012);
 		if(y>0)
-			if(x<7) returnme.add(position-015);
-			if(x>0) returnme.add(position-017);
+			if(x<7 && position-006>0) returnme.add(position-017);
+			if(x>0 && position-006>0) returnme.add(position-021);
 
 		return returnme;
 	}
@@ -40,8 +46,8 @@ public class Knight extends ChessPiece
 		int origin=chessMove/64;
 		int destination=chessMove%64;
 		int difference=destination-origin;
-		int x=origin/8;
-		int y=origin%8;
+		int x=origin%8;
+		int y=origin/8;
 
 		switch(difference)
 		{
@@ -49,17 +55,17 @@ public class Knight extends ChessPiece
 				return x>1 && y<7;
 			case  012:	//+1+2
 				return x<6 && y<7;
-			case  015:	//+2-1
+			case  017:	//+2-1
 				return x>0 && y<6;
-			case  017:	//+2+1
+			case  021:	//+2+1
 				return x<7 && y<6;
 			case -006:	//-1+2
 				return x<6 && y>1;
 			case -012:	//-1-2
 				return x>1 && y>1;
-			case -015:	//-2+1
+			case -017:	//-2+1
 				return x<7 && y>0;
-			case -017:	//-2-1
+			case -021:	//-2-1
 				return x>0 && y>0;
 		}
 
