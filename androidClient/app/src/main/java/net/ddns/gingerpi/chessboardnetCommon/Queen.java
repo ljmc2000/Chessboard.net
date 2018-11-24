@@ -32,7 +32,7 @@ public class Queen extends ChessPiece
 		Rook rook=new Rook(color);
 		Bishop bishop=new Bishop(color);
 
-		return rook.checkLegal(chessMove,attacking) && bishop.checkLegal(chessMove,attacking);
+		return rook.checkLegal(chessMove,attacking) || bishop.checkLegal(chessMove,attacking);
 	}
 
 	public String toString()
