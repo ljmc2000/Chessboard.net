@@ -3,6 +3,7 @@ import java.util.ArrayList;
 
 public class ChessBoard
 {
+	boolean whosTurn=false;	//switches every time someone makes a move
 	ChessPiece[] map={
 			new Rook(true),null,null,null,null,null,null,new Rook(true),
 			new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),
@@ -38,6 +39,41 @@ public class ChessBoard
 		{
 			return false;
 		}
+	}
+
+	public boolean movePiece(int chessMove)
+	{
+		int origin=chessMove/64;
+		int destination=chessMove%64;
+		ChessPiece piece=map[origin];
+		ChessPiece target=map[destination];
+		boolean attacking=false;
+
+		if(piece==null)
+			return false;
+
+		if(piece.getColor() != whosTurn)
+			return false;
+
+		if(target != null)
+			if(piece.getColor() == target.getColor())
+				return false;
+			else
+				attacking=true;
+
+		if(piece.checkLegal(chessMove,attacking))
+		{
+			piece.addMove();
+			if(attacking)
+				piece.addKill();
+			map[destination]=piece;
+			map[origin]=null;
+			whosTurn=!whosTurn;
+
+			return true;
+		}
+
+		return false;
 	}
 
 	public String toString()

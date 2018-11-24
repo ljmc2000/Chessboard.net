@@ -46,7 +46,7 @@ public class Pawn extends ChessPiece
 	@Override
 	public boolean checkLegal(int chessMove,boolean attacking)
 	{
-		if(color)
+		if(!color)
 			chessMove=invertMove(chessMove);
 
 		int origin=chessMove/64;
