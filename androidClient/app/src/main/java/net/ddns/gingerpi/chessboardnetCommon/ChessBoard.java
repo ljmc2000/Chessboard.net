@@ -5,9 +5,7 @@ public class ChessBoard
 {
 	ChessPiece[] map={
 			new Rook(true),null,null,null,null,null,null,new Rook(true),
-			new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),
-			null,null,null,null,null,null,null,null,
-			null,null,null,null,null,null,null,null,
+			null,new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),new Pawn(true),
 			null,null,null,null,null,null,null,null,
 			null,null,null,null,null,null,null,null,
 			null,null,null,null,null,null,null,null,
@@ -19,5 +17,26 @@ public class ChessBoard
 	public ChessPiece getItem(int position)
 	{
 		return map[position];
+	}
+
+	public boolean addMoveToList(ArrayList<Integer> returnme,int position,boolean color)
+	//adds a move to list if the target square is empty or contains an enemy
+	{
+		if(map[position]==null)
+		{
+			returnme.add(position);
+			return true;
+		}
+
+		else if(map[position].getColor() != color)
+		{
+			returnme.add(position);
+			return false;
+		}
+
+		else
+		{
+			return false;
+		}
 	}
 }

@@ -16,9 +16,54 @@ public class Rook extends ChessPiece
 	@Override
         public ArrayList<Integer> getLegalMoves(int position,ChessBoard chessBoard)
 	{
-		ArrayList<Integer> returnme=new ArrayList<Integer>();
+		int i;
+		int stopAt;
+		final ArrayList<Integer> returnme=new ArrayList<Integer>();
+
+		//down
+		i=position;
+		while(i<64)
+		{
+			i+=010;
+			if(!chessBoard.addMoveToList(returnme,i,color))
+				break;
+		}
+
+		//right
+		i=position;
+		stopAt=position/8;
+		stopAt=position*8;
+		stopAt+=8;
+		while(i<stopAt)
+		{
+			i+=001;
+			if(!chessBoard.addMoveToList(returnme,i,color))
+				break;
+		}
+
+		//up
+		i=position;
+		while(i>0)
+		{
+			i-=010;
+			if(!chessBoard.addMoveToList(returnme,i,color))
+				break;
+		}
+
+		//left
+		i=position;
+		stopAt=position/8;
+		stopAt=position*8;
+		while(i>0)
+		{
+			i-=001;
+			if(!chessBoard.addMoveToList(returnme,i,color))
+				break;
+		}
+
 		return returnme;
 	}
+
 
 	@Override
 	public boolean checkLegal(int chessMove,boolean attacking)
