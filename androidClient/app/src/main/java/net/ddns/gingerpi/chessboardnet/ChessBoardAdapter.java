@@ -1,6 +1,9 @@
 package net.ddns.gingerpi.chessboardnet;
 
+import static net.ddns.gingerpi.chessboardnet.ChessSet.chessSet;
+
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,15 +19,18 @@ public class ChessBoardAdapter extends BaseAdapter{
     private int dimensions=64;  //a chessboard is 64 squares large
     private int[] squareContents=new int[dimensions];
     private int[] tileColor;  //an array of 2 colours: eg. black and white
+    private ChessSet p1set;    //icons for player 1's chess set
+    private ChessSet p2set;    //icons for player s's chess set
     int tileSize;
 
-    public ChessBoardAdapter(Context c,int color1,int color2,int tileSize){
+    public ChessBoardAdapter(Context c,int color1,int color2,int tileSize,chessSet set1,chessSet set2){
         mContext=c;
         this.tileColor=new int[]{color1,color2};
         this.tileSize=tileSize;
         for(int i=0; i<dimensions; i++)
             squareContents[i]=-1;
-        //squareContents[0]=R.drawable.doodle_black_pawn;
+        p1set=new ChessSet(mContext, set1);
+        p2set=new ChessSet(mContext, set2);
     }
 
     @Override
@@ -67,6 +73,9 @@ public class ChessBoardAdapter extends BaseAdapter{
             int display_for = Toast.LENGTH_SHORT;
             Toast my_toast = Toast.makeText(button_context,b1_text,display_for);
             my_toast.show();
+
+            squareContents[position]=p1set.getPiece(ChessSet.piece.rook_front);
+            notifyDataSetChanged();
         }
     };
 }
