@@ -1,4 +1,5 @@
 package net.ddns.gingerpi.chessboardnetServer;
+import static net.ddns.gingerpi.chessboardnetCommon.ChessBoard.texturePack;
 
 import org.bson.types.ObjectId;
 import org.bson.*;
@@ -59,6 +60,19 @@ class MongoDataManager
 		if(returnme.toString().equals(userid.toString()))
 			returnme=players.get(1);
 
+		return returnme;
+	}
+
+	public ObjectId getGameId(ObjectId userid)
+	{
+		Document match=onGoingMatches.find(in("players",userid)).first();
+		ObjectId gameId=(ObjectId) match.get("_id");
+		return gameId;
+	}
+
+	public texturePack[] getUserFavourites()
+	{
+		texturePack[] returnme=new texturePack[]{texturePack.white,texturePack.black};
 		return returnme;
 	}
 }

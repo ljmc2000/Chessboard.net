@@ -7,11 +7,13 @@ import java.util.HashMap;
 
 import  net.ddns.gingerpi.chessboardnetCommon.*;
 import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.*;
+import static net.ddns.gingerpi.chessboardnetCommon.ChessBoard.texturePack;
 
 class Control
 {
 	static int remainingConnections=100;
 	public static HashMap<ObjectId,UserConnection> clients = new HashMap<ObjectId,UserConnection>();
+	public static HashMap<ObjectId,ChessBoard> boards = new HashMap<ObjectId,ChessBoard>();
 
 	public static void main(String[] args)
 	{
@@ -40,8 +42,15 @@ class Control
 					//get opponent
 					ObjectId opponentid=db.getOpponentId(userid);
 
+					//setup chessboard
+					ObjectId gameId=db.getGameId(userid);
+					ChessBoard chessBoard=boards.get(gameId);
+					if(chessBoard==null)
+						chessBoard=new ChessBoard(texturePack.black,texturePack.white);
+					boards.put(gameId,chessBoard);
+
 					//start the network handler thread for user
-					UserConnection pThread = new UserConnection(connection,out,in,userid,opponentid,db);
+					UserConnection pThread = new UserConnection(connection,out,in,userid,opponentid,chessBoard,db);
 					clients.put(userid,pThread);
 					pThread.start();
 					remainingConnections--;

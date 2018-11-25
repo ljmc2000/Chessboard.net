@@ -1,13 +1,11 @@
 package net.ddns.gingerpi.chessboardnet;
 
 import static net.ddns.gingerpi.chessboardnetCommon.ChessBoard.texturePack;
+import static net.ddns.gingerpi.chessboardnet.ChessSet.piece.*;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -20,7 +18,7 @@ public class ChessBoardAdapter extends BaseAdapter{
     private int[] squareContents=new int[dimensions];
     private int[] tileColor;  //an array of 2 colours: eg. black and white
     private ChessSet p1set;    //icons for player 1's chess set
-    private ChessSet p2set;    //icons for player s's chess set
+    private ChessSet p2set;    //icons for player 2's chess set
     int tileSize;
 
     public ChessBoardAdapter(Context c,int color1,int color2,int tileSize,texturePack set1,texturePack set2){
@@ -74,8 +72,80 @@ public class ChessBoardAdapter extends BaseAdapter{
             Toast my_toast = Toast.makeText(button_context,b1_text,display_for);
             my_toast.show();
 
-            squareContents[position]=p1set.getPiece(ChessSet.piece.rook_front);
-            notifyDataSetChanged();
+            //squareContents[position]=p1set.getPiece(ChessSet.piece.rook_front);
+            //notifyDataSetChanged();
         }
     };
+
+    public void refreshBoard(String contents){
+        for(int i=0; i<dimensions; i++){
+            switch(contents.charAt(i)){
+                case 'K':{
+                    squareContents[i]=p2set.getPiece(king_front);
+                    break;
+                }
+
+                case 'k':{
+                    squareContents[i]=p1set.getPiece(king_back);
+                    break;
+                }
+
+                case 'Q':{
+                    squareContents[i]=p2set.getPiece(queen_front);
+                    break;
+                }
+
+                case 'q':{
+                    squareContents[i]=p1set.getPiece(queen_back);
+                    break;
+                }
+
+                case 'B':{
+                    squareContents[i]=p2set.getPiece(bishop_front);
+                    break;
+                }
+
+                case 'b':{
+                    squareContents[i]=p1set.getPiece(bishop_back);
+                    break;
+                }
+
+                case 'N':{
+                    squareContents[i]=p2set.getPiece(knight_front);
+                    break;
+                }
+
+                case 'n':{
+                    squareContents[i]=p1set.getPiece(knight_back);
+                    break;
+                }
+
+                case 'R':{
+                    squareContents[i]=p2set.getPiece(rook_front);
+                    break;
+                }
+
+                case 'r':{
+                    squareContents[i]=p1set.getPiece(rook_back);
+                    break;
+                }
+
+                case 'P':{
+                    squareContents[i]=p2set.getPiece(pawn_front);
+                    break;
+                }
+
+                case 'p':{
+                    squareContents[i]=p1set.getPiece(pawn_back);
+                    break;
+                }
+
+                default: {
+                    squareContents[i]=-1;
+                }
+            }
+        }
+
+        notifyDataSetChanged();
+    }
 }

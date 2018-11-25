@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import net.ddns.gingerpi.chessboardnet.Roomfiles.CacheDatabase;
 import net.ddns.gingerpi.chessboardnet.Roomfiles.UserInfo;
+import net.ddns.gingerpi.chessboardnetCommon.ChessBoard;
 
 public class ChessPlayer extends Activity {
 
@@ -64,8 +65,8 @@ public class ChessPlayer extends Activity {
         final GridView chessBoard = (GridView) findViewById(R.id.chessboard);
         int squareSize=this.getWindowManager().getDefaultDisplay().getWidth()/16;
         Log.d("#squaresize",Integer.toString(squareSize));
-        int color1=getResources().getColor(R.color.chessTileDark);
-        int color2=getResources().getColor(R.color.chessTileLight);
+        int color1=getResources().getColor(R.color.chessTileLight);
+        int color2=getResources().getColor(R.color.chessTileDark);
         final ChessBoardAdapter chessBoardAdapter=new ChessBoardAdapter(this,color1,color2,squareSize,texturePack.white,texturePack.black);
         chessBoard.setAdapter(chessBoardAdapter);
         chessBoard.setOnItemClickListener(chessBoardAdapter.getOnItemClickListener);
@@ -89,7 +90,7 @@ public class ChessPlayer extends Activity {
         try{
             imout.setMovementMethod(new ScrollingMovementMethod());
             Bundle extras=getIntent().getExtras();
-            conmanager=new ServerConnection(extras.getString("hostname"),extras.getInt("port"),opponentInfo,extras.getString("loginToken"),imout);
+            conmanager=new ServerConnection(extras.getString("hostname"),extras.getInt("port"),opponentInfo,extras.getString("loginToken"),chessBoardAdapter,imout);
             conmanager.start();
         }
 
@@ -110,5 +111,9 @@ public class ChessPlayer extends Activity {
     public void surrender(View view){
         conmanager.surrender();
         finish();
+    }
+
+    public void refreshBoard(View view){
+        conmanager.refreshBoard();
     }
 }

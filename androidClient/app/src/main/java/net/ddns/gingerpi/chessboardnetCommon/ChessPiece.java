@@ -1,8 +1,9 @@
 //an interface to represent an interface
 package net.ddns.gingerpi.chessboardnetCommon;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public abstract class ChessPiece
+public abstract class ChessPiece implements Serializable
 {
 	String name;
 	int moveCount;

@@ -8,6 +8,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import net.ddns.gingerpi.chessboardnetCommon.ChessBoard;
 import net.ddns.gingerpi.chessboardnetCommon.ChessPacket;
 import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.*;
 
@@ -20,16 +21,19 @@ public class ServerConnection extends Thread {
     String loginToken;
     ChessPlayer.OpponentInfo opponentInfo;
     TextView imout;     //object to display instant messages
+    ChessBoardAdapter boardOut;      //write directly to the board
+    ChessBoard board;
     ArrayList<ChessPacket> sendQueue=new ArrayList<ChessPacket>();
     ChessPacket recievedMessage;
 
-    public ServerConnection(String url, int port, ChessPlayer.OpponentInfo opponentInfo, String token, TextView imout){
+    public ServerConnection(String url, int port, ChessPlayer.OpponentInfo opponentInfo, String token, ChessBoardAdapter boardOut, TextView imout){
         try {
-            this.imout = imout;
             this.address = InetAddress.getByName(url);
-            this.loginToken=token;
-            this.opponentInfo=opponentInfo;
             this.port = port;
+            this.opponentInfo=opponentInfo;
+            this.loginToken=token;
+            this.boardOut=boardOut;
+            this.imout = imout;
         }
 
         catch(Exception e){
@@ -94,6 +98,12 @@ public class ServerConnection extends Thread {
                         mycon.close();
                         break;
                     }
+
+                    case refreshBoard: {
+                        board=(ChessBoard) in.readObject();
+                        boardOut.refreshBoard(board.toString());
+                        break;
+                    }
                 }
             }
         }
@@ -109,5 +119,9 @@ public class ServerConnection extends Thread {
 
     public void surrender(){
         this.sendQueue.add(new ChessPacket(end,"surrender"));
+    }
+
+    public void refreshBoard(){
+        this.sendQueue.add(new ChessPacket(refreshBoard));
     }
 }

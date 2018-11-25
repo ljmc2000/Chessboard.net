@@ -15,15 +15,17 @@ class UserConnection extends Thread
 	ObjectOutputStream out;
 	ObjectInputStream in;
 	MongoDataManager db;
+	ChessBoard chessBoard;
 	ChessPacket messageIn,messageOut;
 
-	public UserConnection(Socket s,ObjectOutputStream out, ObjectInputStream in,ObjectId userId,ObjectId opponent,MongoDataManager db)
+	public UserConnection(Socket s,ObjectOutputStream out, ObjectInputStream in,ObjectId userId,ObjectId opponent,ChessBoard chessBoard,MongoDataManager db)
 	{
 		this.s=s;
 		this.out=out;
 		this.in=in;
 		this.userID=userId;
 		this.opponent=opponent;
+		this.chessBoard=chessBoard;
 		this.db=db;
 	}
 
@@ -73,6 +75,13 @@ class UserConnection extends Thread
 						s.close();
 						Control.releaseConnection();
 						break connection;
+					}
+
+					case refreshBoard:
+					{
+						out.writeObject(new ChessPacket(refreshBoard));
+						out.writeObject(chessBoard);
+						break;
 					}
 				}
 			}

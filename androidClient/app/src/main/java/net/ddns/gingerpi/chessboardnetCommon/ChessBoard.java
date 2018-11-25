@@ -1,11 +1,11 @@
 package net.ddns.gingerpi.chessboardnetCommon;
 import java.util.ArrayList;
+import java.io.Serializable;
 
-public class ChessBoard
+public class ChessBoard implements Serializable
 {
 	public enum texturePack{white,black};
-	final texturePack[] textures=new texturePack[2];
-
+	texturePack player1set,player2set;
 	boolean whosTurn=false;	//switches every time someone makes a move
 	ChessPiece[] map={
 			new Rook(true),new Knight(true),new Bishop(true),new Queen(true),new King(true),new Bishop(true),new Knight(true),new Rook(true),
@@ -17,6 +17,12 @@ public class ChessBoard
 			new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),
 			new Rook(false),new Knight(false),new Bishop(false),new Queen(false),new King(false),new Bishop(false),new Knight(false),new Rook(false)
 	};
+
+	public ChessBoard(texturePack player1set, texturePack player2set)
+	{
+		this.player1set=player1set;
+		this.player2set=player2set;
+	}
 
 	public ChessPiece getItem(int position)
 	{
@@ -98,7 +104,7 @@ public class ChessBoard
 					returnme+=" ";
 			}
 
-			returnme+="\n";
+			//returnme+="\n";		//was here for human readable purpouses
 		}
 
 		return returnme;
