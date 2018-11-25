@@ -35,12 +35,12 @@ public class Knight extends ChessPiece
 		if(y>1)
 		{
 			if(x<6 && position-006>0) returnme.add(position-006);
-			if(x>1 && position-006>0) returnme.add(position-0012);
+			if(x>1 && position-012>0) returnme.add(position-0012);
 		}
 		if(y>0)
 		{
-			if(x<7 && position-006>0) returnme.add(position-017);
-			if(x>0 && position-006>0) returnme.add(position-021);
+			if(x<7 && position-017>0) returnme.add(position-017);
+			if(x>0 && position-021>0) returnme.add(position-021);
 		}
 
 		return returnme;
