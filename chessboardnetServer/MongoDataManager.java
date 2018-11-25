@@ -57,7 +57,7 @@ class MongoDataManager
 		ArrayList<ObjectId> players=(ArrayList) match.get("players");
 		ObjectId returnme=players.get(0);
 
-		if(returnme.toString().equals(userid))
+		if(returnme.toString().equals(userid.toString()))
 			returnme=players.get(1);
 
 		return returnme;

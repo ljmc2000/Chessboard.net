@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import net.ddns.gingerpi.chessboardnetCommon.ChessPacket;
 import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.*;
@@ -19,7 +20,7 @@ public class ServerConnection extends Thread {
     String loginToken;
     ChessPlayer.OpponentInfo opponentInfo;
     TextView imout;     //object to display instant messages
-    ChessPacket sendMessage;
+    ArrayList<ChessPacket> sendQueue=new ArrayList<ChessPacket>();
     ChessPacket recievedMessage;
 
     public ServerConnection(String url, int port, ChessPlayer.OpponentInfo opponentInfo, String token, TextView imout){
@@ -38,6 +39,7 @@ public class ServerConnection extends Thread {
 
     public void run() {
         try {
+            ChessPacket sendMessage;
             mycon = new Socket(this.address, port);
             out = new ObjectOutputStream(mycon.getOutputStream());
             in = new ObjectInputStream(mycon.getInputStream());
@@ -45,6 +47,14 @@ public class ServerConnection extends Thread {
             out.writeObject(loginToken);
 
             while (mycon.isConnected()) {
+                try {
+                    sendMessage = sendQueue.get(0);
+                    sendQueue.remove(0);
+                }
+                catch(IndexOutOfBoundsException e){
+                    sendMessage=null;
+                }
+
                 if (sendMessage != null) {
                     out.writeObject(sendMessage);
                     sendMessage=null;
@@ -101,10 +111,10 @@ public class ServerConnection extends Thread {
     }
 
     public void sendIMessage(String s){
-        this.sendMessage=new ChessPacket(im,s);
+        this.sendQueue.add(new ChessPacket(im,s));
     }
 
     public void surrender(){
-        this.sendMessage=new ChessPacket(end,"surrender");
+        this.sendQueue.add(new ChessPacket(end,"surrender"));
     }
 }

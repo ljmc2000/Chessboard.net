@@ -1,7 +1,6 @@
 package net.ddns.gingerpi.chessboardnet;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 
 public class ChessSet {
     public enum piece{pawn_front,pawn_back,rook_front,rook_back,knight_front,knight_back,bishop_front,bishop_back,queen_front,queen_back,king_front,king_back};
