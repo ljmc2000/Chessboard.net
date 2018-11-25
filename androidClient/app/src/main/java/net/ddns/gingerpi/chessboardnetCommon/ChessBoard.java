@@ -12,7 +12,7 @@ public class ChessBoard
 			null,null,null,null,null,null,null,null,
 			null,null,null,null,null,null,null,null,
 			new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),
-			new Rook(false),new Knight(false),new Bishop(false),new Queen(false),new King(true),new Bishop(false),new Knight(false),new Rook(false)
+			new Rook(false),new Knight(false),new Bishop(false),new Queen(false),new King(false),new Bishop(false),new Knight(false),new Rook(false)
 	};
 
 	public ChessPiece getItem(int position)
