@@ -1,4 +1,6 @@
 package net.ddns.gingerpi.chessboardnet;
+import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -13,6 +15,7 @@ import net.ddns.gingerpi.chessboardnetCommon.ChessPacket;
 import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.*;
 
 public class ServerConnection extends Thread {
+    ChessPlayer mainThread;
     Socket mycon;
     ObjectOutputStream out;
     ObjectInputStream in;
@@ -22,12 +25,13 @@ public class ServerConnection extends Thread {
     ChessPlayer.OpponentInfo opponentInfo;
     TextView imout;     //object to display instant messages
     ChessBoardAdapter boardOut;      //write directly to the board
-    ChessBoard board;
+    public ChessBoard board;
     ArrayList<ChessPacket> sendQueue=new ArrayList<ChessPacket>();
     ChessPacket recievedMessage;
 
-    public ServerConnection(String url, int port, ChessPlayer.OpponentInfo opponentInfo, String token, ChessBoardAdapter boardOut, TextView imout){
+    public ServerConnection(ChessPlayer mainThread, String url, int port, ChessPlayer.OpponentInfo opponentInfo, String token, ChessBoardAdapter boardOut, TextView imout){
         try {
+            this.mainThread=mainThread;
             this.address = InetAddress.getByName(url);
             this.port = port;
             this.opponentInfo=opponentInfo;
@@ -72,7 +76,7 @@ public class ServerConnection extends Thread {
                     }
 
                     case im: {
-                        imout.post(new Runnable() {
+                        mainThread.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 try {
@@ -89,7 +93,7 @@ public class ServerConnection extends Thread {
 
                     case end: {
                         out.writeObject(new ChessPacket(end,"AcKSurrender"));
-                        imout.post(new Runnable() {
+                        mainThread.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 imout.append("Opponent has surrendered"+"\n");
@@ -101,7 +105,13 @@ public class ServerConnection extends Thread {
 
                     case refreshBoard: {
                         board=(ChessBoard) in.readObject();
-                        boardOut.refreshBoard(board.toString());
+                        mainThread.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                boardOut.refreshBoard(board.toString());
+                                boardOut.setChessBoard(board);
+                            }
+                        });
                         break;
                     }
                 }

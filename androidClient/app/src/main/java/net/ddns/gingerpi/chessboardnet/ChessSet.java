@@ -26,6 +26,7 @@ public class ChessSet {
                 this.chessSet[piece.queen_back.ordinal()]=R.drawable.doodle_black_queen_back;
                 this.chessSet[piece.king_front.ordinal()]=R.drawable.doodle_black_king;
                 this.chessSet[piece.king_back.ordinal()]=R.drawable.doodle_black_king_back;
+                break;
             }
 
             case white: {
@@ -41,6 +42,7 @@ public class ChessSet {
                 this.chessSet[piece.queen_back.ordinal()]=R.drawable.doodle_white_queen_back;
                 this.chessSet[piece.king_front.ordinal()]=R.drawable.doodle_white_king;
                 this.chessSet[piece.king_back.ordinal()]=R.drawable.doodle_white_king_back;
+                break;
             }
         }
     }

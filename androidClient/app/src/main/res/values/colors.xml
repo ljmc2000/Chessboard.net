@@ -5,4 +5,7 @@
     <color name="colorAccent">#ff4081</color>
     <color name="chessTileDark">#4900BA</color>
     <color name="chessTileLight">#CCCCCC</color>
+    <color name="chessTileDarkLit">#7505B3</color>
+    <color name="chessTileLightLit">#5D5D5D</color>
+
 </resources>

@@ -12,18 +12,23 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import net.ddns.gingerpi.chessboardnetCommon.ChessBoard;
+import net.ddns.gingerpi.chessboardnetCommon.ChessPiece;
+
+import java.util.ArrayList;
+
 public class ChessBoardAdapter extends BaseAdapter{
     private Context mContext;
+    ChessBoard chessBoard;
     private int dimensions=64;  //a chessboard is 64 squares large
     private int[] squareContents=new int[dimensions];
-    private int[] tileColor;  //an array of 2 colours: eg. black and white
     private ChessSet p1set;    //icons for player 1's chess set
     private ChessSet p2set;    //icons for player 2's chess set
     int tileSize;
+    int selectedSquare=-1;
 
-    public ChessBoardAdapter(Context c,int color1,int color2,int tileSize,texturePack set1,texturePack set2){
+    public ChessBoardAdapter(Context c,int tileSize,texturePack set1,texturePack set2){
         mContext=c;
-        this.tileColor=new int[]{color1,color2};
         this.tileSize=tileSize;
         for(int i=0; i<dimensions; i++)
             squareContents[i]=-1;
@@ -49,11 +54,22 @@ public class ChessBoardAdapter extends BaseAdapter{
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView square=new ImageView(mContext);
-        if((position/8)%2==0)
-            square.setBackgroundColor(tileColor[position%2]);
-        else
-            square.setBackgroundColor(tileColor[(position+1)%2]);
-        if(squareContents[position]!=-1)
+
+        if(squareContents[position]==-2) {
+            if (position %2 == (position/8)%2)
+                square.setBackgroundColor(mContext.getColor(R.color.chessTileLightLit));
+            else
+                square.setBackgroundColor(mContext.getColor(R.color.chessTileDarkLit));
+        }
+
+        else{
+            if (position %2 == (position/8)%2)
+                square.setBackgroundColor(mContext.getColor(R.color.chessTileLight));
+            else
+                square.setBackgroundColor(mContext.getColor(R.color.chessTileDark));
+        }
+
+        if(squareContents[position]>-1)
             square.setImageDrawable(mContext.getResources().getDrawable(squareContents[position], null));
 
         square.setLayoutParams(new ViewGroup.LayoutParams(tileSize,tileSize));
@@ -65,15 +81,35 @@ public class ChessBoardAdapter extends BaseAdapter{
     public OnItemClickListener getOnItemClickListener= new OnItemClickListener(){
         public void onItemClick(AdapterView<?> parent, View v, int position, long id)
         {
-            // make and display the toast message here
-            Context button_context = mContext;
-            CharSequence b1_text = getItem(position).toString();
-            int display_for = Toast.LENGTH_SHORT;
-            Toast my_toast = Toast.makeText(button_context,b1_text,display_for);
-            my_toast.show();
-
             //squareContents[position]=p1set.getPiece(ChessSet.piece.rook_front);
             //notifyDataSetChanged();
+
+            if(selectedSquare!=-1) {
+                selectedSquare = -1;
+                for(int i=0; i<dimensions; i++){
+                    if(squareContents[i]==-2) squareContents[i]=-1;
+                }
+            }
+
+            else{
+                selectedSquare=position;
+
+                ChessPiece p=chessBoard.getItem(position);
+                if(p==null) {
+                    selectedSquare = -1;
+                    return;
+                }
+
+                ArrayList<Integer> validMoves=p.getLegalMoves(position, chessBoard);
+                int square;
+                for (int i = 0; i < validMoves.size(); i++) {
+                    square=validMoves.get(i);
+                    if(squareContents[square]==-1)
+                        squareContents[square]=-2;
+                }
+            }
+
+            notifyDataSetChanged();
         }
     };
 
@@ -147,5 +183,9 @@ public class ChessBoardAdapter extends BaseAdapter{
         }
 
         notifyDataSetChanged();
+    }
+
+    public void setChessBoard(ChessBoard chessBoard){
+        this.chessBoard=chessBoard;
     }
 }
