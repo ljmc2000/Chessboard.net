@@ -24,7 +24,7 @@ public class ChessBoardAdapter extends BaseAdapter{
         this.tileSize=tileSize;
         for(int i=0; i<dimensions; i++)
             squareContents[i]=-1;
-        squareContents[0]=R.drawable.doodle_black_pawn;
+        //squareContents[0]=R.drawable.doodle_black_pawn;
     }
 
     @Override
