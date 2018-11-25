@@ -80,8 +80,8 @@ public class Knight extends ChessPiece
 	public String toString()
 	{
 		if(color)
-			return "K";
+			return "N";
 		else
-			return "k";
+			return "n";
 	}
 }
