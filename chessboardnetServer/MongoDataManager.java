@@ -30,7 +30,6 @@ class MongoDataManager
 
 	public ObjectId getUserId(String token)
 	{
-		System.out.println("hello");
 		BasicDBObject fields=new BasicDBObject("_id",token);
 		Document result = userTokens.find(fields).first();
 		return (ObjectId) result.get("user_id");

@@ -1,5 +1,5 @@
 package net.ddns.gingerpi.chessboardnet;
-import static net.ddns.gingerpi.chessboardnet.ChessSet.chessSet;
+import static net.ddns.gingerpi.chessboardnetCommon.ChessBoard.texturePack;
 
 import android.app.Activity;
 import android.content.Context;
@@ -66,7 +66,7 @@ public class ChessPlayer extends Activity {
         Log.d("#squaresize",Integer.toString(squareSize));
         int color1=getResources().getColor(R.color.chessTileDark);
         int color2=getResources().getColor(R.color.chessTileLight);
-        final ChessBoardAdapter chessBoardAdapter=new ChessBoardAdapter(this,color1,color2,squareSize,chessSet.white,chessSet.black);
+        final ChessBoardAdapter chessBoardAdapter=new ChessBoardAdapter(this,color1,color2,squareSize,texturePack.white,texturePack.black);
         chessBoard.setAdapter(chessBoardAdapter);
         chessBoard.setOnItemClickListener(chessBoardAdapter.getOnItemClickListener);
         chessBoard.setColumnWidth(squareSize);

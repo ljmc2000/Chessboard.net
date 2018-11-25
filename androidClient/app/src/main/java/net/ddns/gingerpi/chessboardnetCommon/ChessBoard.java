@@ -3,6 +3,9 @@ import java.util.ArrayList;
 
 public class ChessBoard
 {
+	public enum texturePack{white,black};
+	final texturePack[] textures=new texturePack[2];
+
 	boolean whosTurn=false;	//switches every time someone makes a move
 	ChessPiece[] map={
 			new Rook(true),new Knight(true),new Bishop(true),new Queen(true),new King(true),new Bishop(true),new Knight(true),new Rook(true),

@@ -1,6 +1,6 @@
 package net.ddns.gingerpi.chessboardnet;
 
-import static net.ddns.gingerpi.chessboardnet.ChessSet.chessSet;
+import static net.ddns.gingerpi.chessboardnetCommon.ChessBoard.texturePack;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -23,7 +23,7 @@ public class ChessBoardAdapter extends BaseAdapter{
     private ChessSet p2set;    //icons for player s's chess set
     int tileSize;
 
-    public ChessBoardAdapter(Context c,int color1,int color2,int tileSize,chessSet set1,chessSet set2){
+    public ChessBoardAdapter(Context c,int color1,int color2,int tileSize,texturePack set1,texturePack set2){
         mContext=c;
         this.tileColor=new int[]{color1,color2};
         this.tileSize=tileSize;
