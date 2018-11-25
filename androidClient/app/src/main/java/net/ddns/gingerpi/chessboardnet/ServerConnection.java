@@ -52,19 +52,12 @@ public class ServerConnection extends Thread {
                     sendQueue.remove(0);
                 }
                 catch(IndexOutOfBoundsException e){
-                    sendMessage=null;
+                    sendMessage=new ChessPacket(ack);
                 }
+                out.writeObject(sendMessage);
 
-                if (sendMessage != null) {
-                    out.writeObject(sendMessage);
-                    sendMessage=null;
-
-                } else {
-                    out.writeObject(new ChessPacket(ack));
-                }
 
                 recievedMessage = (ChessPacket) in.readObject();
-
                 switch (recievedMessage.getHeader()) {
                     case ack: {
                         break;
