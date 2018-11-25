@@ -20,23 +20,28 @@ public class Knight extends ChessPiece
 		int x=position%8;
 		int y=position/8;
 
-		System.out.print(x);
-		System.out.print(",");
-		System.out.print(y);
-		System.out.println();
-
 		if(y<7)
+		{
 			if(x>1 && position+006<64) returnme.add(position+006);
 			if(x<6 && position+012<64) returnme.add(position+012);
+		}
+
 		if(y<6)
+		{
 			if(x>0 && position+017<64) returnme.add(position+017);
 			if(x<7 && position+021<64) returnme.add(position+021);
+		}
+
 		if(y>1)
+		{
 			if(x<6 && position-006>0) returnme.add(position-006);
 			if(x>1 && position-006>0) returnme.add(position-0012);
+		}
 		if(y>0)
+		{
 			if(x<7 && position-006>0) returnme.add(position-017);
 			if(x>0 && position-006>0) returnme.add(position-021);
+		}
 
 		return returnme;
 	}

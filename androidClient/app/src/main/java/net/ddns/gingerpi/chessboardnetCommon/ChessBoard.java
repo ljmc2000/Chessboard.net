@@ -45,6 +45,10 @@ public class ChessBoard
 	{
 		int origin=chessMove/64;
 		int destination=chessMove%64;
+
+		if(origin<0 || origin>=64)
+			return false;
+
 		ChessPiece piece=map[origin];
 		ChessPiece target=map[destination];
 		boolean attacking=false;
