@@ -7,7 +7,6 @@ import java.util.HashMap;
 
 import  net.ddns.gingerpi.chessboardnetCommon.*;
 import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.*;
-import static net.ddns.gingerpi.chessboardnetCommon.ChessBoard.texturePack;
 
 class Control
 {
@@ -46,7 +45,7 @@ class Control
 					ObjectId gameId=db.getGameId(userid);
 					ChessBoard chessBoard=boards.get(gameId);
 					if(chessBoard==null)
-						chessBoard=new ChessBoard(texturePack.black,texturePack.white);
+						chessBoard=new ChessBoard();
 					boards.put(gameId,chessBoard);
 
 					//start the network handler thread for user

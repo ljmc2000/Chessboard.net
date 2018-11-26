@@ -5,8 +5,6 @@ import java.io.Serializable;
 
 public class ChessBoard implements Serializable
 {
-	public enum texturePack{white,black};
-	texturePack player1set,player2set;
 	boolean whosTurn=false;	//switches every time someone makes a move
 	ChessPiece[] map={
 			new Rook(true),new Knight(true),new Bishop(true),new Queen(true),new King(true),new Bishop(true),new Knight(true),new Rook(true),
@@ -18,12 +16,6 @@ public class ChessBoard implements Serializable
 			new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),new Pawn(false),
 			new Rook(false),new Knight(false),new Bishop(false),new Queen(false),new King(false),new Bishop(false),new Knight(false),new Rook(false)
 	};
-
-	public ChessBoard(texturePack player1set, texturePack player2set)
-	{
-		this.player1set=player1set;
-		this.player2set=player2set;
-	}
 
 	public ChessPiece getItem(int position)
 	{

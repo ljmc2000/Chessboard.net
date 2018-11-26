@@ -1,5 +1,5 @@
 package net.ddns.gingerpi.chessboardnet;
-import static net.ddns.gingerpi.chessboardnetCommon.ChessBoard.texturePack;
+import static net.ddns.gingerpi.chessboardnet.ChessSet.texturePack;
 
 import android.app.Activity;
 import android.content.Context;

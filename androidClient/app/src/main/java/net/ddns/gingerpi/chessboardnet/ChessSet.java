@@ -1,9 +1,9 @@
 package net.ddns.gingerpi.chessboardnet;
-import static net.ddns.gingerpi.chessboardnetCommon.ChessBoard.texturePack;
 
 import android.content.Context;
 
 public class ChessSet {
+    public enum texturePack{white,black};
     public enum piece{pawn_front,pawn_back,rook_front,rook_back,knight_front,knight_back,bishop_front,bishop_back,queen_front,queen_back,king_front,king_back};
     int[] chessSet = new int[piece.values().length];
     Context mContext;

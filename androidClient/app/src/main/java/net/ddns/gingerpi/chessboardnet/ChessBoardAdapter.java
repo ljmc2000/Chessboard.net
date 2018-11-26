@@ -1,6 +1,6 @@
 package net.ddns.gingerpi.chessboardnet;
 
-import static net.ddns.gingerpi.chessboardnetCommon.ChessBoard.texturePack;
+import static net.ddns.gingerpi.chessboardnet.ChessSet.texturePack;
 import static net.ddns.gingerpi.chessboardnet.ChessSet.piece.*;
 
 import android.content.Context;
