@@ -17,6 +17,7 @@ class UserConnection extends Thread
 	MongoDataManager db;
 	ChessBoard chessBoard;
 	ChessPacket messageIn,messageOut;
+	boolean color;
 
 	public UserConnection(Socket s,ObjectOutputStream out, ObjectInputStream in,ObjectId userId,ObjectId opponent,ChessBoard chessBoard,MongoDataManager db)
 	{
@@ -27,6 +28,7 @@ class UserConnection extends Thread
 		this.opponent=opponent;
 		this.chessBoard=chessBoard;
 		this.db=db;
+		this.color=db.getUserColor(userId);
 	}
 
 	public void putMessage(ChessPacket message)
@@ -81,6 +83,7 @@ class UserConnection extends Thread
 					{
 						out.writeObject(new ChessPacket(refreshBoard));
 						out.writeObject(chessBoard);
+						out.writeObject(color);
 						break;
 					}
 				}

@@ -70,9 +70,18 @@ class MongoDataManager
 		return gameId;
 	}
 
-	public texturePack[] getUserFavourites()
+	public texturePack[] getUserFavourites(ObjectId userId)
 	{
 		texturePack[] returnme=new texturePack[]{texturePack.white,texturePack.black};
 		return returnme;
+	}
+
+	public boolean getUserColor(ObjectId userId)
+	{
+		Document match=onGoingMatches.find(in("players",userId)).first();
+		ArrayList<ObjectId> players=(ArrayList) match.get("players");
+		ObjectId checkme=players.get(0);
+
+		return checkme.toString().equals(userId.toString());
 	}
 }

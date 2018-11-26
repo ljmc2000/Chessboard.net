@@ -25,6 +25,7 @@ public class ChessBoardAdapter extends BaseAdapter{
     private int[] squareContents=new int[dimensions];
     private ChessSet p1set;    //icons for player 1's chess set
     private ChessSet p2set;    //icons for player 2's chess set
+    boolean color;
     int tileSize;
     int selectedSquare=-1;
 
@@ -82,7 +83,10 @@ public class ChessBoardAdapter extends BaseAdapter{
     public OnItemClickListener getOnItemClickListener= new OnItemClickListener(){
         public void onItemClick(AdapterView<?> parent, View v, int position, long id)
         {
-            if(selectedSquare!=-1) {
+            if(chessBoard==null)
+                return;
+
+            else if(selectedSquare!=-1) {
                 selectedSquare = -1;
                 for(int i=0; i<dimensions; i++){
                     if(squareContents[i]==-2) squareContents[i]=-1;
@@ -98,7 +102,6 @@ public class ChessBoardAdapter extends BaseAdapter{
                     return;
                 }
 
-                Log.d("#polibus",Integer.toString(position));
                 ArrayList<Integer> validMoves=p.getLegalMoves(position, chessBoard);
                 int square;
                 for (int i = 0; i < validMoves.size(); i++) {
@@ -107,6 +110,9 @@ public class ChessBoardAdapter extends BaseAdapter{
                     if(squareContents[square]==-1)
                         squareContents[square]=-2;
                 }
+
+                if(validMoves.size()==0)
+                    selectedSquare=-1;
             }
 
             notifyDataSetChanged();
@@ -115,6 +121,7 @@ public class ChessBoardAdapter extends BaseAdapter{
 
     public void refreshBoard(String contents){
         for(int i=0; i<dimensions; i++){
+            if(color)
             switch(contents.charAt(i)){
                 case 'K':{
                     squareContents[i]=p2set.getPiece(king_front);
@@ -180,6 +187,76 @@ public class ChessBoardAdapter extends BaseAdapter{
                     squareContents[i]=-1;
                 }
             }
+
+
+            else
+            switch(contents.charAt(i)){
+                case 'K':{
+                    squareContents[i]=p2set.getPiece(king_back);
+                    break;
+                }
+
+                case 'k':{
+                    squareContents[i]=p1set.getPiece(king_front);
+                    break;
+                }
+
+                case 'Q':{
+                    squareContents[i]=p2set.getPiece(queen_back);
+                    break;
+                }
+
+                case 'q':{
+                    squareContents[i]=p1set.getPiece(queen_front);
+                    break;
+                }
+
+                case 'B':{
+                    squareContents[i]=p2set.getPiece(bishop_back);
+                    break;
+                }
+
+                case 'b':{
+                    squareContents[i]=p1set.getPiece(bishop_front);
+                    break;
+                }
+
+                case 'N':{
+                    squareContents[i]=p2set.getPiece(knight_back);
+                    break;
+                }
+
+                case 'n':{
+                    squareContents[i]=p1set.getPiece(knight_front);
+                    break;
+                }
+
+                case 'R':{
+                    squareContents[i]=p2set.getPiece(rook_back);
+                    break;
+                }
+
+                case 'r':{
+                    squareContents[i]=p1set.getPiece(rook_front);
+                    break;
+                }
+
+                case 'P':{
+                    squareContents[i]=p2set.getPiece(pawn_back);
+                    break;
+                }
+
+                case 'p':{
+                    squareContents[i]=p1set.getPiece(pawn_front);
+                    break;
+                }
+
+                default: {
+                    squareContents[i]=-1;
+                }
+            }
+
+
         }
 
         notifyDataSetChanged();
@@ -187,5 +264,9 @@ public class ChessBoardAdapter extends BaseAdapter{
 
     public void setChessBoard(ChessBoard chessBoard){
         this.chessBoard=chessBoard;
+    }
+
+    public void setColor(boolean color){
+        this.color=color;
     }
 }

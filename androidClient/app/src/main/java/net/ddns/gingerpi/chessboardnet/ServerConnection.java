@@ -26,6 +26,7 @@ public class ServerConnection extends Thread {
     TextView imout;     //object to display instant messages
     ChessBoardAdapter boardOut;      //write directly to the board
     public ChessBoard board;
+    boolean color;
     ArrayList<ChessPacket> sendQueue=new ArrayList<ChessPacket>();
     ChessPacket recievedMessage;
 
@@ -105,11 +106,17 @@ public class ServerConnection extends Thread {
 
                     case refreshBoard: {
                         board=(ChessBoard) in.readObject();
+                        color=(boolean) in.readObject();
                         mainThread.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                boardOut.refreshBoard(board.toString());
-                                boardOut.setChessBoard(board);
+								boardOut.setChessBoard(board);
+								boardOut.setColor(color);
+
+                            	if (color)
+	                                boardOut.refreshBoard(board.toString());
+                            	else
+                            		boardOut.refreshBoard(board.toStringReversed());
                             }
                         });
                         break;

@@ -118,4 +118,21 @@ public class ChessBoard implements Serializable
 
 		return returnme;
 	}
+
+	public String toStringReversed()
+	{
+		String returnme="";
+		int i,j;
+
+		for(i=070; i>=0; i-=010)
+			for(j=7; j>=0; j--)
+			{
+				if (map[i+j]!=null)
+					returnme+=map[i+j].toString();
+				else
+					returnme+=" ";
+			}
+
+		return returnme;
+	}
 }
