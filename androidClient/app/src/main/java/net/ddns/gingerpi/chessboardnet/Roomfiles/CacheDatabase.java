@@ -3,11 +3,13 @@ package net.ddns.gingerpi.chessboardnet.Roomfiles;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
+import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
 import net.ddns.gingerpi.chessboardnet.R;
 
-@Database(entities = {UserInfo.class},version=1,exportSchema = false)
+@Database(entities = {UserInfo.class},version=2,exportSchema = false)
+@TypeConverters(texturePackConverter.class)
 public abstract class CacheDatabase extends RoomDatabase{
     private static volatile CacheDatabase instance;
 
@@ -22,7 +24,9 @@ public abstract class CacheDatabase extends RoomDatabase{
         return Room.databaseBuilder(
                 context,
                 CacheDatabase.class,
-                context.getResources().getString(R.string.DB_NAME)).build();
+                context.getResources().getString(R.string.DB_NAME))
+				.fallbackToDestructiveMigration()
+				.build();
     }
 
     public abstract UserInfoDao getUserInfoDao();

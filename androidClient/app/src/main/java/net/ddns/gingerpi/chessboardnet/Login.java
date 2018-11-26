@@ -37,7 +37,7 @@ public class Login extends Activity {
             CacheDatabase
                     .getInstance(this.context)
                     .getUserInfoDao()
-                    .insert(new UserInfo(id,username,token));
+                    .insert(new UserInfo(id,username,null,null,token));
         }
 
         public SaveToken(Context context,String id,String username, String token){

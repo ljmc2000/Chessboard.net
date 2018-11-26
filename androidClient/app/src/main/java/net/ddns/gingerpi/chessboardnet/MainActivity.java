@@ -136,6 +136,8 @@ public class MainActivity extends Activity {
                 opponent=new UserInfo(
                         response.getString("userid"),
                         response.getString("username"),
+                        ChessSet.texturePack.valueOf(response.getString("favourite_set")),
+						ChessSet.texturePack.valueOf(response.getString("secondary_set")),
                         null);
 
                 Log.d("#inserting_user",opponent.toString());
