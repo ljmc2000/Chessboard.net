@@ -20,6 +20,7 @@ import com.android.volley.toolbox.Volley;
 
 import net.ddns.gingerpi.chessboardnet.Roomfiles.CacheDatabase;
 import net.ddns.gingerpi.chessboardnet.Roomfiles.UserInfo;
+import net.ddns.gingerpi.chessboardnet.Roomfiles.UserPreferences;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,13 +32,19 @@ public class MainActivity extends Activity {
 
     RequestQueue queue;
     String loginToken="";
+    String userId;
     String serverHostname="";
     int serverPort;
     String opponentid="";
 
+    //threads
+	GetUserPreferencesFromServer getUserPreferencesFromServer;
+	MatchChecker matchChecker;
+
     public class GetUserInfo extends Thread {
         Context context;
         UserInfo result;
+        UserPreferences pref;
 
         @Override
         public void run() {
@@ -46,6 +53,13 @@ public class MainActivity extends Activity {
                             .getInstance(this.context)
                             .getUserInfoDao()
                             .fetch();
+
+            this.pref=
+					CacheDatabase
+							.getInstance(this.context)
+							.getUserPreferencesDao()
+							.fetchOwn();
+
         }
 
         public GetUserInfo(Context context){
@@ -107,12 +121,22 @@ public class MainActivity extends Activity {
 
         loginToken=checkLogin();
         queue=Volley.newRequestQueue(this);
+
+		startThreads();
     }
+
+    @Override
+    protected void onPause(){
+    	super.onPause();
+    	stopThreads();
+	}
 
     @Override
     protected void onResume() {
         super.onResume();
         loginToken=checkLogin();
+
+		startThreads();
     }
 
     class getOpponentInfo extends Thread{
@@ -136,8 +160,6 @@ public class MainActivity extends Activity {
                 opponent=new UserInfo(
                         response.getString("userid"),
                         response.getString("username"),
-                        ChessSet.texturePack.valueOf(response.getString("favourite_set")),
-						ChessSet.texturePack.valueOf(response.getString("secondary_set")),
                         null);
 
                 Log.d("#inserting_user",opponent.toString());
@@ -156,9 +178,56 @@ public class MainActivity extends Activity {
         }
     }
 
+    class GetUserPreferencesFromServer extends Thread{
+		String url=getResources().getString(R.string.HTTPAPIurl)+"/userinfo";
+		int status=0;
+
+		UserPreferences prefs;
+		JSONObject payload=new JSONObject();
+        JSONObject response;
+        RequestFuture<JSONObject> future = RequestFuture.newFuture();
+        JsonObjectRequest userPreferences;
+
+        public GetUserPreferencesFromServer(){
+        	try {
+        		payload.put("token",loginToken);
+        		payload.put("userid",userId);
+
+			}
+			catch(JSONException e){
+                Log.e("#JsonError",e.toString());
+			}
+		}
+
+		@Override
+		public void run(){
+        	try {
+				userPreferences = new JsonObjectRequest(Request.Method.POST, url, payload, future, errorListener);
+				queue.add(userPreferences);
+				response = future.get(15, TimeUnit.SECONDS);
+
+				prefs = new UserPreferences(
+						response.getString("userid"),
+						ChessSet.texturePack.valueOf(response.getString("favourite_set")),
+						ChessSet.texturePack.valueOf(response.getString("secondary_set"))
+				);
+
+				CacheDatabase
+						.getInstance(getApplicationContext())
+						.getUserPreferencesDao()
+						.insert(prefs);
+			}
+
+			catch(Exception e){
+        		Log.d("#prefs",e.toString());
+			}
+		}
+	}
+
     class MatchChecker extends Thread{
         String url=getResources().getString(R.string.HTTPAPIurl)+"/getmatch";
         int status=0;
+		boolean goOn=true;
 
         JSONObject payload=new JSONObject();
         JSONObject response;
@@ -175,7 +244,6 @@ public class MainActivity extends Activity {
 
         @Override
         public void run(){
-            int retries=10;
             Looper.prepare();
             do {
                 matchCheck=new JsonObjectRequest(Request.Method.POST,url,payload,future ,errorListener);
@@ -191,12 +259,12 @@ public class MainActivity extends Activity {
                     status=-1;
                     break;
                 }
-                retries--;
-            } while (status == 1 && retries>0);
+            } while (status == 1 && goOn);
 
             switch(status){
                 case 0: {
                     try {
+                    	Toast.makeText(getApplicationContext(),"rejoining Match",Toast.LENGTH_SHORT);
                         serverHostname=response.getString("hostname");
                         serverPort=response.getInt("port");
                         opponentid=response.getString("opponentid");
@@ -213,23 +281,22 @@ public class MainActivity extends Activity {
                     break;
                 }
 
-                case 1: {
-                    Toast.makeText(getApplicationContext(), "Timed out waiting for opponent", Toast.LENGTH_SHORT);
-                    break;
-                }
                 case -1: {
                     Toast.makeText(getApplicationContext(), "Error communicating with the lobby", Toast.LENGTH_SHORT);
                     break;
                 }
             }
         }
+
+		public void stopSearch() {
+			this.goOn=false;
+		}
     }
 
     class JoinLobby extends Thread{
 
         @Override
         public void run() {
-            Looper.prepare();
             int status;
             String url = getResources().getString(R.string.HTTPAPIurl) + "/lobby";
             JSONObject payload = new JSONObject();
@@ -249,16 +316,15 @@ public class MainActivity extends Activity {
                 Log.e("#LobbyError", e.toString());
             }
 
+			Looper.prepare();
             switch (status) {
                 case 0: {
                     Toast.makeText(getApplicationContext(), "Queueing for match", Toast.LENGTH_SHORT).show();
-                    new MatchChecker().start();
                     break;
                 }
 
                 case 1: {
                     Toast.makeText(getApplicationContext(), "already in Match", Toast.LENGTH_SHORT).show();
-                    new MatchChecker().start();
                     break;
                 }
 
@@ -302,6 +368,18 @@ public class MainActivity extends Activity {
         startActivity(startgame);
     }
 
+    void startThreads(){
+    	getUserPreferencesFromServer= new GetUserPreferencesFromServer();
+		getUserPreferencesFromServer.start();
+
+		matchChecker=new MatchChecker();
+		matchChecker.start();
+	}
+
+	void stopThreads(){
+    	matchChecker.stopSearch();
+	}
+
     String checkLogin() {
         //if not logged in
         GetUserInfo request= new GetUserInfo(this);
@@ -321,6 +399,7 @@ public class MainActivity extends Activity {
             //once logged in
             TextView usernameBox = findViewById(R.id.usernameBox);
             usernameBox.setText("logged in as " + request.getUsername());
+            this.userId=request.getID();
         }
 
         return request.getToken();

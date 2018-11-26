@@ -12,7 +12,7 @@ public interface UserInfoDao {
     @Query("select * from userinfo where (id = :id)")
     public UserInfo getOpponentInfo(String id);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     public void insert(UserInfo userinfo);
 
     @Query("delete from userinfo")
