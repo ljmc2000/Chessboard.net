@@ -1,4 +1,5 @@
 package net.ddns.gingerpi.chessboardnetCommon;
+
 import java.util.ArrayList;
 import java.io.Serializable;
 
@@ -26,12 +27,20 @@ public class ChessBoard implements Serializable
 
 	public ChessPiece getItem(int position)
 	{
-		return map[position];
+		if(0<position && position<64)
+			return map[position];
+		else
+			return null;
 	}
 
 	public boolean addMoveToList(ArrayList<Integer> returnme,int position,boolean color)
 	//adds a move to list if the target square is empty or contains an enemy
 	{
+		if(position>63 || position<0)
+		{
+			return false;
+		}
+
 		if(map[position]==null)
 		{
 			returnme.add(position);

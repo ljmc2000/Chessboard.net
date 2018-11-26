@@ -32,7 +32,7 @@ public class Rook extends ChessPiece
 		//right
 		i=position;
 		stopAt=position/8;
-		stopAt=position*8;
+		stopAt=stopAt*8;
 		stopAt+=8;
 		while(i<stopAt)
 		{
@@ -53,7 +53,7 @@ public class Rook extends ChessPiece
 		//left
 		i=position;
 		stopAt=position/8;
-		stopAt=position*8;
+		stopAt=stopAt*8;
 		while(i>0)
 		{
 			i-=001;

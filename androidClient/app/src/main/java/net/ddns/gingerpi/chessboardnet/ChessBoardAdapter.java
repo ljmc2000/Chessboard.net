@@ -4,6 +4,7 @@ import static net.ddns.gingerpi.chessboardnetCommon.ChessBoard.texturePack;
 import static net.ddns.gingerpi.chessboardnet.ChessSet.piece.*;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -81,9 +82,6 @@ public class ChessBoardAdapter extends BaseAdapter{
     public OnItemClickListener getOnItemClickListener= new OnItemClickListener(){
         public void onItemClick(AdapterView<?> parent, View v, int position, long id)
         {
-            //squareContents[position]=p1set.getPiece(ChessSet.piece.rook_front);
-            //notifyDataSetChanged();
-
             if(selectedSquare!=-1) {
                 selectedSquare = -1;
                 for(int i=0; i<dimensions; i++){
@@ -100,10 +98,12 @@ public class ChessBoardAdapter extends BaseAdapter{
                     return;
                 }
 
+                Log.d("#polibus",Integer.toString(position));
                 ArrayList<Integer> validMoves=p.getLegalMoves(position, chessBoard);
                 int square;
                 for (int i = 0; i < validMoves.size(); i++) {
                     square=validMoves.get(i);
+                    if(0<square && square<64)
                     if(squareContents[square]==-1)
                         squareContents[square]=-2;
                 }
