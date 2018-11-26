@@ -22,7 +22,7 @@ def create_user():
 		username=request.json.get("username")
 		password=request.json.get("password")
 		passhash=bcrypt.hashpw(password.encode(),bcrypt.gensalt())
-		userid=db.users.insert({"username":username,"passhash":passhash})
+		userid=db.users.insert({"username":username,"passhash":passhash,"favourite_set":"white","secondary_set":"black"})
 		login_token=secrets.token_urlsafe(TOKEN_LEN)
 		expires=datetime.datetime.now()+datetime.timedelta(days=365)
 		db.user_tokens.insert({"_id":login_token,"user_id":userid,"expires":expires})

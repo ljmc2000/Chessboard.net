@@ -1,8 +1,10 @@
 package net.ddns.gingerpi.chessboardnet.Roomfiles;
+
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
+
 import net.ddns.gingerpi.chessboardnet.R;
 
 @Database(entities = {UserInfo.class},version=1,exportSchema = false)

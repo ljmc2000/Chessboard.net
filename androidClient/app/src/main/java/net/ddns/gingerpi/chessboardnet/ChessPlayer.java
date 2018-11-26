@@ -1,23 +1,19 @@
 package net.ddns.gingerpi.chessboardnet;
-import static net.ddns.gingerpi.chessboardnet.ChessSet.texturePack;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import net.ddns.gingerpi.chessboardnet.Roomfiles.CacheDatabase;
 import net.ddns.gingerpi.chessboardnet.Roomfiles.UserInfo;
+
+import static net.ddns.gingerpi.chessboardnet.ChessSet.texturePack;
 
 public class ChessPlayer extends Activity {
 
@@ -63,7 +59,6 @@ public class ChessPlayer extends Activity {
         //generate chessboard
         final GridView chessBoard = (GridView) findViewById(R.id.chessboard);
         int squareSize=this.getWindowManager().getDefaultDisplay().getWidth()/16;
-        Log.d("#squaresize",Integer.toString(squareSize));
         final ChessBoardAdapter chessBoardAdapter=new ChessBoardAdapter(this,squareSize,texturePack.white,texturePack.black);
         chessBoard.setAdapter(chessBoardAdapter);
         chessBoard.setOnItemClickListener(chessBoardAdapter.getOnItemClickListener);

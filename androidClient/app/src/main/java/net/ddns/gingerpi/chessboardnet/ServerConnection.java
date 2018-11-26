@@ -1,8 +1,10 @@
 package net.ddns.gingerpi.chessboardnet;
-import android.app.Activity;
-import android.content.Context;
+
 import android.util.Log;
 import android.widget.TextView;
+
+import net.ddns.gingerpi.chessboardnetCommon.ChessBoard;
+import net.ddns.gingerpi.chessboardnetCommon.ChessPacket;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -10,9 +12,10 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import net.ddns.gingerpi.chessboardnetCommon.ChessBoard;
-import net.ddns.gingerpi.chessboardnetCommon.ChessPacket;
-import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.*;
+import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.ack;
+import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.end;
+import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.im;
+import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.refreshBoard;
 
 public class ServerConnection extends Thread {
     ChessPlayer mainThread;

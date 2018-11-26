@@ -1,22 +1,31 @@
 package net.ddns.gingerpi.chessboardnet;
 
-import static net.ddns.gingerpi.chessboardnet.ChessSet.texturePack;
-import static net.ddns.gingerpi.chessboardnet.ChessSet.piece.*;
-
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import net.ddns.gingerpi.chessboardnetCommon.ChessBoard;
 import net.ddns.gingerpi.chessboardnetCommon.ChessPiece;
 
 import java.util.ArrayList;
+
+import static net.ddns.gingerpi.chessboardnet.ChessSet.piece.bishop_back;
+import static net.ddns.gingerpi.chessboardnet.ChessSet.piece.bishop_front;
+import static net.ddns.gingerpi.chessboardnet.ChessSet.piece.king_back;
+import static net.ddns.gingerpi.chessboardnet.ChessSet.piece.king_front;
+import static net.ddns.gingerpi.chessboardnet.ChessSet.piece.knight_back;
+import static net.ddns.gingerpi.chessboardnet.ChessSet.piece.knight_front;
+import static net.ddns.gingerpi.chessboardnet.ChessSet.piece.pawn_back;
+import static net.ddns.gingerpi.chessboardnet.ChessSet.piece.pawn_front;
+import static net.ddns.gingerpi.chessboardnet.ChessSet.piece.queen_back;
+import static net.ddns.gingerpi.chessboardnet.ChessSet.piece.queen_front;
+import static net.ddns.gingerpi.chessboardnet.ChessSet.piece.rook_back;
+import static net.ddns.gingerpi.chessboardnet.ChessSet.piece.rook_front;
+import static net.ddns.gingerpi.chessboardnet.ChessSet.texturePack;
 
 public class ChessBoardAdapter extends BaseAdapter{
     private Context mContext;

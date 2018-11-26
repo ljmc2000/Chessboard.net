@@ -1,7 +1,7 @@
 package net.ddns.gingerpi.chessboardnetCommon;
 
-import java.util.ArrayList;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class ChessBoard implements Serializable
 {
