@@ -112,6 +112,7 @@ public class ChessPlayer extends Activity {
             imout.setMovementMethod(new ScrollingMovementMethod());
             Bundle extras=getIntent().getExtras();
             conmanager=new ServerConnection(this,extras.getString("hostname"),extras.getInt("port"),playerInfo,extras.getString("loginToken"),chessBoardAdapter,imout);
+            chessBoardAdapter.setServer(conmanager);
             conmanager.start();
             conmanager.refreshBoard();
         }

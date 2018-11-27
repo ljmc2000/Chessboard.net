@@ -1,6 +1,7 @@
 package net.ddns.gingerpi.chessboardnet;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -29,12 +30,12 @@ import static net.ddns.gingerpi.chessboardnet.ChessSet.texturePack;
 
 public class ChessBoardAdapter extends BaseAdapter{
     private Context mContext;
+    ServerConnection server;
     ChessBoard chessBoard;
     private int dimensions=64;  //a chessboard is 64 squares large
     private int[] squareContents=new int[dimensions];
     private ChessSet p1set;    //icons for player 1's chess set
     private ChessSet p2set;    //icons for player 2's chess set
-    boolean color;
     int tileSize;
     int selectedSquare=-1;
 
@@ -94,6 +95,10 @@ public class ChessBoardAdapter extends BaseAdapter{
                 return;
 
             else if(selectedSquare!=-1) {
+            	int move=(selectedSquare*64)+position;
+            	server.movePiece(move);
+            	Log.d("#Chessmove",Integer.toString(move));
+
                 selectedSquare = -1;
                 for(int i=0; i<dimensions; i++){
                     if(squareContents[i]==-2) squareContents[i]=-1;
@@ -133,7 +138,6 @@ public class ChessBoardAdapter extends BaseAdapter{
 
     public void refreshBoard(String contents){
         for(int i=0; i<dimensions; i++){
-            if(color)
             switch(contents.charAt(i)){
                 case 'K':{
                     squareContents[i]=p2set.getPiece(king_front);
@@ -199,76 +203,6 @@ public class ChessBoardAdapter extends BaseAdapter{
                     squareContents[i]=-1;
                 }
             }
-
-
-            else
-            switch(contents.charAt(i)){
-                case 'K':{
-                    squareContents[i]=p2set.getPiece(king_back);
-                    break;
-                }
-
-                case 'k':{
-                    squareContents[i]=p1set.getPiece(king_front);
-                    break;
-                }
-
-                case 'Q':{
-                    squareContents[i]=p2set.getPiece(queen_back);
-                    break;
-                }
-
-                case 'q':{
-                    squareContents[i]=p1set.getPiece(queen_front);
-                    break;
-                }
-
-                case 'B':{
-                    squareContents[i]=p2set.getPiece(bishop_back);
-                    break;
-                }
-
-                case 'b':{
-                    squareContents[i]=p1set.getPiece(bishop_front);
-                    break;
-                }
-
-                case 'N':{
-                    squareContents[i]=p2set.getPiece(knight_back);
-                    break;
-                }
-
-                case 'n':{
-                    squareContents[i]=p1set.getPiece(knight_front);
-                    break;
-                }
-
-                case 'R':{
-                    squareContents[i]=p2set.getPiece(rook_back);
-                    break;
-                }
-
-                case 'r':{
-                    squareContents[i]=p1set.getPiece(rook_front);
-                    break;
-                }
-
-                case 'P':{
-                    squareContents[i]=p2set.getPiece(pawn_back);
-                    break;
-                }
-
-                case 'p':{
-                    squareContents[i]=p1set.getPiece(pawn_front);
-                    break;
-                }
-
-                default: {
-                    squareContents[i]=-1;
-                }
-            }
-
-
         }
 
         notifyDataSetChanged();
@@ -277,8 +211,7 @@ public class ChessBoardAdapter extends BaseAdapter{
     public void setChessBoard(ChessBoard chessBoard){
         this.chessBoard=chessBoard;
     }
-
-    public void setColor(boolean color){
-        this.color=color;
-    }
+    public void setServer(ServerConnection server){
+    	this.server=server;
+	}
 }

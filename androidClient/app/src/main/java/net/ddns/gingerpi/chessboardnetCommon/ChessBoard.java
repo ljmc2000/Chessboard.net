@@ -111,20 +111,19 @@ public class ChessBoard implements Serializable
 		return returnme;
 	}
 
-	public String toStringReversed()
+	public void reverse()
 	{
-		String returnme="";
-		int i,j;
+		int i;
+		ChessPiece tmp;
 
-		for(i=070; i>=0; i-=010)
-			for(j=7; j>=0; j--)
-			{
-				if (map[i+j]!=null)
-					returnme+=map[i+j].toString();
-				else
-					returnme+=" ";
-			}
+		for(i=0; i<map.length/2; i++)
+		{
+			tmp=map[i];
+			map[i]=map[077-i];
+			map[077-i]=tmp;
 
-		return returnme;
+			if(map[i] != null) map[i].invertColor();
+			if(map[077-i] != null) map[077-i].invertColor();
+		}
 	}
 }

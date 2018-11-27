@@ -93,6 +93,7 @@ public class ServerConnection extends Thread {
                     }
 
                     case chessMove: {
+                    	int move=recievedMessage.getMove();
                         break;
                     }
 
@@ -127,6 +128,8 @@ public class ServerConnection extends Thread {
                     case refreshBoard: {
                         board=(ChessBoard) in.readObject();
                         color=(boolean) in.readObject();
+
+                        //set textures and settle disputes
                         ChessSet.texturePack mine=playerInfo.getMyTexturePack1();
                         ChessSet.texturePack opptp=playerInfo.getOpponentTexturePack1();
                         if(mine==opptp) {
@@ -135,22 +138,19 @@ public class ServerConnection extends Thread {
 							else
 								mine=playerInfo.getMyTexturePack2();
 						}
-						if(color)
-							boardOut.setTextures(mine, opptp);
-						else
-							boardOut.setTextures(opptp, mine);
-
-
+						boardOut.setTextures(mine, opptp);
+                        
+                        //refresh the view
                         mainThread.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
 								boardOut.setChessBoard(board);
-								boardOut.setColor(color);
 
-                            	if (color)
-	                                boardOut.refreshBoard(board.toString());
-                            	else
-                            		boardOut.refreshBoard(board.toStringReversed());
+                            	if (!color)
+                            		board.reverse();
+
+                            	boardOut.refreshBoard(board.toString());
+
                             }
                         });
                         break;
@@ -176,4 +176,17 @@ public class ServerConnection extends Thread {
     public void refreshBoard(){
         this.sendQueue.add(new ChessPacket(refreshBoard));
     }
+
+    public boolean movePiece(int move){
+    	if(!color) move=07777-move;
+
+    	if(board.movePiece(move)){
+    		this.sendQueue.add(new ChessPacket(move));
+
+    		return true;
+		}
+
+		else
+			return false;
+	}
 }

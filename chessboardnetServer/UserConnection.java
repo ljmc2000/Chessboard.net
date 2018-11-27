@@ -57,6 +57,14 @@ class UserConnection extends Thread
 						break;
 					}
 
+					case chessMove:
+					{
+						int move=messageIn.getMove();
+						chessBoard.movePiece(move);
+						//inform opponent
+						break;
+					}
+
 					case im:
 					{
 						UserConnection otherPlayer = Control.clients.get(opponent);

@@ -44,6 +44,11 @@ public abstract class ChessPiece implements Serializable
 		return color;
 	}
 
+	public void invertColor()
+	{
+		color=!color;
+	}
+
 	public int invertMove(int chessMove)	//return the same move if made from the other side of the board
 	{
 		/*this is a lot harder to explain than code but here goes
