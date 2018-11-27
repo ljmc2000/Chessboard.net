@@ -278,8 +278,6 @@ public class MainActivity extends Activity {
             switch(status){
                 case 0: {
                     try {
-                    	Looper.prepare();
-                    	Toast.makeText(getApplicationContext(),"rejoining Match",Toast.LENGTH_SHORT);
                         serverHostname=response.getString("hostname");
                         serverPort=response.getInt("port");
                         opponentid=response.getString("opponentid");
@@ -297,11 +295,10 @@ public class MainActivity extends Activity {
                 }
 
                 case -1: {
-                	Looper.prepare();
-                    Toast.makeText(getApplicationContext(), "Error communicating with the lobby", Toast.LENGTH_SHORT);
                     break;
                 }
             }
+
         }
 
 		public void stopSearch() {
@@ -338,23 +335,29 @@ public class MainActivity extends Activity {
                 Log.e("#LobbyError", e.toString());
             }
 
-			Looper.prepare();
-            switch (status) {
-                case 0: {
-                    Toast.makeText(getApplicationContext(), "Queueing for match", Toast.LENGTH_SHORT).show();
-                    break;
-                }
+            final int s=status;
+			runOnUiThread(new Runnable() {
 
-                case 1: {
-                    Toast.makeText(getApplicationContext(), "already in Match", Toast.LENGTH_SHORT).show();
-                    break;
-                }
+				@Override
+				public void run() {
+					switch (s) {
+						case 0: {
+							Toast.makeText(getApplicationContext(), "Queueing for match", Toast.LENGTH_SHORT).show();
+							break;
+						}
 
-                case -1: {
-                    Toast.makeText(getApplicationContext(), "Error connecting to the match making system", Toast.LENGTH_SHORT).show();
-                    break;
-                }
-            }
+						case 1: {
+							Toast.makeText(getApplicationContext(), "already in Match", Toast.LENGTH_SHORT).show();
+							break;
+						}
+
+						case -1: {
+							Toast.makeText(getApplicationContext(), "Error connecting to the match making system", Toast.LENGTH_SHORT).show();
+							break;
+						}
+					}
+				}
+			});
         }
     }
 
