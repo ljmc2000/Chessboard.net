@@ -52,12 +52,28 @@ public class ServerConnection extends Thread {
 
     public void run() {
         try {
-            ChessPacket sendMessage;
+			ChessPacket sendMessage;
+
+        	mainThread.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					imout.append("connecting to server\n");
+				}
+			});
+        	Thread.sleep(1000);
+
             mycon = new Socket(this.address, port);
             out = new ObjectOutputStream(mycon.getOutputStream());
             in = new ObjectInputStream(mycon.getInputStream());
 
             out.writeObject(loginToken);
+
+            mainThread.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					imout.append("connected to server\n");
+				}
+			});
 
             while (mycon.isConnected()) {
                 try {
@@ -145,6 +161,7 @@ public class ServerConnection extends Thread {
 
         catch(Exception e){
             Log.e("#Network",e.toString());
+            run();
         }
     }
 
