@@ -132,7 +132,6 @@ public class ChessPlayer extends Activity {
 
     public void surrender(View view){
         conmanager.surrender();
-        finish();
     }
 
     public void refreshBoard(View view){

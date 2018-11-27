@@ -270,10 +270,12 @@ public class MainActivity extends Activity {
                 }
 
                 catch (Exception e) {
+					matchCheck=new JsonObjectRequest(Request.Method.POST,url,payload,future ,errorListener);
+        	        queue.add(matchCheck);
+        	        status=-1;
                     Log.e("#HTTPAPI",e.toString());
-                    break;
                 }
-            } while (status == 1 && goOn);
+            } while (status != 0 && goOn);
 
             switch(status){
                 case 0: {
