@@ -113,6 +113,7 @@ public class ChessPlayer extends Activity {
             Bundle extras=getIntent().getExtras();
             conmanager=new ServerConnection(this,extras.getString("hostname"),extras.getInt("port"),playerInfo,extras.getString("loginToken"),chessBoardAdapter,imout);
             conmanager.start();
+            conmanager.refreshBoard();
         }
 
         catch (Exception e){
