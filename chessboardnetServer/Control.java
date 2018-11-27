@@ -23,50 +23,61 @@ class Control
 			MongoDataManager db = new MongoDataManager();
 
 			System.out.println("Server listening on port "+port);
+		
+
 			//for the rest of runtime
 			while(1==1)
 			{
-				if(remainingConnections>0)
+				try
 				{
-					//connect
-					Socket connection = myServerSocket.accept();
-					System.out.println("Connection from "+connection.getRemoteSocketAddress());
-					ObjectOutputStream out=new ObjectOutputStream(connection.getOutputStream());
-					ObjectInputStream in=new ObjectInputStream(connection.getInputStream());
+					if(remainingConnections>0)
+					{
+						//connect
+						Socket connection = myServerSocket.accept();
+						System.out.println("Connection from "+connection.getRemoteSocketAddress());
+						ObjectOutputStream out=new ObjectOutputStream(connection.getOutputStream());
+						ObjectInputStream in=new ObjectInputStream(connection.getInputStream());
 
-					//login
-					String token=(String) in.readObject();
-					ObjectId userid=db.getUserId(token);
+						//login
+						String token=(String) in.readObject();
+						ObjectId userid=db.getUserId(token);
 
-					//get opponent
-					ObjectId opponentid=db.getOpponentId(userid);
+						//get opponent
+						ObjectId opponentid=db.getOpponentId(userid);
 
-					//setup chessboard
-					ObjectId gameId=db.getGameId(userid);
-					ChessBoard chessBoard=boards.get(gameId);
-					if(chessBoard==null)
-						chessBoard=new ChessBoard();
-					boards.put(gameId,chessBoard);
+						//setup chessboard
+						ObjectId gameId=db.getGameId(userid);
+						ChessBoard chessBoard=boards.get(gameId);
+						if(chessBoard==null)
+							chessBoard=new ChessBoard();
+						boards.put(gameId,chessBoard);
 
-					//start the network handler thread for user
-					UserConnection pThread = new UserConnection(connection,out,in,userid,opponentid,chessBoard,db);
-					clients.put(userid,pThread);
-					pThread.start();
-					remainingConnections--;
+						//start the network handler thread for user
+						UserConnection pThread = new UserConnection(connection,out,in,userid,opponentid,chessBoard,db);
+						clients.put(userid,pThread);
+						pThread.start();
+						remainingConnections--;
+					}
+
+					else
+					{
+						Socket connection = myServerSocket.accept();
+						ObjectOutputStream out=new ObjectOutputStream(connection.getOutputStream());
+						out.writeObject(new ChessPacket(fullserver,"Server has no free connections"));
+					}
 				}
 
-				else
+				catch(Exception e)
 				{
-					Socket connection = myServerSocket.accept();
-					ObjectOutputStream out=new ObjectOutputStream(connection.getOutputStream());
-					out.writeObject(new ChessPacket(fullserver,"Server has no free connections"));
+					System.out.println("main: "+e);
 				}
 			}
+
 		}
 
-		catch(Exception e)
+		catch (Exception e)
 		{
-			System.out.println("main: "+e);
+			System.exit(1);
 		}
 	}
 

@@ -70,6 +70,9 @@ class UserConnection extends Thread
 						//end the game and record the result
 						db.endGame(opponent,messageIn.getMessage());
 
+						//destroy the chessboard
+						chessBoard=null;
+
 						//disconnect other player
 						System.out.println("user has disconnected; Reason: "+messageIn.getMessage());
 						UserConnection otherPlayer = Control.clients.get(opponent);
