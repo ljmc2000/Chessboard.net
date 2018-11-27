@@ -20,8 +20,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Login" />
-        <activity android:name=".ChessPlayer" android:screenOrientation="landscape"></activity>
+        <activity android:name=".Login" android:launchMode="singleInstance"/>
+        <activity android:name=".ChessPlayer" android:launchMode="singleInstance" android:screenOrientation="landscape"></activity>
     </application>
 
 </manifest>

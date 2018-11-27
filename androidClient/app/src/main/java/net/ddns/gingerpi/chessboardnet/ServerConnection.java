@@ -75,7 +75,7 @@ public class ServerConnection extends Thread {
 				}
 			});
 
-            while (mycon.isConnected()) {
+            Loop: while (mycon.isConnected()) {
                 try {
                     sendMessage = sendQueue.get(0);
                     sendQueue.remove(0);
@@ -121,7 +121,7 @@ public class ServerConnection extends Thread {
                             }
                         });
                         mycon.close();
-                        break;
+                        break Loop;
                     }
 
                     case refreshBoard: {

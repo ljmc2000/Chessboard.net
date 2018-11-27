@@ -120,6 +120,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         loginToken=checkLogin();
+        opponentid=null;
         queue=Volley.newRequestQueue(this);
 
 		startThreads();
@@ -129,12 +130,15 @@ public class MainActivity extends Activity {
     protected void onPause(){
     	super.onPause();
     	stopThreads();
+    	queue.stop();
 	}
 
     @Override
     protected void onResume() {
         super.onResume();
         loginToken=checkLogin();
+        opponentid=null;
+        queue=Volley.newRequestQueue(this);
 
 		startThreads();
     }
@@ -192,7 +196,6 @@ public class MainActivity extends Activity {
 
     class GetUserPreferencesFromServer extends Thread{
 		String url=getResources().getString(R.string.HTTPAPIurl)+"/userinfo";
-		int status=0;
 
 		UserPreferences prefs;
 		JSONObject payload=new JSONObject();
@@ -256,19 +259,18 @@ public class MainActivity extends Activity {
 
         @Override
         public void run(){
-            Looper.prepare();
+
             do {
-                matchCheck=new JsonObjectRequest(Request.Method.POST,url,payload,future ,errorListener);
-                queue.add(matchCheck);
-                try {
+				try {
+					Thread.sleep(3000);    //minimise number of requests
+    	            matchCheck=new JsonObjectRequest(Request.Method.POST,url,payload,future ,errorListener);
+        	        queue.add(matchCheck);
                     response=future.get(3,TimeUnit.SECONDS);
                     status=response.getInt("status");
-                    Thread.sleep(3000);    //minimise number of requests
                 }
 
                 catch (Exception e) {
                     Log.e("#HTTPAPI",e.toString());
-                    status=-1;
                     break;
                 }
             } while (status == 1 && goOn);
@@ -276,6 +278,7 @@ public class MainActivity extends Activity {
             switch(status){
                 case 0: {
                     try {
+                    	Looper.prepare();
                     	Toast.makeText(getApplicationContext(),"rejoining Match",Toast.LENGTH_SHORT);
                         serverHostname=response.getString("hostname");
                         serverPort=response.getInt("port");
@@ -294,6 +297,7 @@ public class MainActivity extends Activity {
                 }
 
                 case -1: {
+                	Looper.prepare();
                     Toast.makeText(getApplicationContext(), "Error communicating with the lobby", Toast.LENGTH_SHORT);
                     break;
                 }
@@ -302,6 +306,12 @@ public class MainActivity extends Activity {
 
 		public void stopSearch() {
 			this.goOn=false;
+			try{
+				this.finalize();
+			}
+			catch(java.lang.Throwable e){
+				Log.e("#matchChecker",e.toString());
+			}
 		}
     }
 
@@ -372,12 +382,13 @@ public class MainActivity extends Activity {
     }
 
     public void startGame(String hostname,int port){
-        Intent startgame=new Intent(this,ChessPlayer.class);
-        startgame.putExtra("loginToken", loginToken);
-        startgame.putExtra("opponentid",opponentid);
-        startgame.putExtra("hostname", hostname);
-        startgame.putExtra("port",port);
-        startActivity(startgame);
+    	Intent startgame = new Intent(this, ChessPlayer.class);
+		startgame.putExtra("loginToken", loginToken);
+		startgame.putExtra("opponentid", opponentid);
+		startgame.putExtra("hostname", hostname);
+		startgame.putExtra("port", port);
+		startActivity(startgame);
+
     }
 
     void startThreads(){
