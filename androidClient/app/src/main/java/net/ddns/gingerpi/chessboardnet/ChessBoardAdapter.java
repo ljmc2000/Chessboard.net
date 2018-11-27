@@ -38,13 +38,11 @@ public class ChessBoardAdapter extends BaseAdapter{
     int tileSize;
     int selectedSquare=-1;
 
-    public ChessBoardAdapter(Context c,int tileSize,texturePack set1,texturePack set2){
+    public ChessBoardAdapter(Context c,int tileSize){
         mContext=c;
         this.tileSize=tileSize;
         for(int i=0; i<dimensions; i++)
             squareContents[i]=-1;
-        p1set=new ChessSet(mContext, set1);
-        p2set=new ChessSet(mContext, set2);
     }
 
     @Override
@@ -127,6 +125,11 @@ public class ChessBoardAdapter extends BaseAdapter{
             notifyDataSetChanged();
         }
     };
+
+    public void setTextures(texturePack p1,texturePack p2){
+    	this.p1set=new ChessSet(mContext, p1);
+    	this.p2set=new ChessSet(mContext, p2);
+	}
 
     public void refreshBoard(String contents){
         for(int i=0; i<dimensions; i++){

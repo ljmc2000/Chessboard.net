@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import net.ddns.gingerpi.chessboardnet.Roomfiles.CacheDatabase;
 import net.ddns.gingerpi.chessboardnet.Roomfiles.UserInfo;
+import net.ddns.gingerpi.chessboardnet.Roomfiles.UserPreferences;
 
 import static net.ddns.gingerpi.chessboardnet.ChessSet.texturePack;
 
@@ -20,9 +21,11 @@ public class ChessPlayer extends Activity {
     ServerConnection conmanager;
     TextView imout;
 
-    class OpponentInfo extends Thread{
+    class PlayerInfo extends Thread{
         String opponentid;
         UserInfo opponent;
+        UserPreferences opponentPrefs;
+        UserPreferences myPrefs;
 
         @Override
         public void run(){
@@ -31,15 +34,41 @@ public class ChessPlayer extends Activity {
                             .getInstance(getApplicationContext())
                             .getUserInfoDao()
                             .getOpponentInfo(opponentid);
+
+            this.opponentPrefs=
+					CacheDatabase
+					.getInstance(getApplicationContext())
+					.getUserPreferencesDao()
+					.getOpponentPreferences(opponentid);
+
+            this.myPrefs=
+					CacheDatabase
+					.getInstance(getApplicationContext())
+					.getUserPreferencesDao()
+					.fetchOwn();
         }
 
-        public OpponentInfo(String opponentid){
+        public PlayerInfo(String opponentid){
             this.opponentid=opponentid;
         }
 
         public String getUsername(){
             return this.opponent.username;
         }
+        public texturePack getOpponentTexturePack1(){
+        	return this.opponentPrefs.favourite_set;
+		}
+		public texturePack getOpponentTexturePack2(){
+        	return this.opponentPrefs.secondary_set;
+		}
+
+		public texturePack getMyTexturePack1(){
+        	return this.myPrefs.favourite_set;
+		}
+
+		public texturePack getMyTexturePack2(){
+        	return this.myPrefs.secondary_set;
+		}
     }
 
     @Override
@@ -48,10 +77,10 @@ public class ChessPlayer extends Activity {
         setContentView(R.layout.activity_chess_player);
 
         //get opponent info from room
-        OpponentInfo opponentInfo=new OpponentInfo(getIntent().getExtras().getString("opponentid"));
-        opponentInfo.start();
+        PlayerInfo playerInfo=new PlayerInfo(getIntent().getExtras().getString("opponentid"));
+        playerInfo.start();
         try {
-            opponentInfo.join();
+            playerInfo.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -59,7 +88,7 @@ public class ChessPlayer extends Activity {
         //generate chessboard
         final GridView chessBoard = (GridView) findViewById(R.id.chessboard);
         int squareSize=this.getWindowManager().getDefaultDisplay().getWidth()/16;
-        final ChessBoardAdapter chessBoardAdapter=new ChessBoardAdapter(this,squareSize,texturePack.white,texturePack.black);
+        final ChessBoardAdapter chessBoardAdapter=new ChessBoardAdapter(this,squareSize);
         chessBoard.setAdapter(chessBoardAdapter);
         chessBoard.setOnItemClickListener(chessBoardAdapter.getOnItemClickListener);
         chessBoard.setColumnWidth(squareSize);
@@ -82,7 +111,7 @@ public class ChessPlayer extends Activity {
         try{
             imout.setMovementMethod(new ScrollingMovementMethod());
             Bundle extras=getIntent().getExtras();
-            conmanager=new ServerConnection(this,extras.getString("hostname"),extras.getInt("port"),opponentInfo,extras.getString("loginToken"),chessBoardAdapter,imout);
+            conmanager=new ServerConnection(this,extras.getString("hostname"),extras.getInt("port"),playerInfo,extras.getString("loginToken"),chessBoardAdapter,imout);
             conmanager.start();
         }
 

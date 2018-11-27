@@ -145,6 +145,7 @@ public class MainActivity extends Activity {
         JSONObject payload=new JSONObject();
         JSONObject response;
         UserInfo opponent;
+        UserPreferences oppref;
 
         @Override
         public void run(){
@@ -162,12 +163,23 @@ public class MainActivity extends Activity {
                         response.getString("username"),
                         null);
 
+                oppref=new UserPreferences(
+                		response.getString("userid"),
+						ChessSet.texturePack.valueOf(response.getString("favourite_set")),
+						ChessSet.texturePack.valueOf(response.getString("secondary_set"))
+				);
+
                 Log.d("#inserting_user",opponent.toString());
 
                 CacheDatabase
                     .getInstance(getApplicationContext())
                     .getUserInfoDao()
                     .insert(opponent);
+
+                CacheDatabase
+						.getInstance(getApplicationContext())
+						.getUserPreferencesDao()
+						.insert(oppref);
             }
             catch (JSONException e) {
                 Log.e("#JsonError",e.toString());

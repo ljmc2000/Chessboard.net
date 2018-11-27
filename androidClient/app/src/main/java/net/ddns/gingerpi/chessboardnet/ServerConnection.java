@@ -5,6 +5,7 @@ import android.widget.TextView;
 
 import net.ddns.gingerpi.chessboardnetCommon.ChessBoard;
 import net.ddns.gingerpi.chessboardnetCommon.ChessPacket;
+import net.ddns.gingerpi.chessboardnetCommon.ChessPiece;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -25,7 +26,7 @@ public class ServerConnection extends Thread {
     InetAddress address;
     int port;
     String loginToken;
-    ChessPlayer.OpponentInfo opponentInfo;
+    ChessPlayer.PlayerInfo playerInfo;
     TextView imout;     //object to display instant messages
     ChessBoardAdapter boardOut;      //write directly to the board
     public ChessBoard board;
@@ -33,12 +34,12 @@ public class ServerConnection extends Thread {
     ArrayList<ChessPacket> sendQueue=new ArrayList<ChessPacket>();
     ChessPacket recievedMessage;
 
-    public ServerConnection(ChessPlayer mainThread, String url, int port, ChessPlayer.OpponentInfo opponentInfo, String token, ChessBoardAdapter boardOut, TextView imout){
+    public ServerConnection(ChessPlayer mainThread, String url, int port, ChessPlayer.PlayerInfo playerInfo, String token, ChessBoardAdapter boardOut, TextView imout){
         try {
             this.mainThread=mainThread;
             this.address = InetAddress.getByName(url);
             this.port = port;
-            this.opponentInfo=opponentInfo;
+            this.playerInfo=playerInfo;
             this.loginToken=token;
             this.boardOut=boardOut;
             this.imout = imout;
@@ -84,7 +85,7 @@ public class ServerConnection extends Thread {
                             @Override
                             public void run() {
                                 try {
-                                    imout.append(opponentInfo.getUsername() + ": " + recievedMessage.getMessage() + "\n");
+                                    imout.append(playerInfo.getUsername() + ": " + recievedMessage.getMessage() + "\n");
                                 }
 
                                 catch(Exception e){
@@ -110,6 +111,20 @@ public class ServerConnection extends Thread {
                     case refreshBoard: {
                         board=(ChessBoard) in.readObject();
                         color=(boolean) in.readObject();
+                        ChessSet.texturePack mine=playerInfo.getMyTexturePack1();
+                        ChessSet.texturePack opptp=playerInfo.getOpponentTexturePack1();
+                        if(mine==opptp) {
+							if (color)
+								opptp = playerInfo.getOpponentTexturePack2();
+							else
+								mine=playerInfo.getMyTexturePack2();
+						}
+						if(color)
+							boardOut.setTextures(mine, opptp);
+						else
+							boardOut.setTextures(opptp, mine);
+
+
                         mainThread.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
