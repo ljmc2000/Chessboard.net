@@ -18,7 +18,7 @@ public class Pawn extends ChessPiece
 	{
 		ArrayList<Integer> returnme=new ArrayList<Integer>();
 
-		int direction;
+		int direction,tmp;
 		if(color)
 			direction=1;
 		else
@@ -26,19 +26,26 @@ public class Pawn extends ChessPiece
 
 
 		returnme.add(position+(010*direction));
-		if(moveCount==0)
-			returnme.add(position+(020*direction));
 
-		ChessPiece target=chessBoard.getItem(position+011);	//010+1
+
+		tmp=position+(010*direction);
+		ChessPiece target=chessBoard.getItem(tmp);
+		if(moveCount==0 && target==null)
+				returnme.add(position+(020*direction));
+
+		tmp=position+(011*direction);	//010+1
+		target=chessBoard.getItem(tmp);
 		if(target!=null)
-			if(divineInterventionCheck((position*0100)+(position+011)))
+			if(divineInterventionCheck((position*0100)+(tmp)))
 				if(target.getColor()!=color)
-					 returnme.add(position+011);
-		target=chessBoard.getItem(position+007);	//010-1
+					 returnme.add(tmp);
+
+		tmp=position+(007*direction);	//010-1
+		target=chessBoard.getItem(tmp);
 		if(target!=null)
-			if(divineInterventionCheck((position*0100)+(position+007)))
+			if(divineInterventionCheck((position*0100)+(tmp)))
 				if(target.getColor()!=color)
-					returnme.add(position+011);
+					returnme.add(tmp);
 
 		return returnme;
 	}
