@@ -43,7 +43,7 @@ public class ChessBoardAdapter extends BaseAdapter{
         mContext=c;
         this.tileSize=tileSize;
         for(int i=0; i<dimensions; i++)
-            squareContents[i]=-1;
+            squareContents[i]=1;
     }
 
     @Override
@@ -65,7 +65,7 @@ public class ChessBoardAdapter extends BaseAdapter{
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView square=new ImageView(mContext);
 
-        if(squareContents[position]==-2) {
+        if(squareContents[position]<0) {
             if (position %2 == (position/8)%2)
                 square.setBackgroundColor(mContext.getColor(R.color.chessTileLightLit));
             else
@@ -79,8 +79,11 @@ public class ChessBoardAdapter extends BaseAdapter{
                 square.setBackgroundColor(mContext.getColor(R.color.chessTileDark));
         }
 
-        if(squareContents[position]>-1)
-            square.setImageDrawable(mContext.getResources().getDrawable(squareContents[position], null));
+        if(squareContents[position]<0)
+        	squareContents[position]*=-1;
+        if(squareContents[position]!=1)
+        	square.setImageDrawable(mContext.getResources().getDrawable(squareContents[position], null));
+
 
         square.setLayoutParams(new ViewGroup.LayoutParams(tileSize,tileSize));
         square.setPadding(0,0,0,0);
@@ -101,7 +104,7 @@ public class ChessBoardAdapter extends BaseAdapter{
 
                 selectedSquare = -1;
                 for(int i=0; i<dimensions; i++){
-                    if(squareContents[i]==-2) squareContents[i]=-1;
+                    if(squareContents[i]<0) squareContents[i]*=-1;
                 }
             }
 
@@ -119,8 +122,8 @@ public class ChessBoardAdapter extends BaseAdapter{
                 for (int i = 0; i < validMoves.size(); i++) {
                     square=validMoves.get(i);
                     if(0<square && square<64)
-                    if(squareContents[square]==-1)
-                        squareContents[square]=-2;
+                    squareContents[square]*=-1;
+
                 }
 
                 if(validMoves.size()==0)
@@ -201,7 +204,7 @@ public class ChessBoardAdapter extends BaseAdapter{
                 }
 
                 default: {
-                    squareContents[i]=-1;
+                    squareContents[i]=1;
                 }
             }
         }
