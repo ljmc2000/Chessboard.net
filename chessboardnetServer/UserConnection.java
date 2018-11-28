@@ -66,6 +66,7 @@ class UserConnection extends Thread
 						{
 							System.out.println("illegal move from "+userID.toString());
 							out.writeObject(new ChessPacket(chessError,"You may only move your own pieces"));
+							s.close();
 						}
 
 						else if(chessBoard.movePiece(move))
@@ -79,6 +80,7 @@ class UserConnection extends Thread
 						{
 							System.out.println("illegal move from "+userID.toString());
 							out.writeObject(new ChessPacket(chessError,"Illegal move"));
+							s.close();
 						}
 
 						break;
