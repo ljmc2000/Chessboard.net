@@ -112,7 +112,7 @@ public class ChessBoardAdapter extends BaseAdapter{
                 selectedSquare=position;
 
                 ChessPiece p=chessBoard.getItem(position);
-                if(p==null || p.getColor()) {
+                if(p==null || p.getColor() || chessBoard.getWhosTurn()) {
                     selectedSquare = -1;
                     return;
                 }
