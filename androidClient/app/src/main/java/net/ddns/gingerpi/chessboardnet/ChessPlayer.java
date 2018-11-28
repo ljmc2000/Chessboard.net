@@ -20,12 +20,17 @@ public class ChessPlayer extends Activity {
 
     ServerConnection conmanager;
     TextView imout;
+    PlayerInfo playerInfo;
+	ChessBoardAdapter chessBoardAdapter;
+	GridView chessBoard;
+	Bundle extras;
 
     class PlayerInfo extends Thread{
         String opponentid;
         UserInfo opponent;
         UserPreferences opponentPrefs;
         UserPreferences myPrefs;
+
 
         @Override
         public void run(){
@@ -76,8 +81,11 @@ public class ChessPlayer extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chess_player);
 
+        //get info passed by main
+        extras=getIntent().getExtras();
+
         //get opponent info from room
-        PlayerInfo playerInfo=new PlayerInfo(getIntent().getExtras().getString("opponentid"));
+		playerInfo=new PlayerInfo(getIntent().getExtras().getString("opponentid"));
         playerInfo.start();
         try {
             playerInfo.join();
@@ -86,9 +94,9 @@ public class ChessPlayer extends Activity {
         }
 
         //generate chessboard
-        final GridView chessBoard = (GridView) findViewById(R.id.chessboard);
+        chessBoard = (GridView) findViewById(R.id.chessboard);
         int squareSize=this.getWindowManager().getDefaultDisplay().getWidth()/16;
-        final ChessBoardAdapter chessBoardAdapter=new ChessBoardAdapter(this,squareSize);
+        chessBoardAdapter=new ChessBoardAdapter(this,squareSize);
         chessBoard.setAdapter(chessBoardAdapter);
         chessBoard.setOnItemClickListener(chessBoardAdapter.getOnItemClickListener);
         chessBoard.setColumnWidth(squareSize);
@@ -110,7 +118,6 @@ public class ChessPlayer extends Activity {
 
         try{
             imout.setMovementMethod(new ScrollingMovementMethod());
-            Bundle extras=getIntent().getExtras();
             conmanager=new ServerConnection(this,extras.getString("hostname"),extras.getInt("port"),playerInfo,extras.getString("loginToken"),chessBoardAdapter,imout);
             chessBoardAdapter.setServer(conmanager);
             conmanager.start();
@@ -134,4 +141,12 @@ public class ChessPlayer extends Activity {
     public void surrender(View view){
         conmanager.surrender();
     }
+
+    public void reconnect(View view){
+    	conmanager.disconnnect();
+		conmanager=new ServerConnection(this,extras.getString("hostname"),extras.getInt("port"),playerInfo,extras.getString("loginToken"),chessBoardAdapter,imout);
+		chessBoardAdapter.setServer(conmanager);
+    	conmanager.start();
+    	conmanager.initBoard();
+	}
 }

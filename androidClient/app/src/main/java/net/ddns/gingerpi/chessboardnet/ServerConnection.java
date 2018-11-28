@@ -183,7 +183,7 @@ public class ServerConnection extends Thread {
 			mainThread.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					imout.append("lost connection to server");
+					imout.append("lost connection to server\n");
 
 				}
 			});
@@ -218,5 +218,14 @@ public class ServerConnection extends Thread {
 
 		else
 			return false;
+	}
+
+	public void disconnnect(){
+    	try {
+			mycon.close();
+		}
+		catch (Exception e){
+    		Log.e("#disconnectFail",e.toString());
+		}
 	}
 }
