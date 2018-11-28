@@ -15,18 +15,18 @@ class UserConnection extends Thread
 	ObjectOutputStream out;
 	ObjectInputStream in;
 	MongoDataManager db;
-	ChessBoard chessBoard;
+	ObjectId gameId;
 	ChessPacket messageIn,messageOut;
 	boolean color;
 
-	public UserConnection(Socket s,ObjectOutputStream out, ObjectInputStream in,ObjectId userId,ObjectId opponent,ChessBoard chessBoard,MongoDataManager db)
+	public UserConnection(Socket s,ObjectOutputStream out, ObjectInputStream in,ObjectId userId,ObjectId opponent,ObjectId gameId,MongoDataManager db)
 	{
 		this.s=s;
 		this.out=out;
 		this.in=in;
 		this.userID=userId;
 		this.opponent=opponent;
-		this.chessBoard=chessBoard;
+		this.gameId=gameId;
 		this.db=db;
 		this.color=db.getUserColor(userId);
 	}
@@ -59,9 +59,21 @@ class UserConnection extends Thread
 
 					case chessMove:
 					{
+						ChessBoard chessBoard=Control.boards.get(gameId);
 						int move=messageIn.getMove();
-						chessBoard.movePiece(move);
-						//inform opponent
+						if(chessBoard.movePiece(move))
+						{
+							UserConnection otherPlayer = Control.clients.get(opponent);
+							otherPlayer.putMessage(messageIn);
+						}
+
+						else
+						{
+							System.out.println("illegal move from "+userID.toString());
+						}
+
+						out.writeObject(new ChessPacket(ack));
+
 						break;
 					}
 
@@ -79,7 +91,7 @@ class UserConnection extends Thread
 						db.endGame(opponent,messageIn.getMessage());
 
 						//destroy the chessboard
-						chessBoard=null;
+						Control.boards.remove(gameId);
 
 						//disconnect other player
 						System.out.println("user has disconnected; Reason: "+messageIn.getMessage());
@@ -90,9 +102,11 @@ class UserConnection extends Thread
 						break connection;
 					}
 
-					case refreshBoard:
+					case initBoard:
 					{
-						out.writeObject(new ChessPacket(refreshBoard));
+						ChessBoard chessBoard=Control.boards.get(gameId);
+
+						out.writeObject(new ChessPacket(initBoard));
 						out.writeObject(chessBoard);
 						out.writeObject(color);
 						break;

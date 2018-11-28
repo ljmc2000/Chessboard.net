@@ -23,7 +23,6 @@ class Control
 			MongoDataManager db = new MongoDataManager();
 
 			System.out.println("Server listening on port "+port);
-		
 
 			//for the rest of runtime
 			while(1==1)
@@ -53,7 +52,7 @@ class Control
 						boards.put(gameId,chessBoard);
 
 						//start the network handler thread for user
-						UserConnection pThread = new UserConnection(connection,out,in,userid,opponentid,chessBoard,db);
+						UserConnection pThread = new UserConnection(connection,out,in,userid,opponentid,gameId,db);
 						clients.put(userid,pThread);
 						pThread.start();
 						remainingConnections--;

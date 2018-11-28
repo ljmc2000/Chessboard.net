@@ -105,7 +105,24 @@ public class ChessBoard implements Serializable
 					returnme+=" ";
 			}
 
-			//returnme+="\n";		//was here for human readable purpouses
+			returnme+="\n";
+		}
+
+		return returnme;
+	}
+
+	public String toCompString()
+	{
+		String returnme="";
+		int i,j;
+
+		for(i=0; i<0100; i+=010)
+		for(j=0; j<8; j++)
+		{
+			if (map[i+j]!=null)
+				returnme+=map[i+j].toString();
+			else
+				returnme+=" ";
 		}
 
 		return returnme;
@@ -115,6 +132,7 @@ public class ChessBoard implements Serializable
 	{
 		int i;
 		ChessPiece tmp;
+		whosTurn=!whosTurn;
 
 		for(i=0; i<map.length/2; i++)
 		{

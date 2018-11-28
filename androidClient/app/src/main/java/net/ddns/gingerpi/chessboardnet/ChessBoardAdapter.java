@@ -97,7 +97,7 @@ public class ChessBoardAdapter extends BaseAdapter{
             else if(selectedSquare!=-1) {
             	int move=(selectedSquare*64)+position;
             	server.movePiece(move);
-            	Log.d("#Chessmove",Integer.toString(move));
+            	refreshBoard();
 
                 selectedSquare = -1;
                 for(int i=0; i<dimensions; i++){
@@ -136,9 +136,10 @@ public class ChessBoardAdapter extends BaseAdapter{
     	this.p2set=new ChessSet(mContext, p2);
 	}
 
-    public void refreshBoard(String contents){
+    public void refreshBoard(){
+    	String layout=chessBoard.toCompString();
         for(int i=0; i<dimensions; i++){
-            switch(contents.charAt(i)){
+            switch(layout.charAt(i)){
                 case 'K':{
                     squareContents[i]=p2set.getPiece(king_front);
                     break;

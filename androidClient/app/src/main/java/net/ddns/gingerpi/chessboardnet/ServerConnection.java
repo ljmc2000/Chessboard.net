@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.ack;
 import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.end;
 import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.im;
-import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.refreshBoard;
+import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.initBoard;
 
 public class ServerConnection extends Thread {
     ChessPlayer mainThread;
@@ -28,11 +28,10 @@ public class ServerConnection extends Thread {
     String loginToken;
     ChessPlayer.PlayerInfo playerInfo;
     TextView imout;     //object to display instant messages
+	ChessBoard board;
     ChessBoardAdapter boardOut;      //write directly to the board
-    public ChessBoard board;
     boolean color;
     ArrayList<ChessPacket> sendQueue=new ArrayList<ChessPacket>();
-    ChessPacket recievedMessage;
 
     public ServerConnection(ChessPlayer mainThread, String url, int port, ChessPlayer.PlayerInfo playerInfo, String token, ChessBoardAdapter boardOut, TextView imout){
         try {
@@ -75,7 +74,7 @@ public class ServerConnection extends Thread {
 				}
 			});
 
-            Loop: while (mycon.isConnected()) {
+            Loop: while (true) {
                 try {
                     sendMessage = sendQueue.get(0);
                     sendQueue.remove(0);
@@ -86,7 +85,7 @@ public class ServerConnection extends Thread {
                 out.writeObject(sendMessage);
 
 
-                recievedMessage = (ChessPacket) in.readObject();
+                final ChessPacket recievedMessage = (ChessPacket) in.readObject();
                 switch (recievedMessage.getHeader()) {
                     case ack: {
                         break;
@@ -94,6 +93,14 @@ public class ServerConnection extends Thread {
 
                     case chessMove: {
                     	int move=recievedMessage.getMove();
+                    	if(!color) move=07777-move;
+                    	board.movePiece(move);
+                    	mainThread.runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								boardOut.refreshBoard();
+							}
+						});
                         break;
                     }
 
@@ -114,20 +121,21 @@ public class ServerConnection extends Thread {
                     }
 
                     case end: {
-                        out.writeObject(new ChessPacket(end,"AcKSurrender"));
                         mainThread.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 imout.append("Opponent has surrendered"+"\n");
                             }
                         });
-                        mycon.close();
                         break Loop;
                     }
 
-                    case refreshBoard: {
-                        board=(ChessBoard) in.readObject();
-                        color=(boolean) in.readObject();
+                    case initBoard: {
+                    	board=(ChessBoard) in.readObject();
+                    	color=(boolean) in.readObject();
+						if(!color) board.reverse();
+						boardOut.setChessBoard(board);
+
 
                         //set textures and settle disputes
                         ChessSet.texturePack mine=playerInfo.getMyTexturePack1();
@@ -136,23 +144,22 @@ public class ServerConnection extends Thread {
 							if (color)
 								opptp = playerInfo.getOpponentTexturePack2();
 							else
-								mine=playerInfo.getMyTexturePack2();
+								mine = playerInfo.getMyTexturePack2();
+
+							if(color)
+								boardOut.setTextures(mine, opptp);
+							else
+								boardOut.setTextures(opptp, mine);
 						}
 						boardOut.setTextures(mine, opptp);
-                        
+
                         //refresh the view
                         mainThread.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-								boardOut.setChessBoard(board);
-
-                            	if (!color)
-                            		board.reverse();
-
-                            	boardOut.refreshBoard(board.toString());
-
-                            }
-                        });
+							@Override
+							public void run() {
+								boardOut.refreshBoard();
+							}
+						});
                         break;
                     }
                 }
@@ -161,7 +168,6 @@ public class ServerConnection extends Thread {
 
         catch(Exception e){
             Log.e("#Network",e.toString());
-            run();
         }
     }
 
@@ -170,17 +176,22 @@ public class ServerConnection extends Thread {
     }
 
     public void surrender(){
+    	mainThread.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				imout.append("Surrendering and disconnecting from server\n");
+			}
+		});
         this.sendQueue.add(new ChessPacket(end,"surrender"));
     }
 
-    public void refreshBoard(){
-        this.sendQueue.add(new ChessPacket(refreshBoard));
+    public void initBoard(){
+        this.sendQueue.add(new ChessPacket(initBoard));
     }
 
     public boolean movePiece(int move){
-    	if(!color) move=07777-move;
-
     	if(board.movePiece(move)){
+			if(!color) move=07777-move;
     		this.sendQueue.add(new ChessPacket(move));
 
     		return true;

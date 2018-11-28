@@ -114,7 +114,7 @@ public class ChessPlayer extends Activity {
             conmanager=new ServerConnection(this,extras.getString("hostname"),extras.getInt("port"),playerInfo,extras.getString("loginToken"),chessBoardAdapter,imout);
             chessBoardAdapter.setServer(conmanager);
             conmanager.start();
-            conmanager.refreshBoard();
+            conmanager.initBoard();
         }
 
         catch (Exception e){
@@ -133,9 +133,5 @@ public class ChessPlayer extends Activity {
 
     public void surrender(View view){
         conmanager.surrender();
-    }
-
-    public void refreshBoard(View view){
-        conmanager.refreshBoard();
     }
 }
