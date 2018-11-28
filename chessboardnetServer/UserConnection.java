@@ -60,6 +60,13 @@ class UserConnection extends Thread
 					case chessMove:
 					{
 						ChessBoard chessBoard=Control.boards.get(gameId);
+						if(color==chessBoard.getWhosTurn())
+						{
+							out.writeObject(new ChessPacket(ack));
+							break;
+						}
+
+
 						int move=messageIn.getMove();
 						if(chessBoard.movePiece(move))
 						{

@@ -145,4 +145,9 @@ public class ChessBoard implements Serializable
 			if(map[077-i] != null) map[077-i].invertColor();
 		}
 	}
+
+	public boolean getWhosTurn()
+	{
+		return whosTurn;
+	}
 }
