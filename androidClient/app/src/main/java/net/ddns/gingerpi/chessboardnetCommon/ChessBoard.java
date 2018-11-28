@@ -100,17 +100,17 @@ public class ChessBoard implements Serializable
 		return false;
 	}
 
-	public int inDanger(int square,boolean color)
+	public ArrayList<Integer> inDanger(int square,boolean color)
 	{
-		//return how many pieces a given piece is in danger from
+		//return list of pieces threathening piece at square
+		ArrayList<Integer> returnme=new ArrayList<Integer>();
 		int i;
-		int returnme=0;
 		for(i=0;i<64;i++)
 		{
 			if(map[i]!=null)
 			if(map[i].getColor()!=color)
 			if(map[i].getLegalMoves(i,this).contains(square))
-				returnme++;
+				returnme.add(i);
 		}
 
 		return returnme;
@@ -122,7 +122,29 @@ public class ChessBoard implements Serializable
 		if(color) square=king1;
 		else square=king2;
 
-		return inDanger(square,color);
+		ChessPiece king=map[square];
+		ArrayList<Integer> potAssasains=inDanger(square,color);
+
+		switch(potAssasains.size())
+		{
+			case 0: return 0;	//not in check
+			case 1:			//in check from one piece
+			{
+				ArrayList<Integer> moves=king.getLegalMoves(square,this);
+				for(int i=0; i<moves.size(); i++)
+					if(inDanger(moves.get(i).intValue(),color).size()==0)
+						return 1;	//just check
+
+				int assasian=potAssasains.get(0).intValue();
+				if(inDanger(assasian,!color).size() > 0)
+					return 1;
+				else
+					return 2;	//if assasain cannot be taken, checkmate
+
+			}
+
+			default: return -1;	//in check from more than one piece
+		}
 	}
 
 	public String toString()
