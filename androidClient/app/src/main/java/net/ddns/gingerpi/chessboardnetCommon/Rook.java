@@ -54,7 +54,7 @@ public class Rook extends ChessPiece
 		i=position;
 		stopAt=position/8;
 		stopAt=stopAt*8;
-		while(i>0)
+		while(i>stopAt)
 		{
 			i-=001;
 			if(!chessBoard.addMoveToList(returnme,i,color))

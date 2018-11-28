@@ -5,6 +5,9 @@ import java.util.ArrayList;
 
 public class ChessBoard implements Serializable
 {
+	int king1=004;	//square where king1 sits
+	int king2=074;	//square where king2 sits
+
 	boolean whosTurn=false;	//switches every time someone makes a move
 	ChessPiece[] map={
 			new Rook(true),new Knight(true),new Bishop(true),new Queen(true),new King(true),new Bishop(true),new Knight(true),new Rook(true),
@@ -85,10 +88,41 @@ public class ChessBoard implements Serializable
 			map[origin]=null;
 			whosTurn=!whosTurn;
 
+			//update king location
+			if(piece.toString().equals("K"))
+				king1=destination;
+			else if(piece.toString().equals("k"))
+				king2=destination;
+
 			return true;
 		}
 
 		return false;
+	}
+
+	public int inDanger(int square,boolean color)
+	{
+		//return how many pieces a given piece is in danger from
+		int i;
+		int returnme=0;
+		for(i=0;i<64;i++)
+		{
+			if(map[i]!=null)
+			if(map[i].getColor()!=color)
+			if(map[i].getLegalMoves(i,this).contains(square))
+				returnme++;
+		}
+
+		return returnme;
+	}
+
+	public int inCheck(boolean color)
+	{
+		int square;
+		if(color) square=king1;
+		else square=king2;
+
+		return inDanger(square,color);
 	}
 
 	public String toString()
