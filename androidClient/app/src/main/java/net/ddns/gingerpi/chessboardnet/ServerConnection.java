@@ -14,6 +14,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.ack;
+import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.chessError;
 import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.end;
 import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.im;
 import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.initBoard;
@@ -162,6 +163,17 @@ public class ServerConnection extends Thread {
 						});
                         break;
                     }
+
+					case chessError: {
+						mainThread.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                imout.append("Kicked from Server: "+recievedMessage.getMessage()+"\n");
+                            }
+                        });
+
+						break Loop;
+					}
                 }
             }
         }

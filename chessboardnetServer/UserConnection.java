@@ -60,26 +60,26 @@ class UserConnection extends Thread
 					case chessMove:
 					{
 						ChessBoard chessBoard=Control.boards.get(gameId);
+						int move=messageIn.getMove();
+
 						if(color==chessBoard.getWhosTurn())
 						{
-							out.writeObject(new ChessPacket(ack));
-							break;
+							System.out.println("illegal move from "+userID.toString());
+							out.writeObject(new ChessPacket(chessError,"You may only move your own pieces"));
 						}
 
-
-						int move=messageIn.getMove();
-						if(chessBoard.movePiece(move))
+						else if(chessBoard.movePiece(move))
 						{
 							UserConnection otherPlayer = Control.clients.get(opponent);
 							otherPlayer.putMessage(messageIn);
+							out.writeObject(new ChessPacket(ack));
 						}
 
 						else
 						{
 							System.out.println("illegal move from "+userID.toString());
+							out.writeObject(new ChessPacket(chessError,"Illegal move"));
 						}
-
-						out.writeObject(new ChessPacket(ack));
 
 						break;
 					}
