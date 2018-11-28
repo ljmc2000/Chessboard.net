@@ -166,9 +166,16 @@ public class ServerConnection extends Thread {
             }
         }
 
-        catch(Exception e){
-            Log.e("#Network",e.toString());
-        }
+        catch(Exception e) {
+			Log.e("#Network", e.toString());
+			mainThread.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					imout.append("lost connection to server");
+
+				}
+			});
+		}
     }
 
     public void sendIMessage(String s){
