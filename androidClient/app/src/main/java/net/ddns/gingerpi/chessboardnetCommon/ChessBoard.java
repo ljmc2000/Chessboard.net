@@ -75,7 +75,8 @@ public class ChessBoard implements Serializable
 			else
 				attacking=true;
 
-		if(piece.checkLegal(chessMove,attacking))
+		if(piece.checkLegal(chessMove,attacking))//simple check
+		if(piece.getLegalMoves(origin,this).contains(destination))//more robust
 		{
 			piece.addMove();
 			if(attacking)
