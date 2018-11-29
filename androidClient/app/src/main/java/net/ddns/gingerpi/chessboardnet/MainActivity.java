@@ -343,17 +343,17 @@ public class MainActivity extends Activity {
 				public void run() {
 					switch (s) {
 						case 0: {
-							Toast.makeText(getApplicationContext(), "Queueing for match", Toast.LENGTH_SHORT).show();
+							Toast.makeText(getApplicationContext(), R.string.queueingToast, Toast.LENGTH_SHORT).show();
 							break;
 						}
 
 						case 1: {
-							Toast.makeText(getApplicationContext(), "already in Match", Toast.LENGTH_SHORT).show();
+							Toast.makeText(getApplicationContext(), R.string.inMatchToast, Toast.LENGTH_SHORT).show();
 							break;
 						}
 
 						case -1: {
-							Toast.makeText(getApplicationContext(), "Error connecting to the match making system", Toast.LENGTH_SHORT).show();
+							Toast.makeText(getApplicationContext(), R.string.matchmakingError, Toast.LENGTH_SHORT).show();
 							break;
 						}
 					}

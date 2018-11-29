@@ -1,6 +1,7 @@
 package net.ddns.gingerpi.chessboardnet;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ public class ChessBoardAdapter extends BaseAdapter{
     private Context mContext;
     ServerConnection server;
     ChessBoard chessBoard;
+    ImageView whosTurn;
     private int dimensions=64;  //a chessboard is 64 squares large
     private int[] squareContents=new int[dimensions];
     private ChessSet p1set;    //icons for player 1's chess set
@@ -39,8 +41,9 @@ public class ChessBoardAdapter extends BaseAdapter{
     int tileSize;
     int selectedSquare=-1;
 
-    public ChessBoardAdapter(Context c,int tileSize){
+    public ChessBoardAdapter(Context c,int tileSize,ImageView whosTurn){
         mContext=c;
+        this.whosTurn=whosTurn;
         this.tileSize=tileSize;
         for(int i=0; i<dimensions; i++)
             squareContents[i]=1;
@@ -97,7 +100,7 @@ public class ChessBoardAdapter extends BaseAdapter{
             if(chessBoard==null)
                 return;
 
-            else if(selectedSquare!=-1) {
+            if(selectedSquare!=-1) {
             	int move=(selectedSquare*64)+position;
             	server.movePiece(move);
             	refreshBoard();
@@ -209,6 +212,11 @@ public class ChessBoardAdapter extends BaseAdapter{
             }
         }
 
+        if(chessBoard.getWhosTurn())
+	        whosTurn.setImageDrawable(mContext.getResources().getDrawable(p2set.getPiece(pawn_front), null));
+        else
+        	whosTurn.setImageDrawable(mContext.getResources().getDrawable(p1set.getPiece(pawn_front), null));
+        
         notifyDataSetChanged();
     }
 

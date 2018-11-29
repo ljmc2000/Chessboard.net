@@ -1,6 +1,8 @@
 package net.ddns.gingerpi.chessboardnet;
 
+import android.graphics.drawable.Drawable;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,11 +30,14 @@ public class ServerConnection extends Thread {
     InetAddress address;
     int port;
     String loginToken;
+
     ChessPlayer.PlayerInfo playerInfo;
     TextView imout;     //object to display instant messages
 	ChessBoard board;
     ChessBoardAdapter boardOut;      //write directly to the board
-    boolean color;
+	ImageView whosTurn;
+
+	boolean color;
     ArrayList<ChessPacket> sendQueue=new ArrayList<ChessPacket>();
 
     public ServerConnection(ChessPlayer mainThread, String url, int port, ChessPlayer.PlayerInfo playerInfo, String token, ChessBoardAdapter boardOut, TextView imout){

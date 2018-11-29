@@ -10,6 +10,9 @@
     <string name="challengeStranger">With Anyone</string>
     <string name="statsbutton">View past match Statistics</string>
     <string name="settingsbutton">Change user preferences</string>
+    <string name="queueingToast">Queueing for match</string>
+    <string name="inMatchToast">already in Match</string>
+    <string name="matchmakingError">Error connecting to the match making system</string>
     <string name="exit">Exit</string>
     <string name="send">Send</string>
     <string name="surrender">Surrender</string>

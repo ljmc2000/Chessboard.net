@@ -8,6 +8,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.ddns.gingerpi.chessboardnet.Roomfiles.CacheDatabase;
@@ -96,7 +97,7 @@ public class ChessPlayer extends Activity {
         //generate chessboard
         chessBoard = (GridView) findViewById(R.id.chessboard);
         int squareSize=this.getWindowManager().getDefaultDisplay().getWidth()/16;
-        chessBoardAdapter=new ChessBoardAdapter(this,squareSize);
+        chessBoardAdapter=new ChessBoardAdapter(this,squareSize,(ImageView) findViewById(R.id.whosTurn));
         chessBoard.setAdapter(chessBoardAdapter);
         chessBoard.setOnItemClickListener(chessBoardAdapter.getOnItemClickListener);
         chessBoard.setColumnWidth(squareSize);
