@@ -216,7 +216,7 @@ public class ChessBoardAdapter extends BaseAdapter{
 	        whosTurn.setImageDrawable(mContext.getResources().getDrawable(p2set.getPiece(pawn_front), null));
         else
         	whosTurn.setImageDrawable(mContext.getResources().getDrawable(p1set.getPiece(pawn_front), null));
-        
+
         notifyDataSetChanged();
     }
 

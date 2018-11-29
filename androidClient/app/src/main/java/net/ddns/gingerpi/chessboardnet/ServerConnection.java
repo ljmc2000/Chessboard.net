@@ -106,6 +106,7 @@ public class ServerConnection extends Thread {
 							@Override
 							public void run() {
 								boardOut.refreshBoard();
+								//if(board.inCheck(!color))
 							}
 						});
                         break;

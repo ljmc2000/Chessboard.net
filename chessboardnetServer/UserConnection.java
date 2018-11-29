@@ -1,6 +1,7 @@
 package net.ddns.gingerpi.chessboardnetServer;
 import java.net.*;
 import java.io.*;
+import java.util.ArrayList;
 
 import org.bson.types.ObjectId;
 
@@ -17,6 +18,7 @@ class UserConnection extends Thread
 	MongoDataManager db;
 	ObjectId gameId;
 	ChessPacket messageIn,messageOut;
+	ArrayList<ChessPacket> recieveQueue=new ArrayList<ChessPacket>();
 	boolean color;
 
 	public UserConnection(Socket s,ObjectOutputStream out, ObjectInputStream in,ObjectId userId,ObjectId opponent,ObjectId gameId,MongoDataManager db)
@@ -33,15 +35,13 @@ class UserConnection extends Thread
 
 	public void putMessage(ChessPacket message)
 	{
-		this.messageOut=message;
+		recieveQueue.add(message);
 	}
 
 	public void run()
 	{
 		try
 		{
-			messageOut=new ChessPacket(ack);
-
 			connection: while(true)
 			{
 				//deal with the server side stuff
@@ -51,9 +51,18 @@ class UserConnection extends Thread
 				{
 					case ack:
 					{
+						try
+						{
+							messageOut = recieveQueue.get(0);
+							recieveQueue.remove(0);
+						}
+
+						catch(IndexOutOfBoundsException e)
+						{
+							messageOut=new ChessPacket(ack);
+						}
+
 						out.writeObject(messageOut);
-						if(messageOut.getHeader() != ack)
-							this.messageOut=new ChessPacket(ack);
 						break;
 					}
 
