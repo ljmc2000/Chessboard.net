@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 public abstract class ChessPiece implements Serializable
 {
-	String name;
 	int moveCount;
 	int killCount;
 	boolean color;	//true for one player, false for the other
@@ -15,7 +14,6 @@ public abstract class ChessPiece implements Serializable
 
 	public ChessPiece(boolean color)
 	{
-		this.name="steve";	//change this later
 		this.moveCount=0;
 		this.killCount=0;
 		this.color=color;
@@ -23,10 +21,30 @@ public abstract class ChessPiece implements Serializable
 
 	public ChessPiece(boolean color,int moveCount, int killCount)
 	{
-		this.name="steve";
-		this.moveCount=0;
-		this.killCount=0;
+		this.moveCount=moveCount;
+		this.killCount=killCount;
 		this.color=color;
+	}
+
+	public static ChessPiece fromChar(char c)
+	{
+		switch(c)
+		{
+			case 'K':	return new King(true);
+			case 'k':	return new King(false);
+			case 'Q':	return new Queen(true);
+			case 'q':	return new Queen(false);
+			case 'B':	return new Bishop(true);
+			case 'b':	return new Bishop(false);
+			case 'N':	return new Knight(true);
+			case 'n':	return new Knight(false);
+			case 'R':	return new Rook(true);
+			case 'r':	return new Rook(false);
+			case 'P':	return new Pawn(true);
+			case 'p':	return new Pawn(false);
+
+			default:	return null;
+		}
 	}
 
 	public void addKill()

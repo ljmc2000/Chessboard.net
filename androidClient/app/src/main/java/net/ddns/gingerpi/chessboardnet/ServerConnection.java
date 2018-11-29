@@ -2,6 +2,7 @@ package net.ddns.gingerpi.chessboardnet;
 
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import net.ddns.gingerpi.chessboardnetCommon.ChessBoard;
 import net.ddns.gingerpi.chessboardnetCommon.ChessPacket;
@@ -209,18 +210,28 @@ public class ServerConnection extends Thread {
     }
 
     public boolean movePiece(int move){
-    	if(board.movePiece(move)){
+    	ChessBoard tmpBoard=new ChessBoard(board);
+
+    	if(tmpBoard.movePiece(move))	//move legality
+    	if(tmpBoard.inCheck(!color)==0){	//move causes yourself to go into check
+    		board.movePiece(move);
+
 			if(!color) move=07777-move;
     		this.sendQueue.add(new ChessPacket(move));
 
     		return true;
 		}
 
-		else
-			return false;
+		mainThread.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				Toast.makeText(mainThread.getApplicationContext(), R.string.selfCheck,Toast.LENGTH_SHORT ).show();
+			}
+		});
+		return false;
 	}
 
-	public void disconnnect(){
+	public void disconnect(){
     	try {
 			mycon.close();
 		}

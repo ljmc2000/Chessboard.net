@@ -143,7 +143,7 @@ public class ChessPlayer extends Activity {
     }
 
     public void reconnect(View view){
-    	conmanager.disconnnect();
+    	conmanager.disconnect();
 		conmanager=new ServerConnection(this,extras.getString("hostname"),extras.getInt("port"),playerInfo,extras.getString("loginToken"),chessBoardAdapter,imout);
 		chessBoardAdapter.setServer(conmanager);
     	conmanager.start();

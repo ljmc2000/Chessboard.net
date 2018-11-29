@@ -20,12 +20,37 @@ public class ChessBoard implements Serializable
 			new Rook(false),new Knight(false),new Bishop(false),new Queen(false),new King(false),new Bishop(false),new Knight(false),new Rook(false)
 	};
 
+	public ChessBoard(){};
+
+	public ChessBoard(ChessBoard template)
+	{
+		this.king1=template.getKing(true);
+		this.king2=template.getKing(false);
+		this.whosTurn=template.getWhosTurn();
+
+		int i;
+		String templateMap=template.toCompString();
+		for(i=0; i<64; i++)
+			this.map[i]=ChessPiece.fromChar(templateMap.charAt(i));
+	}
+
 	public ChessPiece getItem(int position)
 	{
 		if(0<position && position<64)
 			return map[position];
 		else
 			return null;
+	}
+
+	public int getKing(boolean color)
+	{
+		if(color) return king1;
+		else return king2;
+	}
+
+	public boolean getWhosTurn()
+	{
+		return whosTurn;
 	}
 
 	public boolean addMoveToList(ArrayList<Integer> returnme,int position,boolean color)
@@ -200,10 +225,5 @@ public class ChessBoard implements Serializable
 			if(map[i] != null) map[i].invertColor();
 			if(map[077-i] != null) map[077-i].invertColor();
 		}
-	}
-
-	public boolean getWhosTurn()
-	{
-		return whosTurn;
 	}
 }
