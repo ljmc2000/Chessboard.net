@@ -39,72 +39,7 @@ public class MainActivity extends Activity {
     //threads
 	GetUserPreferencesFromServer getUserPreferencesFromServer;
 	MatchChecker matchChecker;
-
-    public class GetUserInfo extends Thread {
-        Context context;
-        UserInfo result;
-        UserPreferences pref;
-
-        @Override
-        public void run() {
-            this.result=
-                    CacheDatabase
-                            .getInstance(this.context)
-                            .getUserInfoDao()
-                            .fetch();
-
-            this.pref=
-					CacheDatabase
-							.getInstance(this.context)
-							.getUserPreferencesDao()
-							.fetchOwn();
-
-        }
-
-        public GetUserInfo(Context context){
-            this.context=context;
-        }
-
-        public String getUsername() {
-            try {
-                return this.result.username;
-            }
-
-            catch(Exception e){
-                return null;
-            }
-        }
-
-        public String getID() {
-            return this.result.id;
-        }
-
-        public String getToken() {
-            try{
-                return this.result.token;
-            }
-
-            catch (NullPointerException e){
-                return null;
-            }
-        }
-    }
-    public class DeleteUserInfo extends Thread {
-
-        Context context;
-
-        @Override
-        public void run(){
-            CacheDatabase
-                    .getInstance(this.context)
-                    .getUserInfoDao()
-                    .clear();
-        }
-
-        public DeleteUserInfo(Context context){
-            this.context=context;
-        }
-    }
+	GetOpponentInfo getOpponentInfo;
 
     Response.ErrorListener errorListener = new Response.ErrorListener() {
         @Override
@@ -142,7 +77,73 @@ public class MainActivity extends Activity {
 		startThreads();
     }
 
-    class getOpponentInfo extends Thread{
+	public class GetUserInfo extends Thread {
+		Context context;
+		UserInfo result;
+		UserPreferences pref;
+
+		@Override
+		public void run() {
+			this.result=
+					CacheDatabase
+							.getInstance(this.context)
+							.getUserInfoDao()
+							.fetch();
+
+			this.pref=
+					CacheDatabase
+							.getInstance(this.context)
+							.getUserPreferencesDao()
+							.fetchOwn();
+
+		}
+
+		public GetUserInfo(Context context){
+			this.context=context;
+		}
+
+		public String getUsername() {
+			try {
+				return this.result.username;
+			}
+
+			catch(Exception e){
+				return null;
+			}
+		}
+
+		public String getID() {
+			return this.result.id;
+		}
+
+		public String getToken() {
+			try{
+				return this.result.token;
+			}
+
+			catch (NullPointerException e){
+				return null;
+			}
+		}
+	}
+	public class DeleteUserInfo extends Thread {
+
+		Context context;
+
+		@Override
+		public void run(){
+			CacheDatabase
+					.getInstance(this.context)
+					.getUserInfoDao()
+					.clear();
+		}
+
+		public DeleteUserInfo(Context context){
+			this.context=context;
+		}
+	}
+
+    class GetOpponentInfo extends Thread{
         String url=getResources().getString(R.string.HTTPAPIurl)+"/userinfo";
         RequestFuture<JSONObject> future = RequestFuture.newFuture();
         JSONObject payload=new JSONObject();
@@ -158,7 +159,7 @@ public class MainActivity extends Activity {
 
                 JsonObjectRequest opponentInfo=new JsonObjectRequest(Request.Method.POST,url,payload,future ,errorListener);
                 queue.add(opponentInfo);
-                response=future.get(15,TimeUnit.SECONDS);
+                response=future.get(5,TimeUnit.SECONDS);
 
                 //put into database
                 opponent=new UserInfo(
@@ -283,7 +284,8 @@ public class MainActivity extends Activity {
                         serverPort=response.getInt("port");
                         opponentid=response.getString("opponentid");
                         //get opponent info
-                        new getOpponentInfo().start();
+                        getOpponentInfo=new GetOpponentInfo();
+                        getOpponentInfo.start();
                         //connect to server
                         startGame(serverHostname,serverPort);
                     }
@@ -391,15 +393,29 @@ public class MainActivity extends Activity {
 		startgame.putExtra("opponentid", opponentid);
 		startgame.putExtra("hostname", hostname);
 		startgame.putExtra("port", port);
+
+		try {
+			getUserPreferencesFromServer.join();
+			getOpponentInfo.join();
+		}
+
+		catch (Exception e) {
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					Toast.makeText(getApplicationContext(), R.string.usercheckupfail, Toast.LENGTH_SHORT);
+				}
+			});
+		}
 		startActivity(startgame);
 
     }
 
     void startThreads(){
-    	getUserPreferencesFromServer= new GetUserPreferencesFromServer();
+		getUserPreferencesFromServer= new GetUserPreferencesFromServer();
 		getUserPreferencesFromServer.start();
 
-		matchChecker=new MatchChecker();
+    	matchChecker=new MatchChecker();
 		matchChecker.start();
 	}
 

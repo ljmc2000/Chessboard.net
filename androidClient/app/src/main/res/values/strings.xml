@@ -13,6 +13,7 @@
     <string name="queueingToast">Queueing for match</string>
     <string name="inMatchToast">already in Match</string>
     <string name="matchmakingError">Error connecting to the match making system</string>
+    <string name="usercheckupfail">Failed to get opponent info from httpapi</string>
     <string name="exit">Exit</string>
     <string name="send">Send</string>
     <string name="surrender">Surrender</string>
