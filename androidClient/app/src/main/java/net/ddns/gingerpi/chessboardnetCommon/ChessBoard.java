@@ -148,6 +148,8 @@ public class ChessBoard implements Serializable
 		else square=king2;
 
 		ChessPiece king=map[square];
+		if(!king.toString().equals("k")||!king.toString().equals("K"))
+			return 2;	//if they somehow murder the king
 		ArrayList<Integer> potAssasains=inDanger(square,color);
 
 		switch(potAssasains.size())
