@@ -19,6 +19,7 @@
     <string name="surrender">Surrender</string>
     <string name="reconnect">Reconnect</string>
     <string name="selfCheck">That would leave you in check</string>
+    <string name="badmove">You may not move there</string>
     <string name="check">You are in check</string>
     <string name="checkmate">You have been defeated</string>
 </resources>

@@ -228,7 +228,17 @@ public class ServerConnection extends Thread {
     public boolean movePiece(int move){
     	ChessBoard tmpBoard=new ChessBoard(board);
 
-    	if(tmpBoard.movePiece(move))	//move legality
+    	if(!tmpBoard.movePiece(move)) {    //move legality
+    		mainThread.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						Toast.makeText(mainThread.getApplicationContext(), R.string.badmove, Toast.LENGTH_SHORT).show();
+					}
+				});
+
+				return false;
+		}
+		
     	if(tmpBoard.inCheck(false)==0){	//move causes yourself to go into check
     		board.movePiece(move);
 
