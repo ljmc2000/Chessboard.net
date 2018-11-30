@@ -17,5 +17,7 @@
     <string name="send">Send</string>
     <string name="surrender">Surrender</string>
     <string name="reconnect">Reconnect</string>
-    <string name="selfCheck">That would put yourself in check</string>
+    <string name="selfCheck">That would leave you in check</string>
+    <string name="check">You are in check</string>
+    <string name="checkmate">You have been defeated</string>
 </resources>

@@ -106,7 +106,23 @@ public class ServerConnection extends Thread {
 							@Override
 							public void run() {
 								boardOut.refreshBoard();
-								//if(board.inCheck(!color))
+								switch(board.inCheck(false)){
+									case 0: break;
+
+									case 1:{
+										Toast.makeText(mainThread, R.string.check, Toast.LENGTH_SHORT).show();
+										break;
+									}
+
+									case 2:{
+										Toast.makeText(mainThread, R.string.checkmate, Toast.LENGTH_SHORT).show();
+										break;
+									}
+
+									default:{
+										Toast.makeText(mainThread, Integer.toString(board.inCheck(color)), Toast.LENGTH_SHORT).show();
+									}
+								}
 							}
 						});
                         break;
@@ -219,7 +235,7 @@ public class ServerConnection extends Thread {
     	ChessBoard tmpBoard=new ChessBoard(board);
 
     	if(tmpBoard.movePiece(move))	//move legality
-    	if(tmpBoard.inCheck(!color)==0){	//move causes yourself to go into check
+    	if(tmpBoard.inCheck(false)==0){	//move causes yourself to go into check
     		board.movePiece(move);
 
 			if(!color) move=07777-move;
