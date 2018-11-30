@@ -1,5 +1,5 @@
 from flask import Flask,jsonify,request
-from pymongo import MongoClient
+from pymongo import MongoClient,ASCENDING
 from bson.json_util import dumps
 from bson.objectid import ObjectId
 import bcrypt,secrets,datetime
@@ -10,6 +10,7 @@ app=Flask(__name__)
 db=MongoClient(serverSelectionTimeoutMS=1)
 db.server_info()
 db=db.ChessboardNet
+db.users.create_index([("username",ASCENDING)],unique=True)
 
 @app.route("/")
 def hello_world():
