@@ -139,10 +139,20 @@ public class ServerConnection extends Thread {
                     }
 
                     case end: {
-                        mainThread.runOnUiThread(new Runnable() {
+                    	mainThread.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                imout.append("Opponent has surrendered"+"\n");
+                            	switch (recievedMessage.getMove()) {
+									case 1: {    //surrender
+										imout.append("Opponent has surrendered\n");
+										break;
+									}
+
+									case 2: {    //checkmate
+										imout.append(playerInfo.getUsername() + " Wins\n");
+										break;
+									}
+								}
                             }
                         });
                         break Loop;
@@ -218,7 +228,7 @@ public class ServerConnection extends Thread {
 				imout.append("Surrendering and disconnecting from server\n");
 			}
 		});
-        this.sendQueue.add(new ChessPacket(end,"surrender"));
+        this.sendQueue.add(new ChessPacket(end,1,null));
     }
 
     public void initBoard(){
@@ -238,12 +248,22 @@ public class ServerConnection extends Thread {
 
 				return false;
 		}
-		
+
     	if(tmpBoard.inCheck(false)==0){	//move causes yourself to go into check
     		board.movePiece(move);
 
 			if(!color) move=07777-move;
     		this.sendQueue.add(new ChessPacket(move));
+
+    		if (board.inCheck(true)==2) {
+				this.sendQueue.add(new ChessPacket(end, 2, null));
+				mainThread.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						imout.append("you win\n");
+					}
+				});
+			}
 
     		return true;
 		}

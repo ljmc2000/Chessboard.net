@@ -35,17 +35,17 @@ class MongoDataManager
 		return (ObjectId) result.get("user_id");
 	}
 
-	public void endGame(ObjectId opponent,String endstate)
+	public void endGame(ObjectId winner,String endstate)
 	{
 		ArrayList<ObjectId> player=new ArrayList();
-		player.add(0,opponent);
+		player.add(0,winner);
 		Document match=onGoingMatches.find(in("players",player)).first();
 
 		//delete
 		onGoingMatches.deleteOne(match);
 
 		//save
-		match.put("winner",opponent);
+		match.put("winner",winner);
 		match.put("endstate",endstate);
 		matchResults.insertOne(match);
 	}

@@ -26,6 +26,13 @@ public class ChessPacket implements Serializable
 		this.move=move;
 	}
 
+	public ChessPacket(messageType header,int move,String message)
+	{
+		this.header=header;
+		this.move=move;
+		this.message=message;
+	}
+
 	public messageType getHeader()
 	{
 		return this.header;

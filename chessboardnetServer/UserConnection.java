@@ -108,18 +108,44 @@ class UserConnection extends Thread
 					case end:
 					{
 						//end the game and record the result
-						db.endGame(opponent,messageIn.getMessage());
+						switch(messageIn.getMove())
+						{
+							case 1:
+							{
+								db.endGame(opponent,"surrender");
 
-						//destroy the chessboard
-						Control.boards.remove(gameId);
+								//destroy the chessboard
+								Control.boards.remove(gameId);
 
-						//disconnect other player
-						System.out.println("user has disconnected; Reason: "+messageIn.getMessage());
-						UserConnection otherPlayer = Control.clients.get(opponent);
-						otherPlayer.putMessage(messageIn);
-						s.close();
-						Control.releaseConnection();
-						break connection;
+								//disconnect other player
+								System.out.println("user has disconnected; Reason: "+messageIn.getMessage());
+								UserConnection otherPlayer = Control.clients.get(opponent);
+								otherPlayer.putMessage(messageIn);
+								s.close();
+								Control.releaseConnection();
+								break connection;
+							}
+
+							case 2:
+							{
+								ChessBoard chessBoard=Control.boards.get(gameId);
+								if(chessBoard.inCheck(color)!=2)
+								{
+									out.writeObject(new ChessPacket(chessError,"Opponent not in check"));
+									s.close();
+									break;
+								}
+
+								else
+								{
+									db.endGame(userID,"checkmate");
+									UserConnection otherPlayer = Control.clients.get(opponent);
+									otherPlayer.putMessage(messageIn);
+									out.writeObject(new ChessPacket(ack));
+									break;
+								}
+							}
+						}
 					}
 
 					case initBoard:
