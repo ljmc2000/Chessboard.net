@@ -83,7 +83,8 @@ def joinLobby():
 		lowest=99999999	#nice big number, intmax would be better
 		for server in db.servers.distinct("_id"):
 			players_on_server=db.ongoing_matches.count({"server":server})
-			if players_on_server<lowest:
+			serverCapacity=db.servers.find_one({"_id":server})["capacity"]
+			if players_on_server<lowest and serverCapacity>players_on_server:
 				lowest=players_on_server
 				freeServer=server
 
