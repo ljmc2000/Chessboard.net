@@ -5,12 +5,15 @@ import java.io.*;
 import org.bson.types.ObjectId;
 import java.util.HashMap;
 
-import  net.ddns.gingerpi.chessboardnetCommon.*;
+import net.ddns.gingerpi.chessboardnetCommon.*;
 import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.*;
 
 class Control
 {
 	static int remainingConnections=100;
+	static int port=7000;
+	static String hostname="localhost";
+	static ObjectId serverid;
 	public static HashMap<ObjectId,UserConnection> clients = new HashMap<ObjectId,UserConnection>();
 	public static HashMap<ObjectId,ChessBoard> boards = new HashMap<ObjectId,ChessBoard>();
 
@@ -18,11 +21,24 @@ class Control
 	{
 		try
 		{
-			int port=7000;
+			//get port and connection count from command line if available
+			if(args.length > 0)
+				hostname=args[0];
+			if(args.length > 1)
+				port=Integer.parseInt(args[1]);
+			if(args.length > 2)
+				remainingConnections=Integer.parseInt(args[2]);
+
 			ServerSocket myServerSocket=new ServerSocket(port);
 			MongoDataManager db = new MongoDataManager();
 
-			System.out.println("Server listening on port "+port);
+			//register with database
+			serverid=db.register(hostname,port,remainingConnections);
+			Runtime.getRuntime().addShutdownHook(new Cleaner(serverid,db));
+
+			//return messages to user
+			System.out.println("Server listening on "+hostname+" port "+port);
+			System.out.println(remainingConnections+" Connections remain");
 
 			//for the rest of runtime
 			while(1==1)

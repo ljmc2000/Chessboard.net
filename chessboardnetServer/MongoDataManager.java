@@ -18,6 +18,7 @@ class MongoDataManager
 	MongoCollection<Document> userTokens;
 	MongoCollection<Document> onGoingMatches;
 	MongoCollection<Document> matchResults;
+	MongoCollection<Document> serverList;
 
 	public MongoDataManager()
 	{
@@ -26,6 +27,23 @@ class MongoDataManager
 		userTokens=database.getCollection("user_tokens");
 		onGoingMatches=database.getCollection("ongoing_matches");
 		matchResults=database.getCollection("match_results");
+		serverList=database.getCollection("servers");
+	}
+
+	public ObjectId register(String hostname,int port,int capacity)
+	{
+		Document fields=new Document("hostname",hostname);
+		fields.put("port",port);
+		fields.put("capacity",capacity);
+
+		serverList.insertOne(fields);
+		return (ObjectId) fields.get("_id");
+	}
+
+	public void deregister(ObjectId serverid)
+	{
+		Document fields=new Document("_id",serverid);
+		serverList.deleteOne(fields);
 	}
 
 	public ObjectId getUserId(String token)
