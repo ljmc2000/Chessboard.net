@@ -8,7 +8,7 @@
     android:orientation="horizontal"
     tools:context=".ChessPlayer">
 
-        <GridView
+    <GridView
             android:id="@+id/chessboard"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -38,7 +38,7 @@
                     android:id="@+id/whosTurn"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
-                    android:layout_gravity="left" />
+                    android:layout_gravity="left"/>
 
                 <Space
                     android:layout_width="wrap_content"
@@ -92,6 +92,14 @@
                     android:layout_weight="1"
                     android:onClick="sendMessage"
                     android:text="@string/send" />
+
+                <TextView
+                    android:id="@+id/promenu_anchor"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="0"
+                    android:text="TextView"
+                    android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
 

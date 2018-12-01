@@ -2,6 +2,8 @@
     <string name="app_name">Chessboard.Net</string>
     <string name="HTTPAPIurl">http://192.168.0.1:5000</string>
     <string name="DB_NAME">LocalCache.db</string>
+
+    <!-- main activity -->
     <string name="WelcomeMessage">Welcome to Chessboard.Net</string>
     <string name="loginBanner">You must login or sign up to use Chessboard.Net</string>
     <string name="playOnline">Play online</string>
@@ -15,6 +17,8 @@
     <string name="matchmakingError">Error connecting to the match making system</string>
     <string name="usercheckupfail">Failed to get opponent info from httpapi</string>
     <string name="exit">Exit</string>
+
+    <!-- chessplayer -->
     <string name="send">Send</string>
     <string name="surrender">Surrender</string>
     <string name="reconnect">Reconnect</string>
@@ -22,4 +26,8 @@
     <string name="badmove">You may not move there</string>
     <string name="check">You are in check</string>
     <string name="checkmate">You have been defeated</string>
+    <string name="pqueen">Promote to queen</string>
+    <string name="pknight">Promote to Knight</string>
+    <string name="prook">Promote to rook</string>
+    <string name="pbishop">Promote to bishop</string>
 </resources>

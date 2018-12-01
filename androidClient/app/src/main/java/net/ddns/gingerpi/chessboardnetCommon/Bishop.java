@@ -13,6 +13,11 @@ public class Bishop extends ChessPiece
 		super(color,moveCount,killCount);
 	}
 
+	public Bishop(ChessPiece piece)
+	{
+		super(piece);
+	}
+
 	@Override
         public ArrayList<Integer> getLegalMoves(int position,ChessBoard chessBoard)
 	{

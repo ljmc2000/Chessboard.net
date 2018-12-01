@@ -19,6 +19,13 @@ public abstract class ChessPiece implements Serializable
 		this.color=color;
 	}
 
+	public ChessPiece(ChessPiece piece)
+	{
+		this.color=piece.getColor();
+		this.killCount=piece.getKillCount();
+		this.moveCount=piece.getMoveCount();
+	}
+
 	public ChessPiece(boolean color,int moveCount, int killCount)
 	{
 		this.moveCount=moveCount;
@@ -50,6 +57,16 @@ public abstract class ChessPiece implements Serializable
 	public void addKill()
 	{
 		killCount++;
+	}
+
+	public int getKillCount()
+	{
+		return this.killCount;
+	}
+
+	public int getMoveCount()
+	{
+		return this.moveCount;
 	}
 
 	public void addMove()

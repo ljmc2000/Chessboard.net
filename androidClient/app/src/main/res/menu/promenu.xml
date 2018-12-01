@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/promotequeen"
+        android:title="@string/pqueen"></item>
+    <item
+        android:id="@+id/promoteknight"
+        android:title="@string/pknight"></item>
+    <item
+        android:id="@+id/promoterook"
+        android:title="@string/prook"></item>
+    <item
+        android:id="@+id/promotebishop"
+        android:title="@string/pbishop"></item>
+</menu>

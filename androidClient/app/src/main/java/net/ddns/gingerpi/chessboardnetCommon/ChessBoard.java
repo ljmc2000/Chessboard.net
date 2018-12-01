@@ -174,6 +174,46 @@ public class ChessBoard implements Serializable
 		}
 	}
 
+	public boolean promotable(int position)
+	{
+		return (position<010 && map[position].toString().equals("p"))
+		|| (position>067 && map[position].toString().equals("P"));
+	}
+
+	public enum Rank{queen,knight,rook,bishop};
+	public void promote(int position,Rank rank)
+	{
+		if(!promotable(position))
+			return;
+
+		else switch(rank)
+		{
+			case queen:
+			{
+				map[position]=new Queen(map[position]);
+				break;
+			}
+
+			case knight:
+			{
+				map[position]=new Knight(map[position]);
+				break;
+			}
+
+			case rook:
+			{
+				map[position]=new Rook(map[position]);
+				break;
+			}
+
+			case bishop:
+			{
+				map[position]=new Bishop(map[position]);
+				break;
+			}
+		}
+	}
+
 	public String toString()
 	{
 		String returnme="";

@@ -1,6 +1,9 @@
 package net.ddns.gingerpi.chessboardnet;
 
+import android.support.v7.view.menu.MenuBuilder;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +36,7 @@ public class ServerConnection extends Thread {
 
 	boolean color;
     ArrayList<ChessPacket> sendQueue=new ArrayList<ChessPacket>();
+    int pawn2promote=-1;
 
     public ServerConnection(ChessPlayer mainThread, String url, int port, ChessPlayer.PlayerInfo playerInfo, String token, ChessBoardAdapter boardOut, TextView imout){
         try {
@@ -201,6 +205,19 @@ public class ServerConnection extends Thread {
 
 						break Loop;
 					}
+
+					case promotion: {
+						int position=recievedMessage.getMove();
+						if(!color) position=077-position;
+						board.promote(position, ChessBoard.Rank.valueOf(recievedMessage.getMessage()));
+						mainThread.runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									boardOut.refreshBoard();
+								}
+							});
+						break;
+					}
                 }
             }
         }
@@ -235,6 +252,16 @@ public class ServerConnection extends Thread {
         this.sendQueue.add(new ChessPacket(initBoard));
     }
 
+	public void promote(ChessBoard.Rank rank){
+    	if(pawn2promote!=-1) {
+    		int position=pawn2promote;
+    		if(!color) position=077-position;
+			this.sendQueue.add(new ChessPacket(promotion, position, rank.toString()));
+			board.promote(pawn2promote,rank);
+		}
+    	pawn2promote=-1;
+	}
+
     public boolean movePiece(int move){
     	ChessBoard tmpBoard=new ChessBoard(board);
 
@@ -252,6 +279,17 @@ public class ServerConnection extends Thread {
     	if(tmpBoard.inCheck(false)==0){	//move causes yourself to go into check
     		board.movePiece(move);
 
+			if(board.promotable(move%0100)){
+				pawn2promote=move%0100;
+
+				mainThread.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						mainThread.findViewById(R.id.promenu_anchor).showContextMenu();
+					}
+				});
+			}
+
 			if(!color) move=07777-move;
     		this.sendQueue.add(new ChessPacket(move));
 
@@ -265,7 +303,7 @@ public class ServerConnection extends Thread {
 				});
 			}
 
-    		return true;
+			return true;
 		}
 
 		mainThread.runOnUiThread(new Runnable() {

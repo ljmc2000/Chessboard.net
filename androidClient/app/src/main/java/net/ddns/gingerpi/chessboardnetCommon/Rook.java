@@ -13,6 +13,11 @@ public class Rook extends ChessPiece
 		super(color,moveCount,killCount);
 	}
 
+	public Rook(ChessPiece piece)
+	{
+		super(piece);
+	}
+
 	@Override
         public ArrayList<Integer> getLegalMoves(int position,ChessBoard chessBoard)
 	{

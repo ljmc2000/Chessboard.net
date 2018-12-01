@@ -4,8 +4,13 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -14,6 +19,7 @@ import android.widget.TextView;
 import net.ddns.gingerpi.chessboardnet.Roomfiles.CacheDatabase;
 import net.ddns.gingerpi.chessboardnet.Roomfiles.UserInfo;
 import net.ddns.gingerpi.chessboardnet.Roomfiles.UserPreferences;
+import net.ddns.gingerpi.chessboardnetCommon.ChessBoard;
 
 import static net.ddns.gingerpi.chessboardnet.ChessSet.texturePack;
 
@@ -85,6 +91,9 @@ public class ChessPlayer extends Activity {
         //get info passed by main
         extras=getIntent().getExtras();
 
+        //enable the promotion menu
+		registerForContextMenu(findViewById(R.id.promenu_anchor));
+
         //get opponent info from room
 		playerInfo=new PlayerInfo(getIntent().getExtras().getString("opponentid"));
         playerInfo.start();
@@ -129,6 +138,41 @@ public class ChessPlayer extends Activity {
             Log.e("#GameThread",e.toString());
         }
     }
+
+    @Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+	    super.onCreateContextMenu(menu, v, menuInfo);
+    	MenuInflater inflater = getMenuInflater();
+   		inflater.inflate(R.menu.promenu, menu);
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+    	AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+    	switch(item.getItemId()){
+			case R.id.promotequeen:{
+				conmanager.promote(ChessBoard.Rank.queen);
+				return true;
+			}
+
+			case R.id.promoteknight:{
+				conmanager.promote(ChessBoard.Rank.knight);
+				return true;
+			}
+
+			case R.id.promotebishop:{
+				conmanager.promote(ChessBoard.Rank.bishop);
+				return true;
+			}
+
+			case R.id.promoterook:{
+				conmanager.promote(ChessBoard.Rank.rook);
+				return true;
+			}
+
+    		default: return false;
+		}
+	}
 
     public void sendMessage(View view){
         String s;

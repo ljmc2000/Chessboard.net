@@ -157,6 +157,23 @@ class UserConnection extends Thread
 						out.writeObject(color);
 						break;
 					}
+
+					case promotion: {
+						ChessBoard chessBoard = Control.boards.get(gameId);
+						UserConnection otherPlayer = Control.clients.get(opponent);
+
+						ChessBoard.Rank r = ChessBoard.Rank.valueOf(messageIn.getMessage());
+						if (chessBoard.promotable(messageIn.getMove())) {
+							chessBoard.promote(messageIn.getMove(), r);
+							otherPlayer.putMessage(messageIn);
+							out.writeObject(messageIn);
+						}
+
+						else
+						{
+							out.writeObject(new ChessPacket(chessError,"Failed pawn promtion"));
+						}
+					}
 				}
 			}
 		}
