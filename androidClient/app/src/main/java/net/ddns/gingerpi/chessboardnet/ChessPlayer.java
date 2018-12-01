@@ -179,7 +179,7 @@ public class ChessPlayer extends Activity {
         TextView messageInput=findViewById(R.id.messageInput);
         s=messageInput.getText().toString();
         messageInput.setText("");
-        imout.append("You: "+s+"\n");
+        imout.append(getResources().getString(R.string.you)+s+"\n");
         conmanager.sendIMessage(s);
     }
 

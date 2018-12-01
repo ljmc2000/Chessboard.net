@@ -18,10 +18,24 @@
     <string name="usercheckupfail">Failed to get opponent info from httpapi</string>
     <string name="exit">Exit</string>
 
+    <!-- login -->
+    <string name="badpwd">Incorrect password</string>
+    <string name="nouser">User does not exist</string>
+    <string name="authfail">Failed to Authenticate</string>
+    <string name="nomatchpwd">Passwords do not match</string>
+    <string name="duplicateUser">Existing username found: try another</string>
+    <string name="connfail">Failed to connect to the Authentication server</string>
+
     <!-- chessplayer -->
     <string name="send">Send</string>
     <string name="surrender">Surrender</string>
+    <string name="connecting">Connecting to server</string>
+    <string name="connected">Connected to server</string>
     <string name="reconnect">Reconnect</string>
+    <string name="disconnect">Disconnected from server</string>
+    <string name="surrendered">Surrendering and disconnecting from server</string>
+    <string name="you">You: </string>
+    <string name="unknownuser">Unknown user:</string>
     <string name="selfCheck">That would leave you in check</string>
     <string name="badmove">You may not move there</string>
     <string name="check">You are in check</string>

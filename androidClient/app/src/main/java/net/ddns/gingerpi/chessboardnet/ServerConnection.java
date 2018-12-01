@@ -1,9 +1,6 @@
 package net.ddns.gingerpi.chessboardnet;
 
-import android.support.v7.view.menu.MenuBuilder;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,7 +58,7 @@ public class ServerConnection extends Thread {
         	mainThread.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					imout.append("connecting to server\n");
+					imout.append(mainThread.getResources().getString(R.string.connecting)+"\n");
 				}
 			});
         	Thread.sleep(1000);
@@ -75,7 +72,7 @@ public class ServerConnection extends Thread {
             mainThread.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					imout.append("connected to server\n");
+					imout.append(mainThread.getResources().getString(R.string.connected)+"\n");
 				}
 			});
 
@@ -135,7 +132,7 @@ public class ServerConnection extends Thread {
                                 }
 
                                 catch(Exception e){
-                                    imout.append("Unknown user: " + recievedMessage.getMessage() + "\n");
+                                    imout.append(mainThread.getResources().getString(R.string.unknownuser) + recievedMessage.getMessage() + "\n");
                                 }
                             }
                         });
@@ -227,7 +224,7 @@ public class ServerConnection extends Thread {
 			mainThread.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					imout.append("lost connection to server\n");
+					imout.append(mainThread.getResources().getString(R.string.disconnect)+"\n");
 
 				}
 			});
@@ -242,7 +239,7 @@ public class ServerConnection extends Thread {
     	mainThread.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				imout.append("Surrendering and disconnecting from server\n");
+				imout.append(mainThread.getResources().getString(R.string.surrendered)+"\n");
 			}
 		});
         this.sendQueue.add(new ChessPacket(end,1,null));

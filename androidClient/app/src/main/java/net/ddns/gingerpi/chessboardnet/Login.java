@@ -96,17 +96,17 @@ public class Login extends Activity {
                         }
 
                         case 1: { //failure
-                            Toast.makeText(getApplicationContext(), "Password incorrect", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), R.string.badpwd, Toast.LENGTH_SHORT).show();
                             break;
                         }
 
                         case -1: { //exception
-                            Toast.makeText(getApplicationContext(), "User does not exist", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), R.string.nouser, Toast.LENGTH_SHORT).show();
                             break;
                         }
                     }
                 } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), "Failed to Authenticate", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), R.string.authfail, Toast.LENGTH_SHORT).show();
                     Log.e("#HTTPAPI", e.toString());
                 }
             }
@@ -127,7 +127,7 @@ public class Login extends Activity {
         String p2=password2.getText().toString();
 
         if(!p1.contentEquals(p2)) {
-            Toast.makeText(getApplicationContext(), "Passwords do not match", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.nomatchpwd, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -159,13 +159,13 @@ public class Login extends Activity {
                         }
 
                         case -1: {   //sever side exception
-                            Toast.makeText(getApplicationContext(), "Existing username found: try another", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), R.string.duplicateUser, Toast.LENGTH_SHORT).show();
                             break;
                         }
                     }
 
                 } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), "Failed to connect to the Authentication server", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), R.string.connfail, Toast.LENGTH_SHORT).show();
                     Log.e("#HTTPAPI", e.toString());
                 }
             }
