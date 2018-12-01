@@ -42,7 +42,10 @@ class MongoDataManager
 
 	public void deregister(ObjectId serverid)
 	{
-		Document fields=new Document("_id",serverid);
+		Document fields=new Document("server",serverid);
+		onGoingMatches.deleteMany(fields);
+
+		fields=new Document("_id",serverid);
 		serverList.deleteOne(fields);
 	}
 
