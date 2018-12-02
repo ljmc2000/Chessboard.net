@@ -75,6 +75,10 @@ def joinLobby():
 		return jsonify({"status":1})
 	lobby[userid]=datetime.datetime.now()
 
+	#ensure a server is available
+	if (db.servers.count()==0):
+		return jsonify({"status":2})
+
 	#Match players up
 	while len(lobby)>1:
 		p1=lobby.popitem()[0]

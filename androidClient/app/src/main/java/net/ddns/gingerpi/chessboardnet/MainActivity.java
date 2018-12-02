@@ -354,6 +354,11 @@ public class MainActivity extends Activity {
 							break;
 						}
 
+						case 2: {
+							Toast.makeText(getApplicationContext(),R.string.noserver , Toast.LENGTH_SHORT).show();
+							break;
+						}
+
 						case -1: {
 							Toast.makeText(getApplicationContext(), R.string.matchmakingError, Toast.LENGTH_SHORT).show();
 							break;
