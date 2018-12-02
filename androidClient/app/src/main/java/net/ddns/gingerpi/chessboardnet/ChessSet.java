@@ -3,7 +3,7 @@ package net.ddns.gingerpi.chessboardnet;
 import android.content.Context;
 
 public class ChessSet {
-    public enum texturePack{white,black};
+    public enum texturePack{white,black,goblins};
     public enum piece{pawn_front,pawn_back,rook_front,rook_back,knight_front,knight_back,bishop_front,bishop_back,queen_front,queen_back,king_front,king_back};
     int[] chessSet = new int[piece.values().length];
     Context mContext;
@@ -44,6 +44,22 @@ public class ChessSet {
                 this.chessSet[piece.king_back.ordinal()]=R.drawable.doodle_white_king_back;
                 break;
             }
+
+			case goblins: {
+				this.chessSet[piece.pawn_front.ordinal()]=R.drawable.goblin_pawn;
+				this.chessSet[piece.pawn_back.ordinal()]=R.drawable.goblin_pawn_back;
+				this.chessSet[piece.rook_front.ordinal()]=R.drawable.goblin_rook;
+				this.chessSet[piece.rook_back.ordinal()]=R.drawable.goblin_rook_back;
+				this.chessSet[piece.knight_front.ordinal()]=R.drawable.goblin_knight;
+				this.chessSet[piece.knight_back.ordinal()]=R.drawable.goblin_knight_back;
+				this.chessSet[piece.bishop_front.ordinal()]=R.drawable.goblin_bishop;
+				this.chessSet[piece.bishop_back.ordinal()]=R.drawable.goblin_bishop_back;
+				this.chessSet[piece.queen_front.ordinal()]=R.drawable.goblin_queen;
+				this.chessSet[piece.queen_back.ordinal()]=R.drawable.goblin_queen_back;
+				this.chessSet[piece.king_front.ordinal()]=R.drawable.goblin_king;
+				this.chessSet[piece.king_back.ordinal()]=R.drawable.goblin_king_back;
+				break;
+			}
         }
     }
 

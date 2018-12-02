@@ -19,8 +19,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="doodle_white_pawn" />
-                            <entry key="sourceFile" value="$PROJECT_DIR$/../icons/doodles_white_src/pawn.svg" />
+                            <entry key="outputName" value="goblin_rook_back" />
+                            <entry key="sourceFile" value="$PROJECT_DIR$/../icons/goblins_src/rook_back.svg" />
                           </map>
                         </option>
                       </PersistentState>
