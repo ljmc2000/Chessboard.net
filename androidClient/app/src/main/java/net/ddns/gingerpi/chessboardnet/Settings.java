@@ -91,8 +91,11 @@ public class Settings extends Activity {
 		token=extras.getString("loginToken");
 		url=getResources().getString(R.string.HTTPAPIurl)+"/setprefs";
 
-		GridView set1_selector =findViewById(R.id.set1_selector);
+		//first and second menuitems
 		SetSelectorAdapter s=new SetSelectorAdapter(this);
+
+		//first menuitem
+		GridView set1_selector =findViewById(R.id.set1_selector);
 		AdapterView.OnItemClickListener set1_listener=new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -113,7 +116,27 @@ public class Settings extends Activity {
 		set1_selector.setAdapter(s);
 		set1_selector.setOnItemClickListener(set1_listener);
 
+
+		//second menuitem
 		GridView set2_selector =findViewById(R.id.set2_selector);
+		AdapterView.OnItemClickListener set2_listener=new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				try {
+					RequestFuture<JSONObject> future=RequestFuture.newFuture();
+					JSONObject payload=new JSONObject();
+					payload.put("token",token);
+					payload.put("secondary_set",ChessSet.texturePack.values()[position].toString());
+					JsonObjectRequest change_set2 = new JsonObjectRequest(url, payload, future, errorListener);
+					queue.add(change_set2);
+					new Watcher(future).start();
+				}
+				catch (Exception e){
+					Log.e("#JSONError",e.toString());
+				}
+			}
+		};
 		set2_selector.setAdapter(s);
+		set2_selector.setOnItemClickListener(set2_listener);
 	}
 }
