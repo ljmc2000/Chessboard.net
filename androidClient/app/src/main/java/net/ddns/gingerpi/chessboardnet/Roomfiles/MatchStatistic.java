@@ -24,4 +24,12 @@ public class MatchStatistic {
 		this.surrenders=surrenders;
 		this.total_matches=total_matches;
 	}
+
+	public String toString(){
+		return username+"\n"+
+				"\uD83C\uDFC6: "+Integer.toString(wins)+" | "+
+				"☠: "+Integer.toString(losses)+" | "+
+				"\uD83C\uDFF3: "+Integer.toString(surrenders)+" | "+
+				"Total Matches: "+Integer.toString(total_matches);
+	}
 }

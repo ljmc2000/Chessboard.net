@@ -4,16 +4,14 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
 
@@ -22,15 +20,15 @@ import net.ddns.gingerpi.chessboardnet.Roomfiles.MatchStatistic;
 import net.ddns.gingerpi.chessboardnet.Roomfiles.UserInfo;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class Statistics extends Activity {
+
+	MatchstatsAdapter adapter;
+	ListView matchStats;
 
 	RequestQueue queue;
 	Response.ErrorListener errorListener = new Response.ErrorListener() {
@@ -46,6 +44,13 @@ public class Statistics extends Activity {
 		setContentView(R.layout.activity_statistics);
 
 		queue=Volley.newRequestQueue(this);
+
+		matchStats=(ListView) findViewById(R.id.pastMatchList);
+		adapter=new MatchstatsAdapter(this);
+		matchStats.setAdapter(adapter);
+		adapter.refresh();
+
+
 	}
 
 	class Refresher extends Thread{
@@ -91,6 +96,12 @@ public class Statistics extends Activity {
 									j.getInt("surrenders"),
 									j.getInt("total_matches")));
 				}
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						adapter.refresh();
+					}
+				});
 			}
 			catch(TimeoutException e) {
 				runOnUiThread(new Runnable() {
@@ -107,6 +118,7 @@ public class Statistics extends Activity {
 	}
 
 	public void refresh(View view){
-		new Refresher().start();
+		Refresher r = new Refresher();
+		r.start();
 	}
 }
