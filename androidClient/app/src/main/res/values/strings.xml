@@ -53,4 +53,5 @@
     <!-- settings -->
     <string name="setSet1">Prefered Set</string>
     <string name="setSet2">Alternate set</string>
+    <string name="success">Updated setting successfully</string>
 </resources>

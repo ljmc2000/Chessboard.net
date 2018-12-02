@@ -399,6 +399,7 @@ public class MainActivity extends Activity {
 
 	public void gotoSettings(View view){
     	Intent settings=new Intent(this,Settings.class);
+    	settings.putExtra("loginToken", loginToken);
     	startActivity(settings);
 	}
 
