@@ -8,7 +8,7 @@ import android.content.Context;
 
 import net.ddns.gingerpi.chessboardnet.R;
 
-@Database(entities = {UserInfo.class,UserPreferences.class},version=2,exportSchema = false)
+@Database(entities = {UserInfo.class,UserPreferences.class,MatchStatistic.class},version=4Th,exportSchema = false)
 @TypeConverters(texturePackConverter.class)
 public abstract class CacheDatabase extends RoomDatabase{
     private static volatile CacheDatabase instance;
@@ -31,4 +31,5 @@ public abstract class CacheDatabase extends RoomDatabase{
 
     public abstract UserInfoDao getUserInfoDao();
     public abstract UserPreferencesDao getUserPreferencesDao();
+    public abstract MatchStatisticDao getMatchStatisticDao();
 }

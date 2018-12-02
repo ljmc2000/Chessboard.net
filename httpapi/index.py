@@ -137,3 +137,31 @@ def getUserInfo():
 			return app.response_class(response=dumps(user),status=200,mimetype="application/json")
 	except:
 		return jsonify({"status":-1})
+
+@app.route("/matchstats",methods=["POST"])
+def matchstats():
+	try:
+		token=request.json.get("token")
+	except AttributeError:
+		token=request.json[0].get("token")
+	userid=db.user_tokens.find_one({"_id":token})["user_id"]
+
+	returnme=[]
+	for player in db.match_results.distinct("players"):
+		if player == userid:
+			continue
+
+		d={}
+		d["total_matches"]=db.match_results.find({"players":{"$all":[userid,player]}}).count()
+		if d["total_matches"]==0:
+			continue
+
+		d["surrenders"]=db.match_results.find({"players":{"$all":[userid,player]},"endstate":"surrender"}).count()
+		d["wins"]=db.match_results.find({"players":{"$all":[userid,player]},"endstate":"checkmate","winner":userid}).count()
+		d["losses"]=db.match_results.find({"players":{"$all":[userid,player]},"endstate":"checkmate","winner":player}).count()
+		d["user_id"]=str(player)
+		d["username"]=db.users.find_one({"_id":player})["username"]
+
+		returnme.append(d)
+
+	return jsonify(returnme)

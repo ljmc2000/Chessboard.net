@@ -44,4 +44,8 @@
     <string name="pknight">Promote to Knight</string>
     <string name="prook">Promote to rook</string>
     <string name="pbishop">Promote to bishop</string>
+
+    <!--statistics -->
+    <string name="refreshlabel">Refresh</string>
+    <string name="noconnhttp">Failed to connect to the httpapi</string>
 </resources>

@@ -387,6 +387,11 @@ public class MainActivity extends Activity {
         new JoinLobby().start();
     }
 
+    public void showStatistics(View view){
+    	Intent showStatistics=new Intent(this,Statistics.class);
+    	startActivity(showStatistics);
+	}
+
     public void startGame(String hostname,int port){
     	Intent startgame = new Intent(this, ChessPlayer.class);
 		startgame.putExtra("loginToken", loginToken);
