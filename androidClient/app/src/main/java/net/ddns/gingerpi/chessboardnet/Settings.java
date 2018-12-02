@@ -25,7 +25,6 @@ public class Settings extends Activity {
 	String token;
 	String url;
 	RequestQueue queue;
-	RequestFuture<JSONObject> future=RequestFuture.newFuture();
 	Response.ErrorListener errorListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
@@ -34,42 +33,53 @@ public class Settings extends Activity {
     };
 
 	class Watcher extends Thread{
+		RequestFuture<JSONObject> future;
+		String message;
+
+
+		public Watcher(RequestFuture future){
+			this.future=future;
+			this.message=null;
+		}
 
 		@Override
 		public void run(){
-			while(1==1){
-				try {
-					JSONObject r = future.get(5, TimeUnit.SECONDS);
-					final String message;
-					switch (r.getInt("status")){
-						case 0:{
-							message=getResources().getString(R.string.success);
-							break;
-						}
-
-						case 1:{
-							message=r.getString("reason");
-							break;
-						}
-
-						default:{
-							message="invalid status code";
-							break;
-						}
+			try {
+				JSONObject r = future.get(1, TimeUnit.SECONDS);
+				switch (r.getInt("status")){
+					case 0:{
+						message=getResources().getString(R.string.success);
+						break;
 					}
 
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
-						}
-					});
-				}
-				catch(Exception e){
+					case 1:{
+						message=r.getString("reason");
+						break;
+					}
 
+					default:{
+						message="invalid status code";
+						break;
+					}
 				}
+
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+					}
+				});
+			}
+			catch(Exception e) {
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						Toast.makeText(getApplicationContext(), R.string.noconnhttp, Toast.LENGTH_SHORT).show();
+					}
+				});
 			}
 		}
+
 	}
 
 	@Override
@@ -87,11 +97,13 @@ public class Settings extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				try {
+					RequestFuture<JSONObject> future=RequestFuture.newFuture();
 					JSONObject payload=new JSONObject();
 					payload.put("token",token);
 					payload.put("favourite_set",ChessSet.texturePack.values()[position].toString());
 					JsonObjectRequest change_set1 = new JsonObjectRequest(url, payload, future, errorListener);
 					queue.add(change_set1);
+					new Watcher(future).start();
 				}
 				catch (Exception e){
 					Log.e("#JSONError",e.toString());

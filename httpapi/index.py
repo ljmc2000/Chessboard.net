@@ -169,3 +169,22 @@ def matchstats():
 		returnme.append(d)
 
 	return jsonify(returnme)
+
+@app.route("/setprefs",methods=["POST"])
+def setprefs():
+	token=request.json.get("token")
+	userid=db.user_tokens.find_one({"_id":token})["user_id"]
+
+	a=request.json.get("favourite_set")
+	if(a != None):
+		user=db.users.find_one(userid)
+		if user["secondary_set"]==a:
+			db.users.update({"_id":userid},{"$set":{"secondary_set":user["favourite_set"]}})
+		db.users.update({"_id":userid},{"$set":{"favourite_set":a}})
+		return jsonify({"status":0})
+
+	a=request.json.get("secondary_set")
+	if(a != None):
+		open("holo","w+")
+
+	return jsonify({"status":1,"reason":"No valid setting found"})
