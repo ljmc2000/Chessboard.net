@@ -397,6 +397,11 @@ public class MainActivity extends Activity {
     	startActivity(showStatistics);
 	}
 
+	public void gotoSettings(View view){
+    	Intent settings=new Intent(this,Settings.class);
+    	startActivity(settings);
+	}
+
     public void startGame(String hostname,int port){
     	Intent startgame = new Intent(this, ChessPlayer.class);
 		startgame.putExtra("loginToken", loginToken);

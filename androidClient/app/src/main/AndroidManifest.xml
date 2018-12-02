@@ -29,7 +29,8 @@
             android:name=".ChessPlayer"
             android:launchMode="singleInstance"
             android:screenOrientation="landscape" />
-        <activity android:name=".Statistics"></activity>
+        <activity android:name=".Statistics" />
+        <activity android:name=".Settings"></activity>
     </application>
 
 </manifest>

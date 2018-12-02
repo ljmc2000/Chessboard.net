@@ -49,4 +49,8 @@
     <!--statistics -->
     <string name="refreshlabel">Refresh</string>
     <string name="noconnhttp">Failed to connect to the httpapi</string>
+
+    <!-- settings -->
+    <string name="setSet1">Prefered Set</string>
+    <string name="setSet2">Alternate set</string>
 </resources>
