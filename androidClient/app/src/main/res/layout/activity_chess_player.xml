@@ -9,18 +9,18 @@
     tools:context=".ChessPlayer">
 
     <GridView
-            android:id="@+id/chessboard"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="10"
-            android:gravity="center"
-            android:horizontalSpacing="0dp"
-            android:numColumns="8"
-            android:scrollbars="none"
-            android:stretchMode="none"
-            android:verticalSpacing="0dp">
+        android:id="@+id/chessboard"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="10"
+        android:gravity="center"
+        android:horizontalSpacing="0dp"
+        android:numColumns="8"
+        android:scrollbars="none"
+        android:stretchMode="none"
+        android:verticalSpacing="0dp">
 
-        </GridView>
+    </GridView>
 
         <LinearLayout
             android:layout_width="match_parent"
