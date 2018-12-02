@@ -59,7 +59,7 @@
         android:pathData="m103.949,30.518 l-2.138,21.114 -18.709,-13.363z"
         android:strokeAlpha="1" android:strokeColor="#000000"
         android:strokeLineCap="butt" android:strokeLineJoin="miter" android:strokeWidth="1.68513119"/>
-    <path android:fillAlpha="1" android:fillColor="#ff00ff"
+    <path android:fillAlpha="1" android:fillColor="#3e3a2f"
         android:pathData="M23.097,61.388a40.09,26.593 0,1 0,80.181 0a40.09,26.593 0,1 0,-80.181 0z"
         android:strokeAlpha="1" android:strokeColor="#00000c"
         android:strokeLineCap="round" android:strokeLineJoin="round" android:strokeWidth="1.37953758"/>
