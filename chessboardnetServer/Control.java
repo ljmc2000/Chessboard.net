@@ -49,6 +49,7 @@ class Control
 					{
 						//connect
 						Socket connection = myServerSocket.accept();
+						connection.setSoTimeout(5000);
 						System.out.println("Connection from "+connection.getRemoteSocketAddress());
 						ObjectOutputStream out=new ObjectOutputStream(connection.getOutputStream());
 						ObjectInputStream in=new ObjectInputStream(connection.getInputStream());
@@ -69,9 +70,15 @@ class Control
 
 						//start the network handler thread for user
 						UserConnection pThread = new UserConnection(connection,out,in,userid,opponentid,gameId,db);
+						if(clients.get(userid)!=null)
+						{
+							remainingConnections++;
+							clients.get(userid).stop();
+						}
 						clients.put(userid,pThread);
 						pThread.start();
 						remainingConnections--;
+						System.out.println(remainingConnections+" Connections remain");
 					}
 
 					else
@@ -99,6 +106,6 @@ class Control
 	public static void releaseConnection()
 	{
 		remainingConnections++;
-		System.out.println("Connection freed");
+		System.out.println("Connection freed: "+remainingConnections+" Connections remain");
 	}
 }

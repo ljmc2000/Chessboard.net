@@ -92,8 +92,6 @@ class UserConnection extends Thread
 							s.close();
 						}
 
-						int hi=chessBoard.inCheck(color);
-						System.out.println(hi);
 						break;
 					}
 
