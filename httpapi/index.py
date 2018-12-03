@@ -170,24 +170,49 @@ def matchstats():
 
 	return jsonify(returnme)
 
+
+class HasUnlocked:
+	'''you may have noticed I love enums and switch statements. this is their python equivilant'''
+
+	def white(self,userid):
+		return True
+
+	def black(self,userid):
+		return True
+
+	def goblins(self,userid):
+		'''user must have won at least one match'''
+		return db.match_results.find({"endstate":"checkmate","winner":userid}).count() >= 1
+
+	def __getitem__(self, name):
+		return getattr(self, name)
+
 @app.route("/setprefs",methods=["POST"])
 def setprefs():
 	token=request.json.get("token")
 	userid=db.user_tokens.find_one({"_id":token})["user_id"]
 	user=db.users.find_one(userid)
 
+	hasUnlocked=HasUnlocked()
+
 	a=request.json.get("favourite_set")
 	if(a != None):
-		if user["secondary_set"]==a:
-			db.users.update({"_id":userid},{"$set":{"secondary_set":user["favourite_set"]}})
-		db.users.update({"_id":userid},{"$set":{"favourite_set":a}})
-		return jsonify({"status":0})
+		if hasUnlocked[a](userid):
+			if user["secondary_set"]==a:
+				db.users.update({"_id":userid},{"$set":{"secondary_set":user["favourite_set"]}})
+			db.users.update({"_id":userid},{"$set":{"favourite_set":a}})
+			return jsonify({"status":0})
+		else:
+			return jsonify({"status":1,"reason":"you have not met the requirements for this chess set"})
 
 	a=request.json.get("secondary_set")
 	if(a != None):
-		if user["favourite_set"]==a:
-			 db.users.update({"_id":userid},{"$set":{"favourite_set":user["secondary_set"]}})
-		db.users.update({"_id":userid},{"$set":{"secondary_set":a}})
-		return jsonify({"status":0})
+		if hasUnlocked[a](userid):
+			if user["favourite_set"]==a:
+				 db.users.update({"_id":userid},{"$set":{"favourite_set":user["secondary_set"]}})
+			db.users.update({"_id":userid},{"$set":{"secondary_set":a}})
+			return jsonify({"status":0})
+		else:
+			return jsonify({"status":1,"reason":"you have not met the requirements for this chess set"})
 
 	return jsonify({"status":1,"reason":"No valid setting found"})
