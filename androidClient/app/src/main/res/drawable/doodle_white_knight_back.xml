@@ -4,7 +4,7 @@
         android:pathData="m60.577,0.261 l12.473,2.468 9.895,6.348 0.402,24.304c-20.556,14.009 -23.785,11.564 -44.336,0.238l0.536,-24.066 8.934,-6.148z"
         android:strokeAlpha="1" android:strokeColor="#000000"
         android:strokeLineCap="butt" android:strokeLineJoin="miter" android:strokeWidth="1.63228595"/>
-    <path android:fillAlpha="1" android:fillColor="#00000000"
+    <path android:fillAlpha="1" android:fillColor="#ffffff"
         android:fillType="evenOdd"
         android:pathData="m85.115,43.266 l-8.776,5.665c-9.177,-6.773 -18.867,-9.335 -29.984,-0.172l-7.313,-5.836 2.56,7.553c15.084,61.838 26.868,61.587 39.857,1.545z"
         android:strokeAlpha="1" android:strokeColor="#000000"

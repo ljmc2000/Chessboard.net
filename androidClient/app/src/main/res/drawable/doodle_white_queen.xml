@@ -4,6 +4,11 @@
         android:pathData="m47.444,56.981 l-20.789,67.469 73.327,-0.378 -19.844,-66.713z"
         android:strokeAlpha="1" android:strokeColor="#000000"
         android:strokeLineCap="butt" android:strokeLineJoin="miter" android:strokeWidth="1.76499999"/>
+    <path android:fillAlpha="1" android:fillColor="#000000"
+        android:fillType="evenOdd"
+        android:pathData="m24.602,102.046c8.32,20.019 10.702,7.54 14.053,0.368L51.537,60.79c10.1,5.682 18.395,5.117 25.374,0l12.492,40.519c5.855,15.626 11.711,18.337 17.566,-0.368C119.023,-17.902 6.012,-15.319 24.602,102.046Z"
+        android:strokeAlpha="1" android:strokeColor="#000000"
+        android:strokeLineCap="butt" android:strokeLineJoin="miter" android:strokeWidth="0.79632443"/>
     <path android:fillAlpha="1" android:fillColor="#ffffff"
         android:pathData="M42.307,42.992a21.967,21.478 0,1 0,43.934 0a21.967,21.478 0,1 0,-43.934 0z"
         android:strokeAlpha="1" android:strokeColor="#000000"
