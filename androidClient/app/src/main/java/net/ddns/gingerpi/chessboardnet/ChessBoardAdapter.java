@@ -111,7 +111,7 @@ public class ChessBoardAdapter extends BaseAdapter{
                 int square;
                 for (int i = 0; i < validMoves.size(); i++) {
                     square=validMoves.get(i);
-                    if(0<square && square<64)
+                    if(0<=square && square<64)
                     squareContents[square]*=-1;
 
                 }

@@ -36,7 +36,7 @@ public class ChessBoard implements Serializable
 
 	public ChessPiece getItem(int position)
 	{
-		if(0<position && position<64)
+		if(0<=position && position<64)
 			return map[position];
 		else
 			return null;
@@ -90,7 +90,7 @@ public class ChessBoard implements Serializable
 		ChessPiece piece=map[origin];
 		ChessPiece target=map[destination];
 		boolean attacking=false;
-
+		boolean rooking=false;
 		if(piece==null)
 			return false;
 
@@ -98,10 +98,15 @@ public class ChessBoard implements Serializable
 			return false;
 
 		if(target != null)
-			if(piece.getColor() == target.getColor())
+		{
+			rooking = (piece.toString().equals("K") && target.toString().equals("R"))
+					|| (piece.toString().equals("k") && target.toString().equals("r"));
+			if (rooking);    //nothing happens here, just stop the next one executing
+			else if (piece.getColor() == target.getColor())
 				return false;
 			else
-				attacking=true;
+				attacking = true;
+		}
 
 		if(piece.checkLegal(chessMove,attacking))//simple check
 		if(piece.getLegalMoves(origin,this).contains(destination))//more robust
@@ -111,6 +116,13 @@ public class ChessBoard implements Serializable
 				piece.addKill();
 			map[destination]=piece;
 			map[origin]=null;
+			if(rooking)
+			{
+				int row=origin/010;
+				row*=010;
+				if(origin-destination>0) map[destination+1]=target;
+				else map[destination-1]=target;
+			}
 			whosTurn=!whosTurn;
 
 			//update king location
@@ -123,7 +135,7 @@ public class ChessBoard implements Serializable
 		}
 
 		return false;
-	}
+	}//end move piece
 
 	public ArrayList<Integer> inDanger(int square,boolean color)
 	{
