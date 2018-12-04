@@ -1,11 +1,15 @@
 package net.ddns.gingerpi.chessboardnet;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -317,13 +321,27 @@ public class MainActivity extends Activity {
 
     class JoinLobby extends Thread{
 
+    	JSONObject payload = new JSONObject();
+
+    	JoinLobby(){
+		}
+
+		JoinLobby(String opponent){
+    		try {
+				payload.put("opponent", opponent);
+			}
+			catch(Exception e){
+    			Log.e("#JSONError",e.toString());
+			}
+		}
+
         @Override
         public void run() {
             int status;
             String url = getResources().getString(R.string.HTTPAPIurl) + "/lobby";
-            JSONObject payload = new JSONObject();
             JSONObject response;
             RequestFuture<JSONObject> future = RequestFuture.newFuture();
+
 
             try {
                 payload.put("token", loginToken);
@@ -359,6 +377,16 @@ public class MainActivity extends Activity {
 							break;
 						}
 
+						case 4:{
+							Toast.makeText(getApplicationContext(),R.string.noSuchOpponentToast,Toast.LENGTH_SHORT).show();
+							break;
+						}
+
+						case 5:{
+							Toast.makeText(getApplicationContext(),R.string.opponentInMatchToast,Toast.LENGTH_SHORT).show();
+							break;
+						}
+
 						case -1: {
 							Toast.makeText(getApplicationContext(), R.string.matchmakingError, Toast.LENGTH_SHORT).show();
 							break;
@@ -391,6 +419,27 @@ public class MainActivity extends Activity {
     public void joinLobby(View view){
         new JoinLobby().start();
     }
+
+    public void declareChallenge(View view) {
+    	final AlertDialog.Builder usernamebox = new AlertDialog.Builder(this);
+		usernamebox.setTitle(R.string.setUsername);
+		final EditText userInput = new EditText(this);
+		usernamebox.setView(userInput);
+		usernamebox.setPositiveButton(R.string.confirmChallenge, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				String roomname = userInput.getText().toString();
+				new JoinLobby(roomname).start();
+			}
+		});
+		usernamebox.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+    		}
+		});
+		usernamebox.show();
+	}
 
     public void showStatistics(View view){
     	Intent showStatistics=new Intent(this,Statistics.class);

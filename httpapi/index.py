@@ -59,6 +59,18 @@ def destroy_login_token():
 
 
 lobby={}	#in the from {"uid","last time they sent a request"}
+def getFreeServer():
+	'''return the server with the lowest number of players currently using it'''
+	lowest=99999999	#nice big number, intmax would be better
+	for server in db.servers.distinct("_id"):
+		players_on_server=db.ongoing_matches.count({"server":server})
+		serverCapacity=db.servers.find_one({"_id":server})["capacity"]
+		if players_on_server<lowest and serverCapacity>players_on_server:
+			lowest=players_on_server
+			freeServer=server
+
+	return freeServer
+
 @app.route("/lobby",methods=["POST"])
 def joinLobby():
 	'''add player to the user to the lobby for 60 seconds'''
@@ -73,24 +85,41 @@ def joinLobby():
 	userid=user["user_id"]
 	if db.ongoing_matches.find_one({"players":{"$in":[userid]}}):	#check they are not already in match
 		return jsonify({"status":1})
-	lobby[userid]=datetime.datetime.now()
 
 	#ensure a server is available
 	if (db.servers.count()==0):
 		return jsonify({"status":2})
 
+	#if they have a preference on who to play
+	opponent=request.json.get("opponent")
+	if opponent != None:
+		opponent=db.users.find_one({"username":opponent})
+		if opponent==None:
+			return jsonify({"status":4})
+		else:
+			opponent=opponent["_id"]
+		if db.ongoing_matches.find_one({"players":{"$in":[opponent]}}) != None:
+			return jsonify({"status":5})
+		else:
+			server=getFreeServer()
+			db.ongoing_matches.insert({"players":[userid,opponent],"server":server})
+			try:
+				lobby.remove(userid)
+			except:
+				pass
+			try:
+				lobby.remove(opponent)
+			except:
+				pass
+			return jsonify({"status":0})
+
 	#Match players up
+	lobby[userid]=datetime.datetime.now()
 	while len(lobby)>1:
 		p1=lobby.popitem()[0]
 		p2=lobby.popitem()[0]
 
-		lowest=99999999	#nice big number, intmax would be better
-		for server in db.servers.distinct("_id"):
-			players_on_server=db.ongoing_matches.count({"server":server})
-			serverCapacity=db.servers.find_one({"_id":server})["capacity"]
-			if players_on_server<lowest and serverCapacity>players_on_server:
-				lowest=players_on_server
-				freeServer=server
+		server=getFreeServer()
 
 		db.ongoing_matches.insert({"players":[p1,p2],"server":server})
 

@@ -9,13 +9,18 @@
     <string name="playOnline">Play online</string>
     <string name="playOnlineHint">Play online with real actual human beings</string>
     <string name="challengeFriend">With Friend</string>
+    <string name="setUsername">Enter opponent\'s username</string>
+    <string name="confirmChallenge">Go!</string>
+    <string name="cancel">Cancel</string>
     <string name="challengeStranger">With Anyone</string>
     <string name="statsbutton">View past match Statistics</string>
     <string name="settingsbutton">Change user preferences</string>
     <string name="queueingToast">Queueing for match</string>
     <string name="inMatchToast">already in Match</string>
-    <string name="matchmakingError">Error connecting to the match making system</string>
     <string name="noserver">No server available to join</string>
+    <string name="noSuchOpponentToast">That player does not exist</string>
+    <string name="opponentInMatchToast">Opponent already in match</string>
+    <string name="matchmakingError">Error connecting to the match making system</string>
     <string name="usercheckupfail">Failed to get opponent info from httpapi</string>
     <string name="exit">Exit</string>
 
