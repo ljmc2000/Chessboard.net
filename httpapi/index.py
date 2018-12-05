@@ -213,6 +213,10 @@ class HasUnlocked:
 		'''user must have won at least one match'''
 		return db.match_results.find({"endstate":"checkmate","winner":userid}).count() >= 1
 
+	def teatime(self,userid):
+		'''must have won three'''
+		return db.match_results.find({"endstate":"checkmate","winner":userid}).count() >= 3
+
 	def __getitem__(self, name):
 		return getattr(self, name)
 
