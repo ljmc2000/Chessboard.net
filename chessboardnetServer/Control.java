@@ -70,11 +70,6 @@ class Control
 
 						//start the network handler thread for user
 						UserConnection pThread = new UserConnection(connection,out,in,userid,opponentid,gameId,db);
-						if(clients.get(userid)!=null)
-						{
-							remainingConnections++;
-							clients.get(userid).stop();
-						}
 						clients.put(userid,pThread);
 						pThread.start();
 						remainingConnections--;
