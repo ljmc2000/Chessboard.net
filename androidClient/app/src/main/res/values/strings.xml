@@ -5,7 +5,6 @@
 
     <!-- main activity -->
     <string name="WelcomeMessage">Welcome to Chessboard.Net</string>
-    <string name="loginBanner">You must login or sign up to use Chessboard.Net</string>
     <string name="playOnline">Play online</string>
     <string name="playOnlineHint">Play online with real actual human beings</string>
     <string name="challengeFriend">With Friend</string>
@@ -25,8 +24,12 @@
     <string name="exit">Exit</string>
 
     <!-- login -->
+    <string name="loginBanner">You must login or sign up to use Chessboard.Net</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="conPassword">Confirm Password</string>
     <string name="badpwd">Incorrect password</string>
-    <string name="nouser">User does not exist</string>
+    <string name="nouser">User does not exist</string>voice quality
     <string name="authfail">Failed to Authenticate</string>
     <string name="nomatchpwd">Passwords do not match</string>
     <string name="duplicateUser">Existing username found: try another</string>
