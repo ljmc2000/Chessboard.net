@@ -179,10 +179,18 @@ public class ChessBoard implements Serializable
 					return 1;
 				else
 					return 2;	//if assasain cannot be taken, checkmate
-
 			}
 
-			default: return 2;	//in check from more than one piece
+			default:	//2 pieces or more
+			{
+				ArrayList<Integer> moves=king.getLegalMoves(square,this);
+				for(int i=0; i<moves.size(); i++)
+					if(inDanger(moves.get(i).intValue(),color).size()==0)
+						return 1;	//just check
+
+				//else
+				return 2;
+			}
 		}
 	}
 
