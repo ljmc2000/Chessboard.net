@@ -182,7 +182,7 @@ public class ChessBoard implements Serializable
 
 			}
 
-			default: return -1;	//in check from more than one piece
+			default: return 2;	//in check from more than one piece
 		}
 	}
 
