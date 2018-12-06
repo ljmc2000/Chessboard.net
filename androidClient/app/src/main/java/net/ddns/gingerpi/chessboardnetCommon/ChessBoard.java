@@ -147,6 +147,7 @@ public class ChessBoard implements Serializable
 			if(map[i]!=null)
 			if(map[i].getColor()!=color)
 			if(map[i].getLegalMoves(i,this).contains(square))
+			if(!(map[i].toString().equals("p") || map[i].toString().equals("P")) && !(i%010==square%010))
 				returnme.add(i);
 		}
 
