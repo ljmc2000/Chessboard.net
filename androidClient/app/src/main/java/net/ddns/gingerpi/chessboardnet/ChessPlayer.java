@@ -139,6 +139,12 @@ public class ChessPlayer extends Activity {
     }
 
     @Override
+    protected void onPause(){
+    	super.onPause();
+    	conmanager.disconnect();
+	}
+
+    @Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
 	    super.onCreateContextMenu(menu, v, menuInfo);
     	MenuInflater inflater = getMenuInflater();
