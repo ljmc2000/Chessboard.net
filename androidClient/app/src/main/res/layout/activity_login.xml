@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:gravity="top|center_horizontal"
     android:orientation="vertical"
-    tools:context=".Login">
+    tools:context=".Login"
+    tools:scrollY="match_parent">
 
     <TextView
         android:id="@+id/textView"
@@ -15,71 +16,84 @@
         android:text="@string/loginBanner"
         android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title" />
 
-    <View
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="11dp"
-        android:background="?android:attr/listDivider"
-        android:visibility="invisible" />
+        android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/loginUsername"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/username"
-        android:inputType="text|textPersonName" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top|center_horizontal"
+            android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/loginPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/password"
-        android:inputType="textPassword|textWebPassword" />
+            <View
+                android:id="@+id/divider2"
+                android:layout_width="match_parent"
+                android:layout_height="11dp"
+                android:background="?android:attr/listDivider"
+                android:visibility="invisible" />
 
-    <Button
-        android:id="@+id/loginButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="login"
-        android:text="Login" />
+            <EditText
+                android:id="@+id/loginUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/username"
+                android:inputType="text|textPersonName" />
 
-    <View
-        android:id="@+id/divider2"
-        android:layout_width="match_parent"
-        android:layout_height="11dp"
-        android:background="?android:attr/listDivider"
-        android:visibility="invisible" />
+            <EditText
+                android:id="@+id/loginPassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/password"
+                android:inputType="textPassword|textWebPassword" />
 
-    <EditText
-        android:id="@+id/registerUsername"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/username"
-        android:inputType="textPersonName" />
+            <Button
+                android:id="@+id/loginButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="login"
+                android:text="Login" />
 
-    <EditText
-        android:id="@+id/registerPassword1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/password"
-        android:inputType="textPassword" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="11dp"
+                android:background="?android:attr/listDivider"
+                android:visibility="invisible" />
 
-    <EditText
-        android:id="@+id/registerPassword2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/conPassword"
-        android:inputType="textPassword" />
+            <EditText
+                android:id="@+id/registerUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/username"
+                android:inputType="textPersonName" />
 
-    <Button
-        android:id="@+id/register"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="register"
-        android:text="Register" />
+            <EditText
+                android:id="@+id/registerPassword1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/password"
+                android:inputType="textPassword" />
+
+            <EditText
+                android:id="@+id/registerPassword2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/conPassword"
+                android:inputType="textPassword" />
+
+            <Button
+                android:id="@+id/register"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="register"
+                android:text="Register" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>
