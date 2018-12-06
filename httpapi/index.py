@@ -190,8 +190,8 @@ def matchstats():
 			continue
 
 		d["surrenders"]=db.match_results.find({"players":{"$all":[userid,player]},"endstate":"surrender"}).count()
-		d["wins"]=db.match_results.find({"players":{"$all":[userid,player]},"endstate":"checkmate","winner":userid}).count()
-		d["losses"]=db.match_results.find({"players":{"$all":[userid,player]},"endstate":"checkmate","winner":player}).count()
+		d["wins"]=db.match_results.find({"players":{"$all":[userid,player]},"endstate":{'$regex':'^check'},"winner":userid}).count()
+		d["losses"]=db.match_results.find({"players":{"$all":[userid,player]},"endstate":{'$regex':'^check'},"winner":player}).count()
 		d["user_id"]=str(player)
 		d["username"]=db.users.find_one({"_id":player})["username"]
 
@@ -211,11 +211,11 @@ class HasUnlocked:
 
 	def goblins(self,userid):
 		'''user must have won at least one match'''
-		return db.match_results.find({"endstate":"checkmate","winner":userid}).count() >= 1
+		return db.match_results.find({"endstate": {'$regex':'^check'},"winner":userid}).count() >= 1
 
 	def teatime(self,userid):
 		'''must have won three'''
-		return db.match_results.find({"endstate":"checkmate","winner":userid}).count() >= 3
+		return db.match_results.find({"endstate":{'$regex':'^check'},"winner":userid}).count() >= 3
 
 	def __getitem__(self, name):
 		return getattr(self, name)

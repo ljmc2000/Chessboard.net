@@ -110,7 +110,9 @@ class UserConnection extends Thread
 						{
 							case 1:
 							{
-								db.endGame(opponent,"surrender");
+								ChessBoard board=Control.boards.get(gameId);
+								if (board.inCheck(color)) db.endGame(opponent,"check");
+								else db.endGame(opponent,"surrender");
 
 								//destroy the chessboard
 								Control.boards.remove(gameId);
