@@ -217,8 +217,14 @@ class HasUnlocked:
 		'''must have won three'''
 		return db.match_results.find({"endstate":{'$regex':'^check'},"winner":userid}).count() >= 3
 
+	def _default_(self,userid):
+		return False
+
 	def __getitem__(self, name):
-		return getattr(self, name)
+		try:
+			return getattr(self, name)
+		except AttributeError:
+			return self._default_
 
 @app.route("/setprefs",methods=["POST"])
 def setprefs():
