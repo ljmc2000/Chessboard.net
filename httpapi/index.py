@@ -2,7 +2,7 @@ from flask import Flask,jsonify,request
 from pymongo import MongoClient,ASCENDING
 from bson.json_util import dumps
 from bson.objectid import ObjectId
-import bcrypt,secrets,datetime
+import bcrypt,secrets,datetime,socket
 
 TOKEN_LEN=32	#how many bytes (characters? citation needed) required for login token
 
@@ -139,7 +139,7 @@ def getmatch():
 			returnme["status"]=0
 
 			server=db.servers.find_one(returnme.pop("server"))
-			returnme["hostname"]=server["hostname"]
+			returnme["hostname"]=socket.gethostbyname(server["hostname"])
 			returnme["port"]=server["port"]
 
 			returnme["players"].remove(userid)
