@@ -76,6 +76,12 @@ public class Pawn extends ChessPiece
 		}
 	}
 
+	@Override
+	public char toChar()
+	{
+		return 'P';
+	}
+
 	public String toString()
 	{
 		if(color)

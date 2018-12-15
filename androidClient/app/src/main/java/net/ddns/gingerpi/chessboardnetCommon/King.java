@@ -91,6 +91,12 @@ public class King extends ChessPiece
 		return (x<=1 && y<=1) || canrook;
 	}
 
+	@Override
+	public char toChar()
+	{
+		return 'K';
+	}
+
 	public String toString()
 	{
 		if(color)

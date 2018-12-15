@@ -82,6 +82,12 @@ public class Bishop extends ChessPiece
 		return divineInterventionCheck(chessMove) && ((origin%011) == (destination%011) || (origin%007) == (destination%007));
 	}
 
+	@Override
+	public char toChar()
+	{
+		return 'B';
+	}
+
 	public String toString()
 	{
 		if(color)

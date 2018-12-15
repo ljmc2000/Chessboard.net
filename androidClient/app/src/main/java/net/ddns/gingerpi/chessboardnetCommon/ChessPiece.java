@@ -1,4 +1,4 @@
-//an interface to represent an interface
+//an abstract class to represent a chesspiece
 package net.ddns.gingerpi.chessboardnetCommon;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ public abstract class ChessPiece implements Serializable
 
 	public abstract ArrayList<Integer> getLegalMoves(int position,ChessBoard map);	//list all possible moves the piece could take from it's current position
 	public abstract boolean checkLegal(int chessMove,boolean attacking);		//check a move is chess legal
+	public abstract char toChar();	//return K for king, Q for queen, N for knight etc...
 
 	public ChessPiece(boolean color)
 	{

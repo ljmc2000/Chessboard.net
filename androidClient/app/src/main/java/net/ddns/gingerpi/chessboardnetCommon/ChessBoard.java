@@ -100,7 +100,7 @@ public class ChessBoard implements Serializable
 		if(target != null)
 		{
 			rooking = (piece.toString().equals("K") && target.toString().equals("R"))
-					|| (piece.toString().equals("k") && target.toString().equals("r"));
+				|| (piece.toString().equals("k") && target.toString().equals("r"));
 			if (rooking);    //nothing happens here, just stop the next one executing
 			else if (piece.getColor() == target.getColor())
 				return false;
@@ -147,7 +147,7 @@ public class ChessBoard implements Serializable
 			if(map[i]!=null)
 			if(map[i].getColor()!=color)
 			if(map[i].getLegalMoves(i,this).contains(square))
-			if(!(map[i].toString().equals("p") || map[i].toString().equals("P")) && !(i%010==square%010))
+			if(!(map[i].toChar() == 'P') && !(i%010==square%010))
 				returnme.add(i);
 		}
 
@@ -161,7 +161,7 @@ public class ChessBoard implements Serializable
 		else square=king2;
 
 		ChessPiece king=map[square];
-		if(!king.toString().equals("k")&&!king.toString().equals("K"))
+		if(king.toChar() != 'K')
 			return 2;	//if they somehow murder the king
 		ArrayList<Integer> potAssasains=inDanger(square,color);
 
@@ -197,8 +197,7 @@ public class ChessBoard implements Serializable
 
 	public boolean promotable(int position)
 	{
-		return (position<010 && map[position].toString().equals("p"))
-		|| (position>067 && map[position].toString().equals("P"));
+		return ((position<010 || position>067) && map[position].toChar()=='P');
 	}
 
 	public enum Rank{queen,knight,rook,bishop};

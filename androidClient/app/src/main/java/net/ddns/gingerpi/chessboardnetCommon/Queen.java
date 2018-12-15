@@ -40,6 +40,12 @@ public class Queen extends ChessPiece
 		return rook.checkLegal(chessMove,attacking) || bishop.checkLegal(chessMove,attacking);
 	}
 
+	@Override
+	public char toChar()
+	{
+		return 'Q';
+	}
+
 	public String toString()
 	{
 		if(color)

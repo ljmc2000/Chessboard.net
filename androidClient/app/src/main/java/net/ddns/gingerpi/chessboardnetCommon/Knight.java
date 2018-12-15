@@ -82,6 +82,12 @@ public class Knight extends ChessPiece
 		return false;
 	}
 
+	@Override
+	public char toChar()
+	{
+		return 'N';
+	}
+
 	public String toString()
 	{
 		if(color)
