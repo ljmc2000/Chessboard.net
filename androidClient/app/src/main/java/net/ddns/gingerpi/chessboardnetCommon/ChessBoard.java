@@ -215,7 +215,8 @@ public class ChessBoard implements Serializable
 
 	public boolean promotable(int position)
 	{
-		return ((position<010 || position>067) && map[position].toChar()=='P');
+		if (map[position]==null) return false;
+		else return ((position<010 || position>067) && map[position].toChar()=='P');
 	}
 
 	public enum Rank{queen,knight,rook,bishop};
