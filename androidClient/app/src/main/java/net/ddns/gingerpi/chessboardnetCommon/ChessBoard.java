@@ -119,7 +119,7 @@ public class ChessBoard implements Serializable
 				map[origin]=piece;
 				int row=origin/010;
 				row*=010;
-				if(origin-destination>0)
+				if(origin-destination<0)
 				{
 					map[origin+2]=piece;
 					map[origin+1]=target;
