@@ -148,13 +148,6 @@ public class ChessBoard implements Serializable
 			}
 
 			whosTurn=!whosTurn;
-
-			//update king location
-			if(piece.toString().equals("K"))
-				king1=destination;
-			else if(piece.toString().equals("k"))
-				king2=destination;
-
 			return true;
 		}
 
