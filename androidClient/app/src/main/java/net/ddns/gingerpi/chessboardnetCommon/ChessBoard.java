@@ -114,15 +114,30 @@ public class ChessBoard implements Serializable
 			piece.addMove();
 			if(attacking)
 				piece.addKill();
-			map[destination]=piece;
-			map[origin]=null;
 			if(rooking)
 			{
+				map[origin]=piece;
 				int row=origin/010;
 				row*=010;
-				if(origin-destination>0) map[destination+1]=target;
-				else map[destination-1]=target;
+				if(origin-destination>0)
+				{
+					map[origin+2]=piece;
+					map[origin+1]=target;
+				}
+				else
+				{
+					map[origin-2]=piece;
+					map[origin-1]=target;
+				}
+				map[origin]=null;
 			}
+
+			else
+			{
+				map[destination]=piece;
+				map[origin]=null;
+			}
+
 			whosTurn=!whosTurn;
 
 			//update king location
