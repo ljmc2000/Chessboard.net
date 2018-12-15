@@ -136,6 +136,7 @@ public class ChessBoard implements Serializable
 					else if(piece.toString().equals("k")) king2=origin-2;
 				}
 				map[origin]=null;
+				map[destination]=null;	//destination works a little different here
 			}
 
 			else
