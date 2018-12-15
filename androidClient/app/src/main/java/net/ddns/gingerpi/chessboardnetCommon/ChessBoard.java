@@ -123,11 +123,17 @@ public class ChessBoard implements Serializable
 				{
 					map[origin+2]=piece;
 					map[origin+1]=target;
+					//update king location
+					if(piece.toString().equals("K")) king1=origin+2;
+					else if(piece.toString().equals("k")) king2=origin+2;
 				}
 				else
 				{
 					map[origin-2]=piece;
 					map[origin-1]=target;
+					//update king location
+					if(piece.toString().equals("K")) king1=origin-2;
+					else if(piece.toString().equals("k")) king2=origin-2;
 				}
 				map[origin]=null;
 			}
@@ -136,6 +142,9 @@ public class ChessBoard implements Serializable
 			{
 				map[destination]=piece;
 				map[origin]=null;
+				//update king location
+				if(piece.toString().equals("K")) king1=destination;
+				else if(piece.toString().equals("k")) king2=destination;
 			}
 
 			whosTurn=!whosTurn;
