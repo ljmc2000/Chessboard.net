@@ -130,6 +130,8 @@ def getmatch():
 	try:
 		token=request.json.get("token")
 		user=db.user_tokens.find_one({"_id":token})
+		if user==None:
+			return jsonify({"status":5})
 		userid=user["user_id"]
 
 		returnme=db.ongoing_matches.find_one({"players":{"$in":[userid]}})

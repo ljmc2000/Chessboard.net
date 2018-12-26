@@ -244,7 +244,6 @@ public class MainActivity extends Activity {
 
     class MatchChecker extends Thread{
         String url=getResources().getString(R.string.HTTPAPIurl)+"/getmatch";
-        int status=0;
 		boolean goOn=true;
 
         JSONObject payload=new JSONObject();
@@ -262,6 +261,7 @@ public class MainActivity extends Activity {
 
         @Override
         public void run(){
+        	int status=0;
 
             do {
 				try {
@@ -278,33 +278,53 @@ public class MainActivity extends Activity {
         	        status=-1;
                     Log.e("#HTTPAPI",e.toString());
                 }
-            } while (status != 0 && goOn);
 
-            switch(status){
-                case 0: {
-                    try {
-                        serverHostname=response.getString("hostname");
-                        serverPort=response.getInt("port");
-                        opponentid=response.getString("opponentid");
-                        //get opponent info
-                        getOpponentInfo=new GetOpponentInfo();
-                        getOpponentInfo.start();
-                        //connect to server
-                        startGame(serverHostname,serverPort);
-                    }
+				switch(status){
+					case 0: {
+						try {
+							serverHostname=response.getString("hostname");
+							serverPort=response.getInt("port");
+							opponentid=response.getString("opponentid");
+							//get opponent info
+							getOpponentInfo=new GetOpponentInfo();
+							getOpponentInfo.start();
+							//connect to server
+							startGame(serverHostname,serverPort);
+							stopSearch();
+						}
 
-                    catch(Exception e){
-                        Log.e("#HTTPAPI", e.toString());
-                    }
+						catch(Exception e){
+							Log.e("#HTTPAPI", e.toString());
+						}
 
-                    break;
-                }
+						break;
+					}
 
-                case -1: {
-                    break;
-                }
-            }
+					case 1: {	// normal/nomatch
+						break;
+					}
 
+					case 2:{	//a challenge
+						break;
+					}
+
+					case 3: {    //an new version is available
+
+						break;
+					}
+
+					case 5: {	//login token is invalid
+						stopSearch();
+						logout(null);
+						break;
+					}
+
+					case -1: {
+						break;
+					}
+				}
+
+            } while (goOn);
         }
 
 		public void stopSearch() {
