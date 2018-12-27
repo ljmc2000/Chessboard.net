@@ -1,11 +1,12 @@
 <resources>
     <string name="app_name">Chessboard.Net</string>
-    <!--string name="HTTPAPIurl">http://gingerpi.ddns.net/chess/</string-->
-    <string name="HTTPAPIurl">http://192.168.0.1:5000</string>
+    <string name="HTTPAPIurl">http://gingerpi.ddns.net/chess/</string>
+    <!--string name="HTTPAPIurl">http://192.168.0.1:5000</string-->
     <string name="DB_NAME">LocalCache.db</string>
 
     <!-- main activity -->
     <string name="WelcomeMessage">Welcome to Chessboard.Net</string>
+    <string name="newVersion">A new version of the application is available for download. You must upgrade to continue using this service.</string>
     <string name="playOnline">Play online</string>
     <string name="playOnlineHint">Play online with real actual human beings</string>
     <string name="challengeFriend">With Friend</string>

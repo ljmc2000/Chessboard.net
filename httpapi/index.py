@@ -2,7 +2,7 @@ from flask import Flask,jsonify,request
 from pymongo import MongoClient,ASCENDING
 from bson.json_util import dumps
 from bson.objectid import ObjectId
-import bcrypt,secrets,datetime,socket
+import bcrypt,secrets,datetime,socket,versionInfo
 
 TOKEN_LEN=32	#how many bytes (characters? citation needed) required for login token
 
@@ -16,6 +16,14 @@ db.users.create_index([("username",ASCENDING)],unique=True)
 def hello_world():
 	returnme=db.test.find_one()
 	return app.response_class(response=dumps(returnme),status=200,mimetype="application/json")
+
+@app.route("/version")
+def get_version():
+	return jsonify({"version":versionInfo.version,"tag":versionInfo.tag})
+
+@app.route("/download")
+def download_redirect():
+	return '<script>window.location.href = "http://%s/chessboard_net_v%s.apk"</script>' % (versionInfo.repo,versionInfo.tag)
 
 @app.route("/signup",methods=["POST"])
 def create_user():

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +20,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
+
+import net.ddns.gingerpi.chessboardnetCommon.VersionInfo;
 
 import net.ddns.gingerpi.chessboardnet.Roomfiles.CacheDatabase;
 import net.ddns.gingerpi.chessboardnet.Roomfiles.UserInfo;
@@ -308,11 +311,6 @@ public class MainActivity extends Activity {
 						break;
 					}
 
-					case 3: {    //an new version is available
-
-						break;
-					}
-
 					case 5: {	//login token is invalid
 						stopSearch();
 						logout(null);
@@ -337,6 +335,50 @@ public class MainActivity extends Activity {
 			}
 		}
     }
+
+    class CheckVersion extends Thread {
+		String url=getResources().getString(R.string.HTTPAPIurl)+"/version";
+		JsonObjectRequest checkVersion;
+		JSONObject response;
+		RequestFuture<JSONObject> future = RequestFuture.newFuture();
+		Context mContext;
+
+		public CheckVersion(Context mContext){
+			this.mContext=mContext;
+		}
+
+		@Override
+		public void run(){
+			try {
+				checkVersion=new JsonObjectRequest(Request.Method.GET,url,null,future ,errorListener);
+				queue.add(checkVersion);
+				response = future.get(3, TimeUnit.SECONDS);
+				if(VersionInfo.version!=(int)response.get("version")){
+					runOnUiThread(new Runnable() {
+									  @Override
+									  public void run() {
+									  	AlertDialog.Builder newVersionAvail = new AlertDialog.Builder(mContext);
+									  	newVersionAvail.setTitle(R.string.newVersion);
+									  	newVersionAvail.setPositiveButton(R.string.confirmChallenge, new DialogInterface.OnClickListener() {
+									  		@Override
+											public void onClick(DialogInterface dialog, int which){
+									  			Intent download=new Intent(Intent.ACTION_VIEW,Uri.parse(getString(R.string.HTTPAPIurl)+"/download"));
+									  			startActivity(download);
+									  			finishAffinity();
+											}
+									  	});
+									  	newVersionAvail.show();
+									  }
+								  }
+					);
+				}
+			}
+
+			catch(Exception e){
+				Log.d("#JSONError",e.toString());
+			}
+		}
+	}
 
     class JoinLobby extends Thread{
 
@@ -498,6 +540,9 @@ public class MainActivity extends Activity {
     void startThreads(){
 		getUserPreferencesFromServer= new GetUserPreferencesFromServer();
 		getUserPreferencesFromServer.start();
+
+		CheckVersion checkVersion=new CheckVersion(this);
+		checkVersion.start();
 
     	matchChecker=new MatchChecker();
 		matchChecker.start();
