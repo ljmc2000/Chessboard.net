@@ -23,7 +23,7 @@ def get_version():
 
 @app.route("/download")
 def download_redirect():
-	return '<script>window.location.href = "http://%s/chessboard_net_v%s.apk"</script>' % (versionInfo.repo,versionInfo.tag)
+	return '<script>window.location.href = "http://%s/chessboard_net_%s.apk"</script>' % (versionInfo.repo,versionInfo.tag)
 
 @app.route("/signup",methods=["POST"])
 def create_user():
