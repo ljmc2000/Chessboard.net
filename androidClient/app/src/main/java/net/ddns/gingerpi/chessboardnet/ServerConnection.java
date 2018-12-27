@@ -1,5 +1,6 @@
 package net.ddns.gingerpi.chessboardnet;
 
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,11 +22,17 @@ public class ServerConnection extends Thread {
     Socket mycon;
     ObjectOutputStream out;
     ObjectInputStream in;
+
+    String opponent_username;
+    ChessSet.texturePack own_texturepack1;
+    ChessSet.texturePack own_texturepack2;
+    ChessSet.texturePack opp_texturepack1;
+    ChessSet.texturePack opp_texturepack2;
+
     InetAddress address;
     int port;
     String loginToken;
 
-    ChessPlayer.PlayerInfo playerInfo;
     TextView imout;     //object to display instant messages
 	ChessBoard board;
     ChessBoardAdapter boardOut;      //write directly to the board
@@ -35,13 +42,19 @@ public class ServerConnection extends Thread {
     ArrayList<ChessPacket> sendQueue=new ArrayList<ChessPacket>();
     int pawn2promote=-1;
 
-    public ServerConnection(ChessPlayer mainThread, String url, int port, ChessPlayer.PlayerInfo playerInfo, String token, ChessBoardAdapter boardOut, TextView imout){
+    public ServerConnection(ChessPlayer mainThread, Bundle extras, ChessBoardAdapter boardOut, TextView imout){
         try {
             this.mainThread=mainThread;
-            this.address = InetAddress.getByName(url);
-            this.port = port;
-            this.playerInfo=playerInfo;
-            this.loginToken=token;
+            this.address = InetAddress.getByName(extras.getString("hostname"));
+            this.port = extras.getInt("port");
+            this.loginToken=extras.getString("loginToken");
+
+            this.opponent_username=extras.getString("opponentUsername");
+            this.opp_texturepack1=ChessSet.texturePack.valueOf(extras.getString("opp_favourite_set"));
+			this.opp_texturepack2=ChessSet.texturePack.valueOf(extras.getString("opp_secondary_set"));
+			this.own_texturepack1=ChessSet.texturePack.valueOf(extras.getString("own_favourite_set"));
+			this.own_texturepack2=ChessSet.texturePack.valueOf(extras.getString("own_secondary_set"));
+
             this.boardOut=boardOut;
             this.imout = imout;
         }
@@ -128,7 +141,7 @@ public class ServerConnection extends Thread {
                             @Override
                             public void run() {
                                 try {
-                                    imout.append(playerInfo.getUsername() + ": " + recievedMessage.getMessage() + "\n");
+                                    imout.append(opponent_username + ": " + recievedMessage.getMessage() + "\n");
                                 }
 
                                 catch(Exception e){
@@ -150,7 +163,7 @@ public class ServerConnection extends Thread {
 									}
 
 									case 2: {    //checkmate
-										imout.append(playerInfo.getUsername() + " Wins\n");
+										imout.append(opponent_username + " Wins\n");
 										break;
 									}
 								}
@@ -167,13 +180,13 @@ public class ServerConnection extends Thread {
 
 
                         //set textures and settle disputes
-                        ChessSet.texturePack mine=playerInfo.getMyTexturePack1();
-                        ChessSet.texturePack opptp=playerInfo.getOpponentTexturePack1();
+                        ChessSet.texturePack mine=own_texturepack1;
+                        ChessSet.texturePack opptp=opp_texturepack1;
                         if(mine==opptp) {
 							if (color)
-								opptp = playerInfo.getOpponentTexturePack2();
+								opptp = opp_texturepack2;
 							else
-								mine = playerInfo.getMyTexturePack2();
+								mine = own_texturepack2;
 
 							if(color)
 								boardOut.setTextures(mine, opptp);

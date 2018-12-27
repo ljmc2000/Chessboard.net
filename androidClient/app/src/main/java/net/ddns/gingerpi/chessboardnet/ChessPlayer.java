@@ -16,8 +16,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.ddns.gingerpi.chessboardnet.Roomfiles.CacheDatabase;
-import net.ddns.gingerpi.chessboardnet.Roomfiles.UserInfo;
-import net.ddns.gingerpi.chessboardnet.Roomfiles.UserPreferences;
 import net.ddns.gingerpi.chessboardnetCommon.ChessBoard;
 
 import static net.ddns.gingerpi.chessboardnet.ChessSet.texturePack;
@@ -26,61 +24,9 @@ public class ChessPlayer extends Activity {
 
     ServerConnection conmanager;
     TextView imout;
-    PlayerInfo playerInfo;
 	ChessBoardAdapter chessBoardAdapter;
 	GridView chessBoard;
 	Bundle extras;
-
-    class PlayerInfo extends Thread{
-        String opponentid;
-        UserInfo opponent;
-        UserPreferences opponentPrefs;
-        UserPreferences myPrefs;
-
-
-        @Override
-        public void run(){
-            this.opponent=
-                    CacheDatabase
-                            .getInstance(getApplicationContext())
-                            .getUserInfoDao()
-                            .getOpponentInfo(opponentid);
-
-            this.opponentPrefs=
-					CacheDatabase
-					.getInstance(getApplicationContext())
-					.getUserPreferencesDao()
-					.getOpponentPreferences(opponentid);
-
-            this.myPrefs=
-					CacheDatabase
-					.getInstance(getApplicationContext())
-					.getUserPreferencesDao()
-					.fetchOwn();
-        }
-
-        public PlayerInfo(String opponentid){
-            this.opponentid=opponentid;
-        }
-
-        public String getUsername(){
-            return this.opponent.username;
-        }
-        public texturePack getOpponentTexturePack1(){
-        	return this.opponentPrefs.favourite_set;
-		}
-		public texturePack getOpponentTexturePack2(){
-        	return this.opponentPrefs.secondary_set;
-		}
-
-		public texturePack getMyTexturePack1(){
-        	return this.myPrefs.favourite_set;
-		}
-
-		public texturePack getMyTexturePack2(){
-        	return this.myPrefs.secondary_set;
-		}
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,15 +38,6 @@ public class ChessPlayer extends Activity {
 
         //enable the promotion menu
 		registerForContextMenu(findViewById(R.id.promenu_anchor));
-
-        //get opponent info from room
-		playerInfo=new PlayerInfo(getIntent().getExtras().getString("opponentid"));
-        playerInfo.start();
-        try {
-            playerInfo.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         //generate chessboard
         chessBoard = (GridView) findViewById(R.id.chessboard);
@@ -127,7 +64,7 @@ public class ChessPlayer extends Activity {
 
         try{
             imout.setMovementMethod(new ScrollingMovementMethod());
-            conmanager=new ServerConnection(this,extras.getString("hostname"),extras.getInt("port"),playerInfo,extras.getString("loginToken"),chessBoardAdapter,imout);
+            conmanager=new ServerConnection(this,extras,chessBoardAdapter,imout);
             chessBoardAdapter.setServer(conmanager);
             conmanager.start();
             conmanager.initBoard();
@@ -194,7 +131,7 @@ public class ChessPlayer extends Activity {
 
     public void reconnect(View view){
     	conmanager.disconnect();
-		conmanager=new ServerConnection(this,extras.getString("hostname"),extras.getInt("port"),playerInfo,extras.getString("loginToken"),chessBoardAdapter,imout);
+		conmanager=new ServerConnection(this,extras,chessBoardAdapter,imout);
 		chessBoardAdapter.setServer(conmanager);
     	conmanager.start();
     	conmanager.initBoard();

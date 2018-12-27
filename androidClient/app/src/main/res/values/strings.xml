@@ -22,7 +22,6 @@
     <string name="noSuchOpponentToast">That player does not exist</string>
     <string name="opponentInMatchToast">Opponent already in match</string>
     <string name="matchmakingError">Error connecting to the match making system</string>
-    <string name="usercheckupfail">Failed to get opponent info from httpapi</string>
     <string name="exit">Exit</string>
 
     <!-- login -->

@@ -1,7 +1,6 @@
 package net.ddns.gingerpi.chessboardnet;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,38 +14,14 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
-import net.ddns.gingerpi.chessboardnet.Roomfiles.CacheDatabase;
-import net.ddns.gingerpi.chessboardnet.Roomfiles.UserInfo;
-
 import org.json.JSONObject;
+
+import java.io.OutputStream;
 
 
 public class Login extends Activity {
 
     String token;
-    String id;
-
-    public class SaveToken extends Thread {
-        Context context;
-        String id;
-        String username;
-        String token;
-
-        @Override
-        public void run() {
-            CacheDatabase
-                    .getInstance(this.context)
-                    .getUserInfoDao()
-                    .insert(new UserInfo(id,username,token));
-        }
-
-        public SaveToken(Context context,String id,String username, String token){
-            this.context=context;
-            this.id=id;
-            this.username=username;
-            this.token=token;
-        }
-    }
 
     Response.ErrorListener errorListener = new Response.ErrorListener() {
         @Override
@@ -86,11 +61,8 @@ public class Login extends Activity {
 
                     switch (status) {
                         case 0: { //success
-                            id = response.getString("id");
                             token = response.getString("token");
-                            SaveToken t = new SaveToken(getApplicationContext(),id,uname,token);
-                            t.start();
-                            t.join();
+                            saveToken(uname, token);
                             finish();
                             break;
                         }
@@ -149,11 +121,8 @@ public class Login extends Activity {
 
                     switch (status) {
                         case 0: {   //success
-                            id = response.getString("id");
                             token = response.getString("token");
-                            SaveToken t = new SaveToken(getApplicationContext(), id, uname, token);
-                            t.start();
-                            t.join();
+                            saveToken(uname, token);
                             finish();
                             break;
                         }
@@ -175,4 +144,15 @@ public class Login extends Activity {
         JsonObjectRequest login=new JsonObjectRequest(Request.Method.POST,url,payload,registerResponseListener ,errorListener);
         queue.add(login);
     }
+
+    void saveToken(String username,String token){
+    	 try{
+    	 	deleteFile("login");
+    	 	OutputStream login=openFileOutput("login", MODE_APPEND);
+    	 	login.write((token+"::"+username).getBytes());
+    	 }
+    	 catch(Exception e){
+    	 	Log.e("#IOError",e.toString());
+    	 }
+	}
 }

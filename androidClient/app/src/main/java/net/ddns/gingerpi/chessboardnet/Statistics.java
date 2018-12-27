@@ -17,16 +17,19 @@ import com.android.volley.toolbox.Volley;
 
 import net.ddns.gingerpi.chessboardnet.Roomfiles.CacheDatabase;
 import net.ddns.gingerpi.chessboardnet.Roomfiles.MatchStatistic;
-import net.ddns.gingerpi.chessboardnet.Roomfiles.UserInfo;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class Statistics extends Activity {
 
+	String token;
 	MatchstatsAdapter adapter;
 	ListView matchStats;
 
@@ -43,6 +46,7 @@ public class Statistics extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_statistics);
 
+		token=getToken();
 		queue=Volley.newRequestQueue(this);
 
 		matchStats=(ListView) findViewById(R.id.pastMatchList);
@@ -58,17 +62,12 @@ public class Statistics extends Activity {
 
 		@Override
 		public void run(){
-			UserInfo self=CacheDatabase
-							.getInstance(getApplicationContext())
-							.getUserInfoDao()
-							.fetch();
-
 			try {
 				RequestFuture<JSONArray> future = RequestFuture.newFuture();
 				JSONArray payload=new JSONArray();
 				JSONObject payload_contents=new JSONObject();
 				JSONArray response;
-				payload_contents.put("token", self.token);
+				payload_contents.put("token", token);
 				payload.put(payload_contents);
 				JsonArrayRequest getstats=new JsonArrayRequest(Request.Method.POST,url,payload,future ,errorListener);
 				queue.add(getstats);
@@ -76,15 +75,6 @@ public class Statistics extends Activity {
 				JSONObject j;
 				for(int i=0; i<response.length(); i++){
 					j=response.getJSONObject(i);
-
-					CacheDatabase
-							.getInstance(getApplicationContext())
-							.getUserInfoDao()
-							.insert(new UserInfo(
-									j.getString("user_id"),
-									j.getString("username"),
-									null)
-							);
 
 					CacheDatabase
 							.getInstance(getApplicationContext())
@@ -120,5 +110,19 @@ public class Statistics extends Activity {
 	public void refresh(View view){
 		Refresher r = new Refresher();
 		r.start();
+	}
+
+	String getToken(){
+		try {
+			InputStream loginFile = openFileInput("login");
+			InputStreamReader loginFileReader = new InputStreamReader(loginFile);
+			BufferedReader bufferedReader = new BufferedReader(loginFileReader);
+			String[] rawData = bufferedReader.readLine().split("::");
+			return rawData[0];
+		}
+		catch(Exception e){
+			Log.e("#IOError",e.toString());
+			return null;
+		}
 	}
 }

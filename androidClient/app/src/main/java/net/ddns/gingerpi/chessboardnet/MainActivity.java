@@ -23,13 +23,13 @@ import com.android.volley.toolbox.Volley;
 
 import net.ddns.gingerpi.chessboardnetCommon.VersionInfo;
 
-import net.ddns.gingerpi.chessboardnet.Roomfiles.CacheDatabase;
-import net.ddns.gingerpi.chessboardnet.Roomfiles.UserInfo;
-import net.ddns.gingerpi.chessboardnet.Roomfiles.UserPreferences;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
 
 
@@ -37,15 +37,11 @@ public class MainActivity extends Activity {
 
     RequestQueue queue;
     String loginToken="";
-    String userId;
-    String serverHostname="";
-    int serverPort;
-    String opponentid="";
+    String username=null;
 
     //threads
-	GetUserPreferencesFromServer getUserPreferencesFromServer;
 	MatchChecker matchChecker;
-	GetOpponentInfo getOpponentInfo;
+	GetMatchInfo getMatchInfo;
 
     Response.ErrorListener errorListener = new Response.ErrorListener() {
         @Override
@@ -59,8 +55,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        loginToken=checkLogin();
-        opponentid=null;
+        checkLogin();
         queue=Volley.newRequestQueue(this);
 
 		startThreads();
@@ -76,120 +71,55 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        loginToken=checkLogin();
-        opponentid=null;
+        checkLogin();
         queue=Volley.newRequestQueue(this);
 
 		startThreads();
     }
 
-	public class GetUserInfo extends Thread {
-		Context context;
-		UserInfo result;
-		UserPreferences pref;
-
-		@Override
-		public void run() {
-			this.result=
-					CacheDatabase
-							.getInstance(this.context)
-							.getUserInfoDao()
-							.fetch();
-
-			this.pref=
-					CacheDatabase
-							.getInstance(this.context)
-							.getUserPreferencesDao()
-							.fetchOwn();
-
-		}
-
-		public GetUserInfo(Context context){
-			this.context=context;
-		}
-
-		public String getUsername() {
-			try {
-				return this.result.username;
-			}
-
-			catch(Exception e){
-				return null;
-			}
-		}
-
-		public String getID() {
-			return this.result.id;
-		}
-
-		public String getToken() {
-			try{
-				return this.result.token;
-			}
-
-			catch (NullPointerException e){
-				return null;
-			}
-		}
-	}
-	public class DeleteUserInfo extends Thread {
-
-		Context context;
-
-		@Override
-		public void run(){
-			CacheDatabase
-					.getInstance(this.context)
-					.getUserInfoDao()
-					.clear();
-		}
-
-		public DeleteUserInfo(Context context){
-			this.context=context;
-		}
-	}
-
-    class GetOpponentInfo extends Thread{
+    class GetMatchInfo extends Thread{
         String url=getResources().getString(R.string.HTTPAPIurl)+"/userinfo";
-        RequestFuture<JSONObject> future = RequestFuture.newFuture();
-        JSONObject payload=new JSONObject();
+        String opponentid;
+
+        String own_username;
+        String own_favourite_set;
+        String own_secondary_set;
+		String opp_username;
+        String opp_favourite_set;
+        String opp_secondary_set;
+
+        RequestFuture<JSONObject> future1 = RequestFuture.newFuture();
+        RequestFuture<JSONObject> future2 = RequestFuture.newFuture();
+        JSONObject payload1=new JSONObject();
+        JSONObject payload2=new JSONObject();
         JSONObject response;
-        UserInfo opponent;
-        UserPreferences oppref;
+
+        public GetMatchInfo(String opponentid){
+        	this.opponentid=opponentid;
+		}
 
         @Override
         public void run(){
             try{
-                payload.put("token",loginToken);
-                payload.put("userid",opponentid);
+                payload1.put("token",loginToken);
+                payload1.put("userid",opponentid);
+                payload2.put("token",loginToken);
 
-                JsonObjectRequest opponentInfo=new JsonObjectRequest(Request.Method.POST,url,payload,future ,errorListener);
+                JsonObjectRequest opponentInfo=new JsonObjectRequest(Request.Method.POST,url,payload1,future1 ,errorListener);
+                JsonObjectRequest ownInfo=new JsonObjectRequest(Request.Method.POST, url, payload2, future2, errorListener);
+
                 queue.add(opponentInfo);
-                response=future.get(5,TimeUnit.SECONDS);
+                queue.add(ownInfo);
 
-                //put into database
-                opponent=new UserInfo(
-                        response.getString("userid"),
-                        response.getString("username"),
-                        null);
+                response=future1.get(5,TimeUnit.SECONDS);
+                opp_username=response.getString("username");
+                opp_favourite_set=response.getString("favourite_set");
+                opp_secondary_set=response.getString("secondary_set");
 
-                oppref=new UserPreferences(
-                		response.getString("userid"),
-						ChessSet.texturePack.valueOf(response.getString("favourite_set")),
-						ChessSet.texturePack.valueOf(response.getString("secondary_set"))
-				);
-
-                Log.d("#inserting_user",opponent.toString());
-
-                CacheDatabase
-                    .getInstance(getApplicationContext())
-                    .getUserInfoDao()
-                    .insert(opponent);
-
-                CacheDatabase
-						.getInstance(getApplicationContext())
-						.getUserPreferencesDao()
-						.insert(oppref);
+                response=future2.get(5,TimeUnit.SECONDS);
+                own_username=response.getString("username");
+                own_favourite_set=response.getString("favourite_set");
+                own_secondary_set=response.getString("secondary_set");
             }
             catch (JSONException e) {
                 Log.e("#JsonError",e.toString());
@@ -198,52 +128,28 @@ public class MainActivity extends Activity {
                 Log.e("#HTTPAPI",e.toString());
             }
         }
+
+        public String getOwnUsername(){
+        	return own_username;
+		}
+		public String getOwnFavourite_set(){
+        	return own_favourite_set;
+		}
+		public String getOwnSecondary_set(){
+        	return own_secondary_set;
+		}
+
+		public String getOppUsername(){
+			return opp_username;
+		}
+		public String getOppFavourite_set(){
+			return opp_favourite_set;
+		}
+		public String getOppSecondary_set(){
+			return opp_secondary_set;
+		}
     }
 
-    class GetUserPreferencesFromServer extends Thread{
-		String url=getResources().getString(R.string.HTTPAPIurl)+"/userinfo";
-
-		UserPreferences prefs;
-		JSONObject payload=new JSONObject();
-        JSONObject response;
-        RequestFuture<JSONObject> future = RequestFuture.newFuture();
-        JsonObjectRequest userPreferences;
-
-        public GetUserPreferencesFromServer(){
-        	try {
-        		payload.put("token",loginToken);
-        		payload.put("userid",userId);
-
-			}
-			catch(JSONException e){
-                Log.e("#JsonError",e.toString());
-			}
-		}
-
-		@Override
-		public void run(){
-        	try {
-				userPreferences = new JsonObjectRequest(Request.Method.POST, url, payload, future, errorListener);
-				queue.add(userPreferences);
-				response = future.get(15, TimeUnit.SECONDS);
-
-				prefs = new UserPreferences(
-						response.getString("userid"),
-						ChessSet.texturePack.valueOf(response.getString("favourite_set")),
-						ChessSet.texturePack.valueOf(response.getString("secondary_set"))
-				);
-
-				CacheDatabase
-						.getInstance(getApplicationContext())
-						.getUserPreferencesDao()
-						.insert(prefs);
-			}
-
-			catch(Exception e){
-        		Log.d("#prefs",e.toString());
-			}
-		}
-	}
 
     class MatchChecker extends Thread{
         String url=getResources().getString(R.string.HTTPAPIurl)+"/getmatch";
@@ -268,7 +174,7 @@ public class MainActivity extends Activity {
 
             do {
 				try {
-					Thread.sleep(3000);    //minimise number of requests
+					Thread.sleep(5000);    //minimise number of requests
     	            matchCheck=new JsonObjectRequest(Request.Method.POST,url,payload,future ,errorListener);
         	        queue.add(matchCheck);
                     response=future.get(3,TimeUnit.SECONDS);
@@ -285,14 +191,15 @@ public class MainActivity extends Activity {
 				switch(status){
 					case 0: {
 						try {
-							serverHostname=response.getString("hostname");
-							serverPort=response.getInt("port");
-							opponentid=response.getString("opponentid");
+							String serverHostname=response.getString("hostname");
+							int serverPort=response.getInt("port");
+							String opponentid=response.getString("opponentid");
 							//get opponent info
-							getOpponentInfo=new GetOpponentInfo();
-							getOpponentInfo.start();
+							getMatchInfo=new GetMatchInfo(opponentid);
+							getMatchInfo.start();
+							getMatchInfo.join();
 							//connect to server
-							startGame(serverHostname,serverPort);
+							startGame(serverHostname,serverPort,getMatchInfo);
 							stopSearch();
 						}
 
@@ -313,7 +220,8 @@ public class MainActivity extends Activity {
 
 					case 5: {	//login token is invalid
 						stopSearch();
-						logout(null);
+						if(new File(getFilesDir()+"/login").lastModified()+10000<System.currentTimeMillis())
+							logout(null);
 						break;
 					}
 
@@ -459,9 +367,6 @@ public class MainActivity extends Activity {
     }
 
     public void logout(View view) {
-        DeleteUserInfo request=new DeleteUserInfo(getApplicationContext());
-        request.start();
-
         String url=getResources().getString(R.string.HTTPAPIurl)+"/signout";
         JSONObject payload=new JSONObject();
         try{
@@ -472,6 +377,8 @@ public class MainActivity extends Activity {
         }
         JsonObjectRequest logout=new JsonObjectRequest(Request.Method.POST,url,payload,null ,errorListener);
         queue.add(logout);
+
+        deleteFile("login");
 
         Intent login = new Intent(this,Login.class);
         startActivity(login);
@@ -513,35 +420,23 @@ public class MainActivity extends Activity {
     	startActivity(settings);
 	}
 
-    public void startGame(String hostname,int port){
+    public void startGame(String hostname,int port,GetMatchInfo matchInfo){
     	Intent startgame = new Intent(this, ChessPlayer.class);
 		startgame.putExtra("loginToken", loginToken);
-		startgame.putExtra("opponentid", opponentid);
+		startgame.putExtra("opponentUsername", matchInfo.getOppUsername());
+		startgame.putExtra("opp_favourite_set",matchInfo.getOppFavourite_set());
+		startgame.putExtra("opp_secondary_set",matchInfo.getOppSecondary_set());
+		startgame.putExtra("own_favourite_set",matchInfo.getOwnFavourite_set());
+		startgame.putExtra("own_secondary_set",matchInfo.getOwnSecondary_set());
 		startgame.putExtra("hostname", hostname);
 		startgame.putExtra("port", port);
 
-		try {
-			getUserPreferencesFromServer.join();
-			getOpponentInfo.join();
-		}
-
-		catch (Exception e) {
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					Toast.makeText(getApplicationContext(), R.string.usercheckupfail, Toast.LENGTH_SHORT);
-				}
-			});
-		}
 		startActivity(startgame);
 
     }
 
     void startThreads(){
-		getUserPreferencesFromServer= new GetUserPreferencesFromServer();
-		getUserPreferencesFromServer.start();
-
-		CheckVersion checkVersion=new CheckVersion(this);
+    	CheckVersion checkVersion=new CheckVersion(this);
 		checkVersion.start();
 
     	matchChecker=new MatchChecker();
@@ -552,17 +447,23 @@ public class MainActivity extends Activity {
     	matchChecker.stopSearch();
 	}
 
-    String checkLogin() {
-        //if not logged in
-        GetUserInfo request= new GetUserInfo(this);
-        try {
-            request.start();
-            request.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    void checkLogin() {
+    	username=null;
+    	loginToken=null;
+		try{
+			InputStream loginFile=openFileInput("login");
+			InputStreamReader loginFileReader=new InputStreamReader(loginFile);
+			BufferedReader bufferedReader=new BufferedReader(loginFileReader);
+			String[] rawData=bufferedReader.readLine().split("::");
+			username=rawData[1];
+			loginToken=rawData[0];
+		}
+		catch (Exception e){
+			Log.e("#IOError",e.toString());
+		}
 
-        if(request.getUsername() == null) {
+    	//if not logged in
+		if(username == null) {
             Intent login = new Intent(this,Login.class);
             startActivity(login);
         }
@@ -570,10 +471,7 @@ public class MainActivity extends Activity {
         else {
             //once logged in
             TextView usernameBox = findViewById(R.id.usernameBox);
-            usernameBox.setText("logged in as " + request.getUsername());
-            this.userId=request.getID();
+            usernameBox.setText("logged in as " + username);
         }
-
-        return request.getToken();
     }
 }

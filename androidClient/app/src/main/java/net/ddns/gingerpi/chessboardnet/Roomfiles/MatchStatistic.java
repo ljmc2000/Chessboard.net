@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
-@Entity(foreignKeys = @ForeignKey(entity=UserInfo.class, parentColumns = "username", childColumns = "username", onDelete = CASCADE))
+@Entity
 public class MatchStatistic {
 	@PrimaryKey
 	@NonNull

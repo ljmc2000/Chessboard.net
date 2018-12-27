@@ -167,7 +167,11 @@ def getmatch():
 def getUserInfo():
 	try:
 		token=request.json.get("token")
-		userid=ObjectId(request.json.get("userid"))
+		if request.json.get("userid")==None:
+			userid=db.user_tokens.find_one({"_id":token})["user_id"]
+		else:
+			userid=ObjectId(request.json.get("userid"))
+
 
 		if not db.user_tokens.find_one({"_id":token}):
 			return jsonify({"status":1,"message":"Access Prohibited"})
