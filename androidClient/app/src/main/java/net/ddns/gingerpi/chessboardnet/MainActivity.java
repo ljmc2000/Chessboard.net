@@ -422,14 +422,21 @@ public class MainActivity extends Activity {
 
     public void startGame(String hostname,int port,GetMatchInfo matchInfo){
     	Intent startgame = new Intent(this, ChessPlayer.class);
-		startgame.putExtra("loginToken", loginToken);
-		startgame.putExtra("opponentUsername", matchInfo.getOppUsername());
-		startgame.putExtra("opp_favourite_set",matchInfo.getOppFavourite_set());
-		startgame.putExtra("opp_secondary_set",matchInfo.getOppSecondary_set());
-		startgame.putExtra("own_favourite_set",matchInfo.getOwnFavourite_set());
-		startgame.putExtra("own_secondary_set",matchInfo.getOwnSecondary_set());
-		startgame.putExtra("hostname", hostname);
-		startgame.putExtra("port", port);
+    	try {
+			matchInfo.join();
+			startgame.putExtra("loginToken", loginToken);
+			startgame.putExtra("opponentUsername", matchInfo.getOppUsername());
+			startgame.putExtra("opp_favourite_set", matchInfo.getOppFavourite_set());
+			startgame.putExtra("opp_secondary_set", matchInfo.getOppSecondary_set());
+			startgame.putExtra("own_favourite_set", matchInfo.getOwnFavourite_set());
+			startgame.putExtra("own_secondary_set", matchInfo.getOwnSecondary_set());
+			startgame.putExtra("hostname", hostname);
+			startgame.putExtra("port", port);
+			startActivity(startgame);
+		}
+		catch (Exception e){
+    		Log.d("MatchInfoError","error fecthing preferences from server");
+		}
 
 		startActivity(startgame);
 

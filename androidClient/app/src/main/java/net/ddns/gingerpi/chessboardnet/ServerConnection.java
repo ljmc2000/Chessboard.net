@@ -9,10 +9,12 @@ import android.widget.Toast;
 import net.ddns.gingerpi.chessboardnetCommon.ChessBoard;
 import net.ddns.gingerpi.chessboardnetCommon.ChessPacket;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.*;
@@ -24,10 +26,6 @@ public class ServerConnection extends Thread {
     ObjectInputStream in;
 
     String opponent_username;
-    ChessSet.texturePack own_texturepack1;
-    ChessSet.texturePack own_texturepack2;
-    ChessSet.texturePack opp_texturepack1;
-    ChessSet.texturePack opp_texturepack2;
 
     InetAddress address;
     int port;
@@ -37,7 +35,6 @@ public class ServerConnection extends Thread {
 	ImageView whosTurn;
 
 	boolean color;
-	boolean initialised=false;
     ArrayList<ChessPacket> sendQueue=new ArrayList<ChessPacket>();
     int pawn2promote=-1;
 
@@ -168,16 +165,15 @@ public class ServerConnection extends Thread {
                     	board=(ChessBoard) in.readObject();
                     	color=(boolean) in.readObject();
 						if(!color) board.reverse();
-						mainThread.chessBoardAdapter.setChessBoard(board);
+						mainThread.chessBoardAdapter.setChessBoard(board,color);
 
-                        //refresh the view
+						//refresh the view
                         mainThread.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
 								mainThread.chessBoardAdapter.refreshBoard();
 							}
 						});
-                        initialised=true;
                         break;
                     }
 
@@ -208,15 +204,22 @@ public class ServerConnection extends Thread {
             }
         }
 
-        catch(Exception e) {
+        catch(IOException e) {
 			Log.e("#Network", e.toString());
 			mainThread.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					mainThread.imout.append(mainThread.getResources().getString(R.string.disconnect)+"\n");
-
 				}
 			});
+		}
+
+		catch (InterruptedException e){
+        	Log.e("#Thread",e.toString());
+		}
+
+		catch (ClassNotFoundException e){
+        	Log.e("#ClassnotFound",e.toString());
 		}
     }
 

@@ -2,6 +2,7 @@ package net.ddns.gingerpi.chessboardnet;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -19,6 +20,7 @@ import static net.ddns.gingerpi.chessboardnet.ChessSet.texturePack;
 
 public class ChessBoardAdapter extends BaseAdapter{
     private Context mContext;
+    Bundle extras;
     ServerConnection server;
     ChessBoard chessBoard;
     ImageView whosTurn;
@@ -29,23 +31,13 @@ public class ChessBoardAdapter extends BaseAdapter{
     int tileSize;
     int selectedSquare=-1;
 
-    public ChessBoardAdapter(Context c, Bundle extras, int tileSize, boolean color, ImageView whosTurn){
+    public ChessBoardAdapter(Context c, Bundle extras, int tileSize, ImageView whosTurn){
         mContext=c;
+        this.extras=extras;
         this.whosTurn=whosTurn;
         this.tileSize=tileSize;
         for(int i=0; i<dimensions; i++)
             squareContents[i]=1;
-        //set textures and settle disputes
-        ChessSet.texturePack mine=ChessSet.texturePack.valueOf(extras.getString("own_favourite_set"));
-        ChessSet.texturePack opptp=ChessSet.texturePack.valueOf(extras.getString("opp_favourite_set"));
-        if(mine==opptp) {
-            if (color)
-                opptp = ChessSet.texturePack.valueOf(extras.getString("opp_secondary_set"));
-            else
-                mine = ChessSet.texturePack.valueOf(extras.getString("own_secondary_set"));
-        }
-        
-        setTextures(mine, opptp);
     }
 
     @Override
@@ -142,6 +134,7 @@ public class ChessBoardAdapter extends BaseAdapter{
 	}
 
     public void refreshBoard(){
+        while(this.chessBoard==null);   //wait for a chessboard to exist
     	String layout=chessBoard.toCompString();
         for(int i=0; i<dimensions; i++){
             switch(layout.charAt(i)){
@@ -219,8 +212,19 @@ public class ChessBoardAdapter extends BaseAdapter{
         notifyDataSetChanged();
     }
 
-    public void setChessBoard(ChessBoard chessBoard){
-        this.chessBoard=chessBoard;
+    public void setChessBoard(ChessBoard chessBoard,boolean color){
+    	this.chessBoard=chessBoard;
+    	//set textures and settle disputes
+        ChessSet.texturePack mine=ChessSet.texturePack.valueOf(extras.getString("own_favourite_set"));
+        ChessSet.texturePack opptp=ChessSet.texturePack.valueOf(extras.getString("opp_favourite_set"));
+        if(mine==opptp) {
+            if (color)
+                opptp = ChessSet.texturePack.valueOf(extras.getString("opp_secondary_set"));
+            else
+                mine = ChessSet.texturePack.valueOf(extras.getString("own_secondary_set"));
+        }
+
+        setTextures(mine, opptp);
     }
     public void setServer(ServerConnection server){
     	this.server=server;

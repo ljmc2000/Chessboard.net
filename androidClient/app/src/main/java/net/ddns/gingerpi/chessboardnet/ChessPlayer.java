@@ -40,8 +40,23 @@ public class ChessPlayer extends Activity {
         //get info passed by main
         extras=getIntent().getExtras();
 
+        //create the server thread
+        conmanager = new ServerConnection(this, extras);
+		conmanager.start();
+
         //enable the promotion menu
 		registerForContextMenu(findViewById(R.id.promenu_anchor));
+
+		//generate chessboard
+		int squareSize = this.getWindowManager().getDefaultDisplay().getWidth() / 16;
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+			squareSize *= 2;
+		chessBoardAdapter = new ChessBoardAdapter(this, extras, squareSize, (ImageView) findViewById(R.id.whosTurn));
+		chessBoardAdapter.setServer(conmanager);
+		chessBoard = (GridView) findViewById(R.id.chessboard);
+		chessBoard.setAdapter(chessBoardAdapter);
+		chessBoard.setOnItemClickListener(chessBoardAdapter.getOnItemClickListener);
+		chessBoard.setColumnWidth(squareSize);
 
         //deal with instant messages
         imout=(TextView) findViewById(R.id.Messages);
@@ -57,31 +72,15 @@ public class ChessPlayer extends Activity {
                 return false;
             }
         });
+		imout.setMovementMethod(new ScrollingMovementMethod());
 
         try {
-			imout.setMovementMethod(new ScrollingMovementMethod());
-			conmanager = new ServerConnection(this, extras);
-			//generate chessboard
-			//chessBoard = (GridView) findViewById(R.id.chessboard);
-			int squareSize = this.getWindowManager().getDefaultDisplay().getWidth() / 16;
-			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
-				squareSize *= 2;
-			chessBoardAdapter = new ChessBoardAdapter(this, extras, squareSize, conmanager.color, (ImageView) findViewById(R.id.whosTurn));
-			chessBoard=null;
-			while (chessBoard==null)
-				chessBoard = (GridView) findViewById(R.id.chessboard);
-			chessBoard.setAdapter(chessBoardAdapter);
-			chessBoard.setOnItemClickListener(chessBoardAdapter.getOnItemClickListener);
-			chessBoard.setColumnWidth(squareSize);
-			//end generate chessboard
-			chessBoardAdapter.setServer(conmanager);
-			conmanager.start();
 			conmanager.initBoard();
 		}
 
 		catch (Exception e) {
 			Log.e("#GameThread", e.toString());
-			//Log.e("#GameThread", chessBoardAdapter.toString());
+			Log.e("#GameThread", conmanager.toString());
 		}
 
     }

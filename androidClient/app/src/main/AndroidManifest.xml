@@ -27,8 +27,7 @@
             android:launchMode="singleInstance" />
         <activity
             android:name=".ChessPlayer"
-            android:launchMode="singleInstance"
-            android:configChanges="orientation|screenSize|screenLayout" />
+            android:launchMode="singleInstance"/>
         <activity android:name=".Statistics" />
         <activity android:name=".Settings"></activity>
     </application>
