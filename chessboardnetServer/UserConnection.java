@@ -121,7 +121,6 @@ class UserConnection extends Thread
 								UserConnection otherPlayer = Control.clients.get(opponent);
 								otherPlayer.putMessage(messageIn);
 								s.close();
-								Control.releaseConnection();
 								break connection;
 							}
 
@@ -180,7 +179,6 @@ class UserConnection extends Thread
 		catch (Exception e)
 		{
 			System.err.println(e);
-			Control.releaseConnection();
 		}
 	}
 }
