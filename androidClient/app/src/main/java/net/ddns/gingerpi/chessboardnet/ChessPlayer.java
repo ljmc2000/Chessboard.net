@@ -1,6 +1,7 @@
 package net.ddns.gingerpi.chessboardnet;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -39,14 +40,6 @@ public class ChessPlayer extends Activity {
         //enable the promotion menu
 		registerForContextMenu(findViewById(R.id.promenu_anchor));
 
-        //generate chessboard
-        chessBoard = (GridView) findViewById(R.id.chessboard);
-        int squareSize=this.getWindowManager().getDefaultDisplay().getWidth()/16;
-        chessBoardAdapter=new ChessBoardAdapter(this,squareSize,(ImageView) findViewById(R.id.whosTurn));
-        chessBoard.setAdapter(chessBoardAdapter);
-        chessBoard.setOnItemClickListener(chessBoardAdapter.getOnItemClickListener);
-        chessBoard.setColumnWidth(squareSize);
-
         //deal with instant messages
         imout=(TextView) findViewById(R.id.Messages);
         EditText edittext = (EditText) findViewById(R.id.messageInput);
@@ -64,7 +57,15 @@ public class ChessPlayer extends Activity {
 
         try{
             imout.setMovementMethod(new ScrollingMovementMethod());
-            conmanager=new ServerConnection(this,extras,chessBoardAdapter,imout);
+            conmanager=new ServerConnection(this,extras);
+			//generate chessboard
+			chessBoard = (GridView) findViewById(R.id.chessboard);
+			int squareSize=this.getWindowManager().getDefaultDisplay().getWidth()/16;
+			chessBoardAdapter=new ChessBoardAdapter(this,extras, squareSize,conmanager.color ,(ImageView) findViewById(R.id.whosTurn));
+			chessBoard.setAdapter(chessBoardAdapter);
+			chessBoard.setOnItemClickListener(chessBoardAdapter.getOnItemClickListener);
+			chessBoard.setColumnWidth(squareSize);
+			//end generate chessboard
             chessBoardAdapter.setServer(conmanager);
             conmanager.start();
             conmanager.initBoard();
@@ -72,6 +73,7 @@ public class ChessPlayer extends Activity {
 
         catch (Exception e){
             Log.e("#GameThread",e.toString());
+            Log.e("#GameThread",chessBoard.toString());
         }
     }
 
@@ -131,7 +133,7 @@ public class ChessPlayer extends Activity {
 
     public void reconnect(View view){
     	conmanager.disconnect();
-		conmanager=new ServerConnection(this,extras,chessBoardAdapter,imout);
+		conmanager=new ServerConnection(this,extras);
 		chessBoardAdapter.setServer(conmanager);
     	conmanager.start();
     	conmanager.initBoard();

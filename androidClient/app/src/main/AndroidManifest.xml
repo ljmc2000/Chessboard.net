@@ -28,7 +28,8 @@
         <activity
             android:name=".ChessPlayer"
             android:launchMode="singleInstance"
-            android:screenOrientation="landscape" />
+            android:configChanges="orientation|screenSize|screenLayout"
+            android:screenOrientation="sensor" />
         <activity android:name=".Statistics" />
         <activity android:name=".Settings"></activity>
     </application>

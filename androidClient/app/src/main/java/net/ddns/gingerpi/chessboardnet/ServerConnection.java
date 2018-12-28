@@ -33,16 +33,14 @@ public class ServerConnection extends Thread {
     int port;
     String loginToken;
 
-    TextView imout;     //object to display instant messages
 	ChessBoard board;
-    ChessBoardAdapter boardOut;      //write directly to the board
 	ImageView whosTurn;
 
 	boolean color;
     ArrayList<ChessPacket> sendQueue=new ArrayList<ChessPacket>();
     int pawn2promote=-1;
 
-    public ServerConnection(ChessPlayer mainThread, Bundle extras, ChessBoardAdapter boardOut, TextView imout){
+    public ServerConnection(ChessPlayer mainThread, Bundle extras){
         try {
             this.mainThread=mainThread;
             this.address = InetAddress.getByName(extras.getString("hostname"));
@@ -50,13 +48,6 @@ public class ServerConnection extends Thread {
             this.loginToken=extras.getString("loginToken");
 
             this.opponent_username=extras.getString("opponentUsername");
-            this.opp_texturepack1=ChessSet.texturePack.valueOf(extras.getString("opp_favourite_set"));
-			this.opp_texturepack2=ChessSet.texturePack.valueOf(extras.getString("opp_secondary_set"));
-			this.own_texturepack1=ChessSet.texturePack.valueOf(extras.getString("own_favourite_set"));
-			this.own_texturepack2=ChessSet.texturePack.valueOf(extras.getString("own_secondary_set"));
-
-            this.boardOut=boardOut;
-            this.imout = imout;
         }
 
         catch(Exception e){
@@ -71,7 +62,7 @@ public class ServerConnection extends Thread {
         	mainThread.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					imout.append(mainThread.getResources().getString(R.string.connecting)+"\n");
+					mainThread.imout.append(mainThread.getResources().getString(R.string.connecting)+"\n");
 				}
 			});
         	Thread.sleep(1000);
@@ -85,7 +76,7 @@ public class ServerConnection extends Thread {
             mainThread.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					imout.append(mainThread.getResources().getString(R.string.connected)+"\n");
+					mainThread.imout.append(mainThread.getResources().getString(R.string.connected)+"\n");
 				}
 			});
 
@@ -113,7 +104,7 @@ public class ServerConnection extends Thread {
                     	mainThread.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								boardOut.refreshBoard();
+								mainThread.chessBoardAdapter.refreshBoard();
 								switch(board.inCheck(false)){
 									case 0: break;
 
@@ -141,11 +132,11 @@ public class ServerConnection extends Thread {
                             @Override
                             public void run() {
                                 try {
-                                    imout.append(opponent_username + ": " + recievedMessage.getMessage() + "\n");
+                                    mainThread.imout.append(opponent_username + ": " + recievedMessage.getMessage() + "\n");
                                 }
 
                                 catch(Exception e){
-                                    imout.append(mainThread.getResources().getString(R.string.unknownuser) + recievedMessage.getMessage() + "\n");
+                                    mainThread.imout.append(mainThread.getResources().getString(R.string.unknownuser) + recievedMessage.getMessage() + "\n");
                                 }
                             }
                         });
@@ -158,12 +149,12 @@ public class ServerConnection extends Thread {
                             public void run() {
                             	switch (recievedMessage.getMove()) {
 									case 1: {    //surrender
-										imout.append("Opponent has surrendered\n");
+										mainThread.imout.append("Opponent has surrendered\n");
 										break;
 									}
 
 									case 2: {    //checkmate
-										imout.append(opponent_username + " Wins\n");
+										mainThread.imout.append(opponent_username + " Wins\n");
 										break;
 									}
 								}
@@ -176,30 +167,13 @@ public class ServerConnection extends Thread {
                     	board=(ChessBoard) in.readObject();
                     	color=(boolean) in.readObject();
 						if(!color) board.reverse();
-						boardOut.setChessBoard(board);
-
-
-                        //set textures and settle disputes
-                        ChessSet.texturePack mine=own_texturepack1;
-                        ChessSet.texturePack opptp=opp_texturepack1;
-                        if(mine==opptp) {
-							if (color)
-								opptp = opp_texturepack2;
-							else
-								mine = own_texturepack2;
-
-							if(color)
-								boardOut.setTextures(mine, opptp);
-							else
-								boardOut.setTextures(opptp, mine);
-						}
-						boardOut.setTextures(mine, opptp);
+						mainThread.chessBoardAdapter.setChessBoard(board);
 
                         //refresh the view
                         mainThread.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								boardOut.refreshBoard();
+								mainThread.chessBoardAdapter.refreshBoard();
 							}
 						});
                         break;
@@ -209,7 +183,7 @@ public class ServerConnection extends Thread {
 						mainThread.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                imout.append("Kicked from Server: "+recievedMessage.getMessage()+"\n");
+                                mainThread.imout.append("Kicked from Server: "+recievedMessage.getMessage()+"\n");
                             }
                         });
 
@@ -223,7 +197,7 @@ public class ServerConnection extends Thread {
 						mainThread.runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
-									boardOut.refreshBoard();
+									mainThread.chessBoardAdapter.refreshBoard();
 								}
 							});
 						break;
@@ -237,7 +211,7 @@ public class ServerConnection extends Thread {
 			mainThread.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					imout.append(mainThread.getResources().getString(R.string.disconnect)+"\n");
+					mainThread.imout.append(mainThread.getResources().getString(R.string.disconnect)+"\n");
 
 				}
 			});
@@ -252,7 +226,7 @@ public class ServerConnection extends Thread {
     	mainThread.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				imout.append(mainThread.getResources().getString(R.string.surrendered)+"\n");
+				mainThread.imout.append(mainThread.getResources().getString(R.string.surrendered)+"\n");
 			}
 		});
         this.sendQueue.add(new ChessPacket(end,1,null));
@@ -308,7 +282,7 @@ public class ServerConnection extends Thread {
 				mainThread.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						imout.append("you win\n");
+						mainThread.imout.append("you win\n");
 					}
 				});
 			}

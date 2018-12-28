@@ -1,6 +1,7 @@
 package net.ddns.gingerpi.chessboardnet;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -28,12 +29,26 @@ public class ChessBoardAdapter extends BaseAdapter{
     int tileSize;
     int selectedSquare=-1;
 
-    public ChessBoardAdapter(Context c,int tileSize,ImageView whosTurn){
+    public ChessBoardAdapter(Context c, Bundle extras, int tileSize, boolean color, ImageView whosTurn){
         mContext=c;
         this.whosTurn=whosTurn;
         this.tileSize=tileSize;
         for(int i=0; i<dimensions; i++)
             squareContents[i]=1;
+        //set textures and settle disputes
+        ChessSet.texturePack mine=ChessSet.texturePack.valueOf(extras.getString("own_favourite_set"));
+        ChessSet.texturePack opptp=ChessSet.texturePack.valueOf(extras.getString("opp_favourite_set"));
+        if(mine==opptp) {
+            if (color)
+                opptp = ChessSet.texturePack.valueOf(extras.getString("opp_secondary_set"));
+            else
+                mine = ChessSet.texturePack.valueOf(extras.getString("own_secondary_set"));
+
+            if(color)
+                setTextures(mine, opptp);
+            else
+                setTextures(opptp, mine);
+        }
     }
 
     @Override
