@@ -43,12 +43,9 @@ public class ChessBoardAdapter extends BaseAdapter{
                 opptp = ChessSet.texturePack.valueOf(extras.getString("opp_secondary_set"));
             else
                 mine = ChessSet.texturePack.valueOf(extras.getString("own_secondary_set"));
-
-            if(color)
-                setTextures(mine, opptp);
-            else
-                setTextures(opptp, mine);
         }
+        
+        setTextures(mine, opptp);
     }
 
     @Override

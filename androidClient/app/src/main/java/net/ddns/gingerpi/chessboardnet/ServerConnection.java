@@ -37,6 +37,7 @@ public class ServerConnection extends Thread {
 	ImageView whosTurn;
 
 	boolean color;
+	boolean initialised=false;
     ArrayList<ChessPacket> sendQueue=new ArrayList<ChessPacket>();
     int pawn2promote=-1;
 
@@ -176,6 +177,7 @@ public class ServerConnection extends Thread {
 								mainThread.chessBoardAdapter.refreshBoard();
 							}
 						});
+                        initialised=true;
                         break;
                     }
 

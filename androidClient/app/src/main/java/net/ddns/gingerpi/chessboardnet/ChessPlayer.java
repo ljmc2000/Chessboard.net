@@ -2,6 +2,8 @@ package net.ddns.gingerpi.chessboardnet;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.content.pm.ConfigurationInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -32,6 +34,7 @@ public class ChessPlayer extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         setContentView(R.layout.activity_chess_player);
 
         //get info passed by main
@@ -55,26 +58,32 @@ public class ChessPlayer extends Activity {
             }
         });
 
-        try{
-            imout.setMovementMethod(new ScrollingMovementMethod());
-            conmanager=new ServerConnection(this,extras);
+        try {
+			imout.setMovementMethod(new ScrollingMovementMethod());
+			conmanager = new ServerConnection(this, extras);
 			//generate chessboard
-			chessBoard = (GridView) findViewById(R.id.chessboard);
-			int squareSize=this.getWindowManager().getDefaultDisplay().getWidth()/16;
-			chessBoardAdapter=new ChessBoardAdapter(this,extras, squareSize,conmanager.color ,(ImageView) findViewById(R.id.whosTurn));
+			//chessBoard = (GridView) findViewById(R.id.chessboard);
+			int squareSize = this.getWindowManager().getDefaultDisplay().getWidth() / 16;
+			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+				squareSize *= 2;
+			chessBoardAdapter = new ChessBoardAdapter(this, extras, squareSize, conmanager.color, (ImageView) findViewById(R.id.whosTurn));
+			chessBoard=null;
+			while (chessBoard==null)
+				chessBoard = (GridView) findViewById(R.id.chessboard);
 			chessBoard.setAdapter(chessBoardAdapter);
 			chessBoard.setOnItemClickListener(chessBoardAdapter.getOnItemClickListener);
 			chessBoard.setColumnWidth(squareSize);
 			//end generate chessboard
-            chessBoardAdapter.setServer(conmanager);
-            conmanager.start();
-            conmanager.initBoard();
-        }
+			chessBoardAdapter.setServer(conmanager);
+			conmanager.start();
+			conmanager.initBoard();
+		}
 
-        catch (Exception e){
-            Log.e("#GameThread",e.toString());
-            Log.e("#GameThread",chessBoard.toString());
-        }
+		catch (Exception e) {
+			Log.e("#GameThread", e.toString());
+			//Log.e("#GameThread", chessBoardAdapter.toString());
+		}
+
     }
 
     @Override
