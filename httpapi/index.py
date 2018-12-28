@@ -274,7 +274,7 @@ def setprefs():
 
 @app.route("/getunlocked",methods=["POST"])
 def get_unlocked():
-#	try:
+	try:
 		token=request.json.get("token")
 		userid=db.user_tokens.find_one({"_id":token})["user_id"]
 		unlocked=0
@@ -288,5 +288,5 @@ def get_unlocked():
 
 		return jsonify({"status":0,"unlocked":unlocked,"userid":str(userid)})
 
-#	except:
-#		return jsonify({"status":1})
+	except:
+		return jsonify({"status":1})

@@ -1,14 +1,18 @@
 package net.ddns.gingerpi.chessboardnet;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
+import java.io.InputStream;
+
 public class SetSelectorAdapter extends BaseAdapter {
 	Context mContext;
 	int size=ChessSet.texturePack.values().length;
+	int ulocked_sets;
 	ChessSet[] setsAvailable;
 	ChessSet.texturePack[] allTextures=ChessSet.texturePack.values();
 
@@ -19,6 +23,8 @@ public class SetSelectorAdapter extends BaseAdapter {
 		for(int i=0; i<size; i++){
 			setsAvailable[i]=new ChessSet(mContext, allTextures[i]);
 		}
+
+		loadSets();
 	}
 
 	@Override
@@ -36,9 +42,23 @@ public class SetSelectorAdapter extends BaseAdapter {
 
 	public View getView(int position, View convertView, ViewGroup parent){
 		ImageView icon = new ImageView(mContext);
-		icon.setImageDrawable(mContext.getDrawable(setsAvailable[position].getPiece(ChessSet.piece.pawn_front)));
+		if((ulocked_sets>>position)%2==1)
+			icon.setImageDrawable(mContext.getDrawable(setsAvailable[position].getPiece(ChessSet.piece.pawn_front)));
+		else
+			icon.setImageDrawable(mContext.getDrawable(R.drawable.ic_locked));
 		icon.setMinimumHeight(96);
 		return icon;
 	}
 
+	public void loadSets() {
+		//load unlocked sets from file
+		try {
+			InputStream u_file = mContext.openFileInput("unlocked_sets");
+			ulocked_sets = u_file.read();
+			u_file.close();
+		} catch (Exception e) {
+			ulocked_sets = 3;
+			Log.e("#groovy",e.toString());
+		}
+	}
 }

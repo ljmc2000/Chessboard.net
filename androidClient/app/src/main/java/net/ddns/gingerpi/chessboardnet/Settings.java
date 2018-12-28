@@ -17,6 +17,7 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
 
+import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
 
 public class Settings extends Activity {
@@ -24,6 +25,7 @@ public class Settings extends Activity {
 	Bundle extras;
 	String token;
 	String url;
+	SetSelectorAdapter setSelectorAdapter;
 	RequestQueue queue;
 	Response.ErrorListener errorListener = new Response.ErrorListener() {
         @Override
@@ -82,6 +84,62 @@ public class Settings extends Activity {
 
 	}
 
+	class SyncSets extends Thread{
+		String url=getResources().getString(R.string.HTTPAPIurl)+"/getunlocked";
+		RequestFuture<JSONObject> future=RequestFuture.newFuture();
+		SetSelectorAdapter setSelectorAdapter;
+		JSONObject payload;
+		JSONObject response;
+
+		public SyncSets(String token,SetSelectorAdapter setSelectorAdapter){
+			payload=new JSONObject();
+			try{
+				payload.put("token",token);
+			}
+			catch(Exception e){
+				Log.e("#JSONError",e.toString());
+			}
+			this.setSelectorAdapter=setSelectorAdapter;
+		}
+
+		@Override
+		public void run() {
+			JsonObjectRequest getunlocked=new JsonObjectRequest(url, payload, future, errorListener);
+			queue.add(getunlocked);
+			try{
+				response=future.get(3, TimeUnit.SECONDS);
+				switch(response.getInt("status")){
+					case 0:{
+						deleteFile("unlocked_sets");
+						OutputStream avsets=openFileOutput("unlocked_sets", MODE_APPEND);
+						avsets.write(response.getInt("unlocked"));
+						avsets.close();
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								setSelectorAdapter.loadSets();
+								setSelectorAdapter.notifyDataSetChanged();
+							}
+						});
+						break;
+					}
+					case 1:{
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								Toast.makeText(getApplicationContext(), R.string.noconnhttp, Toast.LENGTH_SHORT);
+							}
+						});
+						break;
+					}
+				}
+			}
+			catch (Exception e){
+				Log.e("#JSONError",e.toString());
+			}
+		}
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -92,7 +150,7 @@ public class Settings extends Activity {
 		url=getResources().getString(R.string.HTTPAPIurl)+"/setprefs";
 
 		//first and second menuitems
-		SetSelectorAdapter s=new SetSelectorAdapter(this);
+		setSelectorAdapter=new SetSelectorAdapter(this);
 
 		//first menuitem
 		GridView set1_selector =findViewById(R.id.set1_selector);
@@ -113,7 +171,7 @@ public class Settings extends Activity {
 				}
 			}
 		};
-		set1_selector.setAdapter(s);
+		set1_selector.setAdapter(setSelectorAdapter);
 		set1_selector.setOnItemClickListener(set1_listener);
 
 
@@ -136,7 +194,12 @@ public class Settings extends Activity {
 				}
 			}
 		};
-		set2_selector.setAdapter(s);
+		set2_selector.setAdapter(setSelectorAdapter);
 		set2_selector.setOnItemClickListener(set2_listener);
+	}
+
+	public void refresh(View view){
+		SyncSets syncSets=new SyncSets(token,setSelectorAdapter);
+		syncSets.start();
 	}
 }
