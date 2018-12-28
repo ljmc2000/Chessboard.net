@@ -1,7 +1,6 @@
 package net.ddns.gingerpi.chessboardnet;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -58,7 +57,6 @@ public class SetSelectorAdapter extends BaseAdapter {
 			u_file.close();
 		} catch (Exception e) {
 			ulocked_sets = 3;
-			Log.e("#groovy",e.toString());
 		}
 	}
 }
