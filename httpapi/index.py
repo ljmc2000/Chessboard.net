@@ -217,6 +217,8 @@ def matchstats():
 class HasUnlocked:
 	'''you may have noticed I love enums and switch statements. this is their python equivilant'''
 
+	setlist=["white","black","goblins","teatime"]
+
 	def white(self,userid):
 		return True
 
@@ -269,3 +271,22 @@ def setprefs():
 			return jsonify({"status":1,"reason":"you have not met the requirements for this chess set"})
 
 	return jsonify({"status":1,"reason":"No valid setting found"})
+
+@app.route("/getunlocked",methods=["POST"])
+def get_unlocked():
+#	try:
+		token=request.json.get("token")
+		userid=db.user_tokens.find_one({"_id":token})["user_id"]
+		unlocked=0
+		hasUnlocked=HasUnlocked()
+
+		num=1
+		for set in hasUnlocked.setlist:
+			if hasUnlocked[set](userid):
+				unlocked+=num
+			num*=2
+
+		return jsonify({"status":0,"unlocked":unlocked,"userid":str(userid)})
+
+#	except:
+#		return jsonify({"status":1})
