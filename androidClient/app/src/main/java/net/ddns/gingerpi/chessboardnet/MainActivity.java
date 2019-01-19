@@ -17,6 +17,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
@@ -56,7 +57,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         checkLogin();
-        queue=Volley.newRequestQueue(this);
+        queue=Volley.newRequestQueue(this,new HurlStack(null, SelfSignedFactory.getSocketFactory(this,R.raw.server)));
 
 		startThreads();
     }
