@@ -19,7 +19,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 public class SelfSignedFactory{
 
-	public static SSLSocketFactory getSocketFactory(Context mContext,int certId){
+	public static SSLSocketFactory getSocketFactory(Context mContext, int certId){
 		CertificateFactory cf = null;
 
 		try {
@@ -50,7 +50,7 @@ public class SelfSignedFactory{
             HostnameVerifier hostnameVerifier = new HostnameVerifier() {
             	@Override
 				public boolean verify(String hostname, SSLSession session) {
-                   	Log.e("CipherUsed", session.getCipherSuite());
+                   	Log.d("#CipherUsed", session.getCipherSuite());
                    	return hostname.compareTo("192.168.0.1")==0; //The Hostname of your server
                    	//return hostname.compareTo("gingerpi.ddns.net")==0; //The Hostname of your server
             	}

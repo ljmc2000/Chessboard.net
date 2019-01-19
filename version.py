@@ -1,6 +1,6 @@
 #generate the version information files for all parts of the program
-version=4
-tag="v1.1.3"
+version=5
+tag="v1.2.0"
 repo="gingerpi.ddns.net/chessrepo"
 
 java=open("androidClient/app/src/main/java/net/ddns/gingerpi/chessboardnetCommon/VersionInfo.java","w+")
