@@ -23,58 +23,56 @@ public class SelfSignedFactory{
 		CertificateFactory cf = null;
 
 		try {
-               cf = CertificateFactory.getInstance("X.509");
-               InputStream caInput = mContext.getResources().openRawResource(certId);
-               Certificate ca;
-               try {
-                   ca = cf.generateCertificate(caInput);
-                   Log.e("CERT", "ca=" + ((X509Certificate) ca).getSubjectDN());
-               }
-               finally {
-                   caInput.close();
-               }
+			cf = CertificateFactory.getInstance("X.509");
+            InputStream caInput = mContext.getResources().openRawResource(certId);
+            Certificate ca;
+            try {
+            	ca = cf.generateCertificate(caInput);
+            	Log.e("CERT", "ca=" + ((X509Certificate) ca).getSubjectDN());
+            }
+
+            finally {
+            	caInput.close();
+            }
 
 
-               String keyStoreType = KeyStore.getDefaultType();
-               KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-               keyStore.load(null, null);
-               keyStore.setCertificateEntry("ca", ca);
+            String keyStoreType = KeyStore.getDefaultType();
+            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("ca", ca);
 
 
-               String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-               TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-               tmf.init(keyStore);
+            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+            tmf.init(keyStore);
 
 
-               HostnameVerifier hostnameVerifier = new HostnameVerifier() {
-                   @Override
-                   public boolean verify(String hostname, SSLSession session) {
+            HostnameVerifier hostnameVerifier = new HostnameVerifier() {
+            	@Override
+				public boolean verify(String hostname, SSLSession session) {
+                   	Log.e("CipherUsed", session.getCipherSuite());
+                   	return hostname.compareTo("192.168.0.1")==0; //The Hostname of your server
+                   	//return hostname.compareTo("gingerpi.ddns.net")==0; //The Hostname of your server
+            	}
+            };
 
-                       Log.e("CipherUsed", session.getCipherSuite());
-                       return hostname.compareTo("192.168.0.1")==0; //The Hostname of your server
-					   //return hostname.compareTo("gingerpi.ddns.net")==0; //The Hostname of your server
+            HttpsURLConnection.setDefaultHostnameVerifier(hostnameVerifier);
+            SSLContext context = null;
+            context = SSLContext.getInstance("TLS");
 
-                   }
-               };
+            context.init(null, tmf.getTrustManagers(), null);
+            HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
 
-               HttpsURLConnection.setDefaultHostnameVerifier(hostnameVerifier);
-               SSLContext context = null;
-               context = SSLContext.getInstance("TLS");
-
-               context.init(null, tmf.getTrustManagers(), null);
-               HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
-
-               SSLSocketFactory sf = context.getSocketFactory();
+            SSLSocketFactory sf = context.getSocketFactory();
 
 
-               return sf;
+            return sf;
+		}
 
-           }
-           catch (Exception e) {
-			   Log.e("#certificate",e.toString());
-		   }
+		catch (Exception e) {
+			Log.e("#certificate",e.toString());
+		}
 
-           return  null;
-       }
-
+		return  null;
 	}
+}
