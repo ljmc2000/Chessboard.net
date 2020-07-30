@@ -1,0 +1,976 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0066)file:///tmp/lu446918ufvgi.tmp/lu446918ufvgo.tmp/project_report.htm -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<title></title>
+	<meta name="generator" content="LibreOffice 6.4.5.2 (Linux)">
+	<meta name="created" content="2018-12-06T22:40:08.155995313">
+	<meta name="changed" content="2018-12-09T23:52:28.628367612">
+	<style type="text/css">
+		@page { size: 8.5in 11in; margin: 0.79in }
+		p { margin-bottom: 0.1in; line-height: 115%; background: transparent }
+		td p { background: transparent }
+	</style>
+</head>
+<body lang="en-GB" link="#000080" vlink="#800000" dir="ltr"><p align="justify" style="margin-bottom: 0in; line-height: 100%">
+Andev report for student C16327966 (a chessgame that works over the
+internet and lets you play with another real human being)</p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%">To
+divide my project into neat chunks is awkward, because not all chunks
+are equal in size and some chunks neatly break down into other
+smaller chunks. The three biggest chunks of my project are the
+applicaion itself, the flask-based httpapi server, and the game
+server. There is also an awkward chunk called chessboardnetCommon
+which is a package that both the game server and client rely on. As
+only the application itself is eligible for marking, I’ll keep my
+explanation of the other two components brief. Although there are no
+marks going for them, you would do well to understand them in the
+context of how they interact with the android client.</p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><b>The
+httpapi</b></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+This component has 3 main duties. Firstly it stores information about
+the user that they may download at any time to store in the room
+database. Secondly it facilitates matchmaking. Both users send the
+api a message saying they wish to play a game, and the httpapi picks
+a server from it’s database and sends the server to both users and
+tells said server that both clients are coming. Thirdly it is
+responsible for storing preferences which at time of writing are
+limited to favourite chess set and second favourite chess set.</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><b>The
+game server</b></p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><span style="font-weight: normal">This
+is an application written in pure java designed to run on for
+example, an android kodi box that some fool put arch linux on (I’ll
+explain later). Essensially you run it and clients can connect to it.
+It is divided into </span><span style="font-weight: normal">four
+classes. The control class, the game thread class, the database
+connector class and the cleaner</span></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; line-height: 100%">
+<b>Control.java</b></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+When a user first connects to the server, their connection is picked
+up by control. Control then uses their login token to verify who they
+are, and from there who their opponent is. It then instanciates a new
+UserConnection thread and starts it running. This process loops till
+no free connections remain. Just for the record, connections are
+theoretically infinite. But in the interest of not melting raspberry
+pis I added a connection limit, after which connections are rejected.
+This is 100 by default.</p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; line-height: 100%">
+<b>UserConnection.java</b></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+This is the meat of the application. It is the mirror of
+ServerConnection.java in the android client, so I’ll only touch
+briefly on it here. My priorities for this were above all, the
+integrity of the games rules, with efficiency coming in at a close
+second. If this app were deployed in the real world, it would be
+running on a server built to handle potentially millions of clients
+at a time. Hence, every if statement counts, and some of the more
+expensive opperations, like detecting checkmate are left to the
+client. But surfice to say, this class is responsible for passing
+messages between the users and preventing cheating.</p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; line-height: 100%">
+<b>MongoDataManager.java</b></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+This class contains all methods that access the back end database.
+It’s the component that was lost in the great git clean fail of day
+11. that’s the most interesting thing about it.</p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; line-height: 100%">
+<b>Cleaner.java</b></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+This is a tiny thread with a vital job. Once the server stops it
+deregisters from the server pool and deletes all it’s ongoing
+matchs, saving users from reconnection loops.</p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><b>ChessboardnetCommon</b></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+This is the part of the project responsible for everything about the
+project relating to chess and it’s rules. The package might seem
+large at a whopping 9 clasees, but 6 of them are just child classes
+of chesspiece so I won’t cover them individually. Surfice to say
+they are all chesspiece with getLegalMoves and checkLegal overridden.</p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; line-height: 100%">
+<font color="#3465a4"><b>ChessPacket</b></font></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#3465a4">This is one of the most important part’s of
+the project. The android client communicates with the server by
+sending these back and forth constantly. A chesspacket has a header,
+a message and a chessmove. The first two are self explanitory,
+however <span style="background: #fff200">sometimes chessmove is used
+for whatever integer I wanted to send with that specific packet, so
+be wary</span>. The packet types are as follows.</font></p>
+<ul>
+	<li><p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+	<font color="#3465a4">Ack – nothing to see here/nothings happening</font></p>
+	</li><li><p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+	<font color="#3465a4">chessmove – take the int and divide it into
+	two sqares and move whatever piece is on the first one to the second
+	one (if legal)</font></p>
+	</li><li><p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+	<font color="#3465a4">IM – instant message. Display the contents
+	of message to the user next to the opponents username.</font></p>
+	</li><li><p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+	<font color="#3465a4">End – declare either surrender or checkmate.
+	Uses chessMove to differenciate.</font></p>
+	</li><li><p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+	<font color="#3465a4">Fullserver – the server has reached it’s
+	connection limit: come back later.</font></p>
+	</li><li><p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+	<font color="#3465a4">InitBoard – please send the layout of the
+	entire chessboard.</font></p>
+	</li><li><p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+	<font color="#3465a4">chessError – the uesr is probably cheating.
+	Kick them from the server and display a message saying they have
+	been kicked for cheating</font></p>
+	</li><li><p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+	<font color="#3465a4">promotion – turn that pawn into something
+	else. chessMove stores the piece’s location.</font></p>
+</li></ul>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">	<b>ChessBoard</b></font></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">This is basically an array of chesspices with
+methods heavily restricting the way you can move pieces. Like
+chesspacket it is serializable, meaning you can send the entire
+chessboard through a socket connection. It’s default constructor
+initialises it with an internataional standard board layout, the
+bottom queen on the left and the bottom right corner a light square
+(actually this class doesn’t even know the squares are colored. It
+also doesn’t know what chess set a given piece is from. It only
+knows the color is true or false)</font></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; line-height: 100%">
+<font color="#000000"><b>ChessPiece</b></font></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">This is an abstract class with a move counter,
+a kill counter and a color. The color is a boolean. Why? Because
+sometimes I go really off the deep end on efficiency witout really
+concidering how efficient something really is. It also has a
+movecount and a killcount, and the story around the latter is a true
+tragedy. Originally every piece would have had a randomly generated
+name, and if you captured enough pieces with a single piece, things
+like “ming the mighty has vanquished calvin the conquerer” would
+start appearing in the IM view for each subsequent kill. Sadly that
+did not get implemented, and killcount is completely redundent. I
+only leave it in out of longing for what might have been. Maybe one
+day, when I’m bored enough I’ll return to this project and
+finally implement the pieces having some deeper meaning than “a
+pawn”. But D-day is approaching, and time is running short.
+Movecount is used to check if rooking can happen. That’s about it.
+The pieces were meant to be more like individuals, and I think that
+feature would have taken this from “impressive given it was made by
+one person in a month” to “impressive”.</font></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><font color="#000000"><b>The
+Android client</b></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">I won’t talk about the room classes on their
+own. We all know what room does. But I will metion volley because I
+hated it so much. I <i><b>ass</b></i><i>u</i><i><b>me</b></i>d that
+sending http post requests on android would be a cake walk. After all
+it’s such a common use case 51% of all apps on the market must use
+it, right? When I found out futures were a thing, it was a godsend.
+Before that volley felt klunkey to the point of ridicule. Even with
+futures what takes 10 lines in java is 2 in python. But my biases
+aside, it did the job in most cases and I’m reasonably happy with
+it.</font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">Activities:</font></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; line-height: 100%">
+<font color="#000000"><b>MainActivity:</b></font></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">On the graphical side of things, this is a very
+simple menu using a LinearLayout. However this wound up being the
+longest file on the list and the most complex, though a lot of it is
+just the six subclasses. </font>
+</p>
+<p align="justify" style="margin-left: 0.98in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">The first is getuserinfo. This upon the
+application starting will fetch the username of the user from sqlite.
+If it fails it triggers the login activity.</font></p>
+<p align="justify" style="margin-left: 0.98in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">The second is DeleteUserInfo. This could be
+renamed logout. It wipes the entire database clean. (this is fine
+because all data is fetched from the httpapi anyway). It is triggered
+upon pressing the logout button in the UI</font></p>
+<p align="justify" style="margin-left: 0.98in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">The Third is GetOpponentInfo. This runs just
+before a match and fetches the other users username and chesspiece
+preferences into your local database.</font></p>
+<p align="justify" style="margin-left: 0.98in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">The forth is getUserPreferencesFromServer. This
+downloads your own preferences for chess sets and stores them in
+sqlite.</font></p>
+<p align="justify" style="margin-left: 0.98in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">The fifth (and most important) is MatchChecker.
+This sends constant messages to the matchmaking server until it is
+told that the user is in a match and then launches the chessplayer
+activity.</font></p>
+<p align="justify" style="margin-left: 0.98in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">The sixth class is JoinLobby. This basically
+just sends a request to the httpapi to match the user up with an
+opponent (specific or otherwise).</font></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">Other than the six functions listed, the main
+activity has buttons to take you to the preferences and statistics
+screens. Despite it’s complexity, this activity will look
+deceptivley simple to the user, as most it’s functionality happens
+in the background.</font></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; line-height: 100%">
+<font color="#000000"><b>Login</b></font></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; line-height: 100%">
+<font color="#000000"><span style="font-weight: normal">This Activity
+will be launched by main automatically if the user is not logged in.
+The logic is handled mostly by the httpapi. If the client provides a
+username and password to the login form and presses login the app
+will send a request to /signin. If the username and password are
+placed in register boxes a request is posted to /signup and a new
+account is created. The user’s id, username and token are placed in
+room table. Once login is complete the app </span><i><span style="font-weight: normal">should</span></i><span style="font-style: normal"><span style="font-weight: normal">
+return to the main activity. If it fails to, just press the back
+button.</span></span></font></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; line-height: 100%">
+<font color="#000000"><b>ChessPlayer</b></font></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">This is the very soul of the program. This
+activity is where the user plays their chessgame. On the UI end, the
+user gets a chessboard, a reconnect button, a surrender button and an
+instant messenger, composed of a textview and a text box. It too has
+threads, but these are external from the file itself, because this
+class was written after main and enjoys the benefit of heinsight.</font></p>
+<p align="justify" style="margin-left: 0.98in; margin-bottom: 0in; line-height: 100%">
+<font color="#000000"><b>ServerConnection:</b></font></p>
+<p align="justify" style="margin-left: 0.98in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">This is responsible for a every message sent
+through or from the server. It also does some processing on those
+instructions but only through other classes such as ChessBoard (Not
+to be confused with ChessBoardAdapter). All of it’s methods work by
+adding a message to the queue, and every time it recieves an <span style="background: #fff200">ACK</span><span style="background: transparent">
+message from the server it sends the bottom most message from the
+queue. The queue is not a true FIFO, just a reglar old arraylist. But
+it is used the same way and may be thought of as such. If the queue
+is empty it merely sends an ack message in response. It is however
+one of the most important classes. When examining, UserConnection
+from the game server should also be vi</span><span style="background: transparent">ewed
+side by side, as they are two halves of a whole</span><span style="background: transparent">.</span></font></p>
+<p align="justify" style="margin-left: 0.98in; margin-bottom: 0in; line-height: 100%">
+<font color="#000000"><b>ChessBoardAdapter:</b></font></p>
+<p align="justify" style="margin-left: 0.98in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000"><span style="background: #fff200">Please do not
+confuse this with a chessboard.<span style="background: transparent">
+The purpous of this class is not to manage the state of the game, but
+rather to display the state of the game to the user. In the user
+interface there is a gridview called chessboard. It is I rows wide
+and has had it’s stretch settings set to zero. </span><span style="background: transparent">This
+UI element has the content’s of it’s squares updated by this
+adapter. The adapter has a “has a” relationship with ChessBoard
+(forgive the grammer). The chessboard within ChessBoardAdapter is the
+same object in memory as the one used by ServerConnection. </span>The
+adapter does call any set methods on the ChessBoard, instead calling
+methods in ServerConnection to do it on it’s behalf.<span style="background: transparent">
+It does however use methods such as getLegalMoves on ChessPiece
+objects within chessboard, </span><span style="background: transparent">for
+functionality such as highlighting what squares the user could
+theoretically move to.</span></span></font></p>
+<p align="justify" style="margin-left: 0.98in; margin-bottom: 0in; line-height: 100%">
+<font color="#000000"><b>ChessSet:</b></font></p>
+<p align="justify" style="margin-left: 0.98in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">While this class is also used in the Settings
+activity, It’s main functionality is here. Without the code in this
+class, displaying multiple chess sets in a scalable manor would not
+be possible. Upon being passed an enum representing a group of
+textures for a chess set, it will populate an array with the unique
+ID for each drawable resource in the texturepack. These IDs are then
+used by the ChessBoardAdapter to draw the chesspieces on the user
+interface. The process for adding a new chess set is so simple that
+even the daftest person alive could do it. You simply add a name to
+the texturePack enum, then copy paste a new case into the switch
+statement, changing the ids of the drawables as nessesary. You could
+even theoretically create your own mix and match chess set this way
+from existing textures. But please don’t do that because some rooks
+look the same from both sides and that would be a HCI nightmare.</font></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">Other than those two you will also find that
+there is a thread within the class itself called playerinfo. Once
+it’s finished however it acts more like an array, essensially a
+group of related data that can be accessed through it’s getters.
+Once it’s finished running it has no reason to run again. Hence I
+won’t go into the detail of how it works besides saying it uses
+room.</font></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; line-height: 100%">
+<font color="#0066b3"><b>Statistics:</b></font></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#0066b3">This is one of the sections most relevant to
+the marking scheme. There is a ListView and a refresh button. The
+refresh button downloads match statistics from the httpapi and stores
+them in the room database, and the ListView’s adapter (called
+MatchstatsAdapter in the tree) will display them broken down by
+player. It will display a list of each player you have played a match
+against and list how many times you beat them (🏆), how many times
+they  beat you (☠), how many matches ended in surrender and how
+many matches you have played in total. These statistics are compiled
+by the httpapi. The MatchstatsAdapter will display these statistics
+next to the relevant emoji. Originally they were word’s but that
+made the screen bland.</font></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; line-height: 100%">
+<font color="#000000"><b>Settings:</b></font></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">This is the single most simplistic screen of
+all. It has logic so once you add a piece to the ChessSet class it
+will automatically be added here, but that’s the extent of this
+class’s functionality. Everything else this class is responsible
+for is handled by the httpapi. All this needs is a thread to send you
+new preference to the httpapi. (Naturally this class is completely
+uselsess when divorced from the internet besides as a list of what
+all the pawns look like)</font></p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-left: 0.49in; margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><font color="#000000"><font size="4" style="font-size: 16pt"><b>Design
+Desisions:</b></font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">Well the base 8 maths sounds like an excellent
+place to start. So a chessboard is 8 squares across right? So in base
+8 maths that’s 10. meaning you can number the squares like so:</font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<img src="./project_report_files/project_report_htm_c4a6acd2ee53813e.png" name="Image1" align="left" width="670" height="84" border="0">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">But why the base 8 maths? Could you not do this
+in base 10? well look what happens when you go into double digits.</font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<img src="./project_report_files/project_report_htm_512bbdb77e3e7539.png" name="Image2" align="left" width="547" height="532" border="0">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">Now would you look at that. Swap the numbers
+around and turn them upside down and you have perfect grid
+co-ordinates! Heck, even in their present state we can use them to
+great effect. This means we can turn every single chess move into a
+simple arithmatic operation. </font>
+</p>
+<table width="100%" cellpadding="5" cellspacing="0">
+	<colgroup><col width="85*">
+
+	<col width="85*">
+
+	<col width="85*">
+
+	</colgroup><tbody><tr valign="top">
+		<td width="33%" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0.04in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<b>Move</b></p>
+		</td>
+		<td width="33%" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0.04in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<b>Base 8</b></p>
+		</td>
+		<td width="33%" style="border: 1px solid #000000; padding: 0.04in"><p align="justify">
+			<b>Base 10</b></p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			Up one</p>
+		</td>
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			-10</p>
+		</td>
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p align="justify">
+			-8</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			Down one</p>
+		</td>
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			+10</p>
+		</td>
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p align="justify">
+			+8</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			Left one</p>
+		</td>
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			-1</p>
+		</td>
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p align="justify">
+			-1</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			Right one</p>
+		</td>
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			+1</p>
+		</td>
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p align="justify">
+			+1</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			Up one left one</p>
+		</td>
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			-11</p>
+		</td>
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p align="justify">
+			-9</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			Down one left one</p>
+		</td>
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			+7</p>
+		</td>
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p align="justify">
+			+7</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			Up one right one</p>
+		</td>
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			-7</p>
+		</td>
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p align="justify">
+			-7</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			Down one right one</p>
+		</td>
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			11</p>
+		</td>
+		<td width="33%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p align="justify">
+			9</p>
+		</td>
+	</tr>
+</tbody></table>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">I won’t go into how knights fit into this
+because it’s not too complicated. There is litterally only one flaw
+in this system and that is wrap around. What’s down one and right
+one from square 17? Square 30. Oh dear. My perfect system is ruined?
+Not so much. You can do a simple mathimatical calculation to check if
+a piece has teleported to somewhere they shouldn’t logically be
+able to be. If a piece is to move diagonally you must take the the y
+and x co-ordinates of both the origin and destination squares and add
+them all together. If the number is even then they landed on a square
+the same colour as the one they started on. If not… well the bug
+has happened, mark the move not legal. See
+ChessPiece.divine-InterventionCheck for implementation.</font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">Knowing that every square is litterally just a
+number between 0 and 63, we can make a move by taking the origin
+square, multiplying by 100(or 64) and adding the destination square.
+For example to move from the square 45 to the square 63.
+(100*45)+63=4563. Voila. This is how chessmoves are dealt with on a
+low level. This operation is easily reversed on the server end.
+Divide by 100 (remainder is auto truncated because integer) to get
+origin, modulus 100 to get destination.</font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">I think the Base 8 maths overall makes for code
+that is both efficient and human readable. Hence it’s use.</font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><font color="#000000"><b>Onto
+the network protocol</b></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">The way the server communicates with the client
+is elegant in my opinion. I chose TCP over UDP mainly because I am
+more familiar with it. Since chess isn’t really a realtime
+application anyway I reckon I made the right decision. So what about
+the design of the chess packets? I knew the String would be nessesary
+because I wanted instant messenging capabilities (which pre-date the
+chess logic). The enum seemed like the easiest way to handle
+differenciating types of packets. At the time I assumed that enum’s
+were mapped in memory as integers. My intention originally was have
+the default case run the ~ operation on negitive headers and then
+treating them as the chessmoves from 2 paragraphs ago. When I
+discovered that enums were a class all to themselves, I just added an
+integer to the chess packet’s specification. For more intricate
+knowledge on how they work see the code for UserConnection in the
+server and ServerConnection in the client.</font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><font color="#000000"><b>Computational
+Load</b></font></p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><font color="#000000"><span style="font-weight: normal">My
+logic for some design decisions was this. The httpapi should be
+scalable. If I were to start selling my app I would probably re-write
+the entire thing for FaaS. It’s complexity doesn’t matter all
+that much because FaaS is cheap. </span><span style="font-weight: normal">For
+the game Server I would need to go with IaaS. Basically rent a
+server. And that would be expensive, So I would want the server to
+have the lowest requirements per user as possible. Hence expensive
+calculations such as inCheck are only ever done client side. This has
+the nice upshot of having such opperations be within the scope of
+what’s markable expensive operations are only carried out server
+side when absolutely nessesary, such as prevention of cheating. As
+for the client, efficiency was less of a priority, because the client
+is the one paying for the computing power and electricity! The fact
+they only have to deal with a single chessgame, wheras a server would
+need to handle potentially thousands at a time helped justify this in
+my mind.</span></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><font color="#000000"><b>HCI
+(or human computer interaction)</b></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000">Minimalism was the intention behind the
+majority of design decisions in the area of the gui. In the
+chessplayer the user can see the chessboard and chat at all times.
+The squares are coloured purple and gray because black and white
+would not contrast right with the staffs of some bishops, the hair of
+the teatime pawns or the outlines on all pieces. The pawn icon left
+of the surrender and reconnect buttons exists because during testing
+I kept forgetting which emulator’s turn it was. I used emoji in the
+stats viewer because the words looked boring but I didn’t want to
+have to get more complex than plaintext.</font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><font color="#000000"><font size="4" style="font-size: 16pt"><b>How
+was the Application tested?</b></font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000"><font size="3" style="font-size: 12pt">Well I
+always compile every time I make a minor change, but I don’t think
+that’s what your asking. This application was tested in the field 4
+times. It’s maiden test was the demo. (yes really. I lack the
+patience to get the board into a checkmate state on my own). That was
+a complete success. Checkmate to my opponent. The second test
+happened in the students union room against a curious student 10
+minutes after the lab ended. I lost. Checkmate was detected. Success.
+Third was against another curious student who called himself “lethal
+at chess”. He beat me so badly that the app couldn’t even believe
+it had happened, and checkmate went undetected. Failure. I patched it
+but I don’t know if I actually fixed the problem. More time would
+be required, and quite frankly this was post demo anyway so if the
+bug persists, it is not likely to be noticed. Finally there was the
+test against the dearest friend I have. Not a student in the collage,
+in fact I haven’t seen him in person in months. We played a game
+over the internet. He didn’t pound my face into the dirt. The match
+ended in stalemate. Since the app can’t actually detect that I just
+surrendered. He disconnected no less than three times within the
+game. But I think that says more about my Dad’s choice of internet
+connection than about my skills as a programmer. And every time he
+rejoined the match it was exactly as he had left it.</font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><font color="#000000"><font size="3" style="font-size: 12pt"><b>Mongo
+Schema Design</b></font></font></p>
+<table width="100%" cellpadding="5" cellspacing="0">
+	<colgroup><col width="39*">
+
+	<col width="39*">
+
+	<col width="59*">
+
+	<col width="59*">
+
+	<col width="59*">
+
+	</colgroup><tbody><tr valign="top">
+		<td width="15%" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0.04in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<font size="3" style="font-size: 12pt"><b>users</b></font></p>
+		</td>
+		<td width="15%" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0.04in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<font size="3" style="font-size: 12pt">username</font></p>
+			<p align="justify"><font size="3" style="font-size: 12pt">String</font></p>
+			<p align="justify"><font size="3" style="font-size: 12pt">unique</font></p>
+		</td>
+		<td width="23%" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0.04in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<font size="3" style="font-size: 12pt">passhash</font></p>
+			<p align="justify"><font size="3" style="font-size: 12pt">BinData</font></p>
+		</td>
+		<td width="23%" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0.04in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<font size="3" style="font-size: 12pt">favourite_set</font></p>
+			<p align="justify"><font size="3" style="font-size: 12pt">String</font></p>
+		</td>
+		<td width="23%" style="border: 1px solid #000000; padding: 0.04in"><p align="justify">
+			<font size="3" style="font-size: 12pt">secondary_set</font></p>
+			<p align="justify"><font size="3" style="font-size: 12pt">String</font></p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="15%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<font size="3" style="font-size: 12pt"><b>user_</b></font></p>
+			<p align="justify"><font size="3" style="font-size: 12pt"><b>tokens</b></font></p>
+		</td>
+		<td width="15%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<font size="3" style="font-size: 12pt">_id</font></p>
+			<p align="justify"><font size="3" style="font-size: 12pt">String</font></p>
+		</td>
+		<td width="23%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<font size="3" style="font-size: 12pt">user_id</font></p>
+			<p align="justify"><font size="3" style="font-size: 12pt">ObjectId</font></p>
+		</td>
+		<td width="23%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<font size="3" style="font-size: 12pt">expires</font></p>
+			<p align="justify"><font size="3" style="font-size: 12pt">Date</font></p>
+		</td>
+		<td width="23%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p align="justify">
+			<br>
+
+			</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="15%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<font size="3" style="font-size: 12pt"><b>servers</b></font></p>
+		</td>
+		<td width="15%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<font size="3" style="font-size: 12pt">hostname</font></p>
+			<p align="justify"><font size="3" style="font-size: 12pt">String</font></p>
+		</td>
+		<td width="23%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<font size="3" style="font-size: 12pt">port</font></p>
+			<p align="justify"><font size="3" style="font-size: 12pt">int</font></p>
+		</td>
+		<td width="23%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<font size="3" style="font-size: 12pt">capacity</font></p>
+			<p align="justify"><font size="3" style="font-size: 12pt">int</font></p>
+		</td>
+		<td width="23%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p align="justify">
+			<br>
+
+			</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="15%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<font size="3" style="font-size: 12pt"><b>ongoing_matches</b></font></p>
+		</td>
+		<td width="15%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<font size="3" style="font-size: 12pt">players</font></p>
+			<p align="justify"><font size="3" style="font-size: 12pt">ObjectId[]</font></p>
+		</td>
+		<td width="23%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<font size="3" style="font-size: 12pt">server</font></p>
+			<p align="justify"><font size="3" style="font-size: 12pt">ObjectId</font></p>
+		</td>
+		<td width="23%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<br>
+
+			</p>
+		</td>
+		<td width="23%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p align="justify">
+			<br>
+
+			</p>
+		</td>
+	</tr>
+	<tr valign="top">
+		<td width="15%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<font size="3" style="font-size: 12pt"><b>match_</b></font></p>
+			<p align="justify"><font size="3" style="font-size: 12pt"><b>results</b></font></p>
+		</td>
+		<td width="15%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<font size="3" style="font-size: 12pt">players</font></p>
+			<p align="justify"><font size="3" style="font-size: 12pt">ObjectId[]</font></p>
+		</td>
+		<td width="23%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="justify">
+			<font size="3" style="font-size: 12pt">server</font></p>
+			<p align="justify"><font size="3" style="font-size: 12pt">ObjectId</font></p>
+		</td>
+		<td width="23%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0in"><p align="left">
+			<font size="3" style="font-size: 12pt">winner</font></p>
+			<p align="left"><font size="3" style="font-size: 12pt">ObjectId</font></p>
+		</td>
+		<td width="23%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0in; padding-bottom: 0.04in; padding-left: 0.04in; padding-right: 0.04in"><p align="left">
+			<font size="3" style="font-size: 12pt">endstate</font></p>
+			<p align="left"><font size="3" style="font-size: 12pt">String</font></p>
+		</td>
+	</tr>
+</tbody></table>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><font color="#000000"><font size="4" style="font-size: 16pt"><b>Challenges
+faced during the development</b></font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000"><font size="3" style="font-size: 12pt"><b>Problem:</b>
+Volley is hard</font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000"><font size="3" style="font-size: 12pt"><b>Solution:</b>
+Stop complaining</font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000"><font size="3" style="font-size: 12pt"><b>Problem:</b>
+Android studio, if you put the server with it’s path where it can
+find it will start asking for the freaking mongo connector to compile
+it and refuse to compile anything until the dependency is satisfied</font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000"><font size="3" style="font-size: 12pt"><b>Solution:</b>
+break the server into two sepperate packages called chessServer and
+ChessboardnetCommon and make both the server and client depend on the
+common package.</font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000"><font size="3" style="font-size: 12pt"><b>Problem:</b>
+Accidentally deleted all code relating to mongodb.</font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000"><font size="3" style="font-size: 12pt"><b>Solution:</b>
+Rewrite it from scratch.</font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000"><font size="3" style="font-size: 12pt"><b>Problem:</b>
+Can’t centre the chessboard on the screen</font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000"><font size="3" style="font-size: 12pt"><b>Solution:</b>
+put the chat to the right of it and force landscape mode.</font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000"><font size="3" style="font-size: 12pt"><b>Problem:</b>
+The Application crashes upon a game starting when you run it on a
+physical device.</font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000"><font size="3" style="font-size: 12pt"><b>Cause:</b>
+It was having to downscale the texture for all 32 pieces every time
+it refreshed the board.</font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000"><font size="3" style="font-size: 12pt"><b>Solution:</b>
+switch to scalable vector graphic textures.</font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000"><font size="3" style="font-size: 12pt"><b>Problem:</b>
+Switching to scalable vector graphic textures made the queen bald.</font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000"><font size="3" style="font-size: 12pt"><b>Solution:</b>
+Draw her new hair and then cry myself to sleep because the old hair
+was hand drawn and took me hours.</font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000"><font size="3" style="font-size: 12pt"><b>Problem:</b>
+rooking didn’t work for the (true) side of the board and resulted
+in an illegal move message from the server.</font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000"><font size="3" style="font-size: 12pt"><b>Cause:</b>
+(&lt;) and (&lt;=). I think that says enough.</font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<font color="#000000"><font size="3" style="font-size: 12pt"><b>Solution:</b>
+Good old find and replace.</font></font></p>
+<p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+<br>
+
+</p>
+<p align="justify" style="margin-bottom: 0in; line-height: 100%"><font color="#000000"><font size="4" style="font-size: 16pt"><b>What
+Did I learn about android?</b></font></font></p>
+<ol>
+	<li><p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+	<font color="#000000"><font size="3" style="font-size: 12pt">Java
+	and Gradle are a pain</font></font></p>
+	</li><li><p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+	<font color="#000000"><font size="3" style="font-size: 12pt">Android
+	does not like downscaling dozens of textures at a time</font></font></p>
+	</li><li><p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+	<font color="#000000"><font size="3" style="font-size: 12pt">Android
+	studio uses a heck of a lot of RAM</font></font></p>
+	</li><li><p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+	<font color="#000000"><font size="3" style="font-size: 12pt">Logcat
+	is the reincarnation of Santa</font></font></p>
+	</li><li><p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+	<font color="#000000"><font size="3" style="font-size: 12pt">Android
+	has no concept of folders for resources</font></font></p>
+	</li><li><p align="justify" style="margin-bottom: 0in; font-weight: normal; line-height: 100%">
+	<font color="#000000"><font size="3" style="font-size: 12pt">Android
+	Java can send serialized objects directly to oracle java with no
+	problems</font></font></p>
+</li></ol>
+
+</body></html>
