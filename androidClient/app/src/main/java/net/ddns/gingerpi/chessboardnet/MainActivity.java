@@ -57,7 +57,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         checkLogin();
-        queue=Volley.newRequestQueue(this,new HurlStack(null, SelfSignedFactory.getSocketFactory(this,R.raw.server)));
+        queue=Volley.newRequestQueue(this,new HurlStack(null, SelfSignedFactory.getSocketFactory(this,R.raw.certificate)));
 
 		startThreads();
     }
