@@ -65,7 +65,7 @@ def get_login_token():
 @app.route("/signout",methods=["POST"])
 def destroy_login_token():
 	token=request.json.get("token")
-	db.user_tokens.remove({"_id":token})
+	db.user_tokens.delete_one({"_id":token})
 	return jsonify({"status":0})
 
 
