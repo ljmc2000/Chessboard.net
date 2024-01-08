@@ -33,6 +33,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+
 
 public class MainActivity extends Activity {
 
@@ -57,7 +61,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         checkLogin();
-        queue=Volley.newRequestQueue(this,new HurlStack(null, SelfSignedFactory.getSocketFactory(this,R.raw.certificate)));
+        queue=Volley.newRequestQueue(this);
 
 		startThreads();
     }
