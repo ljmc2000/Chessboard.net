@@ -31,12 +31,14 @@ def create_user():
 		username=request.json.get("username")
 		password=request.json.get("password")
 		passhash=bcrypt.hashpw(password.encode(),bcrypt.gensalt())
-		userid=db.users.insert({"username":username,"passhash":passhash,"favourite_set":"white","secondary_set":"black"})
+		inserted_user=db.users.insert_one({"username":username,"passhash":passhash,"favourite_set":"white","secondary_set":"black"})
+		userid=inserted_user.inserted_id
 		login_token=secrets.token_urlsafe(TOKEN_LEN)
 		expires=datetime.datetime.now()+datetime.timedelta(days=365)
-		db.user_tokens.insert({"_id":login_token,"user_id":userid,"expires":expires})
-		return jsonify({"status":"0","token":login_token,"id":str(userid)})
-	except:
+		db.user_tokens.insert_one({"_id":login_token,"user_id":userid,"expires":expires})
+		return jsonify({"status":"0","token":login_token,"id":str(inserted_user.inserted_id)})
+	except Exception as e:
+		print(e)
 		return jsonify({"status":"-1"})
 
 @app.route("/signin",methods=["POST"])
@@ -52,11 +54,12 @@ def get_login_token():
 		if bcrypt.checkpw(password.encode(),userdetails["passhash"]):
 			login_token=secrets.token_urlsafe(TOKEN_LEN)
 			expires=datetime.datetime.now()+datetime.timedelta(days=365)
-			db.user_tokens.insert({"_id":login_token,"user_id":userdetails["_id"],"expires":expires})
+			db.user_tokens.insert_one({"_id":login_token,"user_id":userdetails["_id"],"expires":expires})
 			return jsonify({"status":"0","id":str(userdetails["_id"]),"token":login_token})
 		else:
 			return jsonify({"status":"1"})
-	except:
+	except Exception as e:
+		print(e)
 		return jsonify({"status":"-1"})
 
 @app.route("/signout",methods=["POST"])
@@ -71,7 +74,7 @@ def getFreeServer():
 	'''return the server with the lowest number of players currently using it'''
 	lowest=99999999	#nice big number, intmax would be better
 	for server in db.servers.distinct("_id"):
-		players_on_server=db.ongoing_matches.count({"server":server})
+		players_on_server=db.ongoing_matches.estimated_document_count({"server":server})
 		serverCapacity=db.servers.find_one({"_id":server})["capacity"]
 		if players_on_server<lowest and serverCapacity>players_on_server:
 			lowest=players_on_server
@@ -95,7 +98,7 @@ def joinLobby():
 		return jsonify({"status":1})
 
 	#ensure a server is available
-	if (db.servers.count()==0):
+	if (db.servers.estimated_document_count()==0):
 		return jsonify({"status":2})
 
 	#if they have a preference on who to play
@@ -110,7 +113,7 @@ def joinLobby():
 			return jsonify({"status":5})
 		else:
 			server=getFreeServer()
-			db.ongoing_matches.insert({"players":[userid,opponent],"server":server})
+			db.ongoing_matches.insert_one({"players":[userid,opponent],"server":server})
 			try:
 				lobby.remove(userid)
 			except:
@@ -129,7 +132,7 @@ def joinLobby():
 
 		server=getFreeServer()
 
-		db.ongoing_matches.insert({"players":[p1,p2],"server":server})
+		db.ongoing_matches.insert_one({"players":[p1,p2],"server":server})
 
 	return jsonify({"status":0})
 
@@ -199,13 +202,13 @@ def matchstats():
 			continue
 
 		d={}
-		d["total_matches"]=db.match_results.find({"players":{"$all":[userid,player]}}).count()
+		d["total_matches"]=db.match_results.count_documents({"players":{"$all":[userid,player]}})
 		if d["total_matches"]==0:
 			continue
 
-		d["surrenders"]=db.match_results.find({"players":{"$all":[userid,player]},"endstate":"surrender"}).count()
-		d["wins"]=db.match_results.find({"players":{"$all":[userid,player]},"endstate":{'$regex':'^check'},"winner":userid}).count()
-		d["losses"]=db.match_results.find({"players":{"$all":[userid,player]},"endstate":{'$regex':'^check'},"winner":player}).count()
+		d["surrenders"]=db.match_results.count_documents({"players":{"$all":[userid,player]},"endstate":"surrender"})
+		d["wins"]=db.match_results.count_documents({"players":{"$all":[userid,player]},"endstate":{'$regex':'^check'},"winner":userid})
+		d["losses"]=db.match_results.count_documents({"players":{"$all":[userid,player]},"endstate":{'$regex':'^check'},"winner":player})
 		d["user_id"]=str(player)
 		d["username"]=db.users.find_one({"_id":player})["username"]
 
@@ -227,11 +230,11 @@ class HasUnlocked:
 
 	def goblins(self,userid):
 		'''user must have won at least one match'''
-		return db.match_results.find({"endstate": {'$regex':'^check'},"winner":userid}).count() >= 1
+		return db.match_results.count_documents({"endstate": {'$regex':'^check'},"winner":userid}) >= 1
 
 	def teatime(self,userid):
 		'''must have won three'''
-		return db.match_results.find({"endstate":{'$regex':'^check'},"winner":userid}).count() >= 3
+		return db.match_results.count_documents({"endstate":{'$regex':'^check'},"winner":userid}) >= 3
 
 	def _default_(self,userid):
 		return False
@@ -254,8 +257,8 @@ def setprefs():
 	if(a != None):
 		if hasUnlocked[a](userid):
 			if user["secondary_set"]==a:
-				db.users.update({"_id":userid},{"$set":{"secondary_set":user["favourite_set"]}})
-			db.users.update({"_id":userid},{"$set":{"favourite_set":a}})
+				db.users.update_one({"_id":userid},{"$set":{"secondary_set":user["favourite_set"]}})
+			db.users.update_one({"_id":userid},{"$set":{"favourite_set":a}})
 			return jsonify({"status":0})
 		else:
 			return jsonify({"status":1,"reason":"you have not met the requirements for this chess set"})
@@ -264,8 +267,8 @@ def setprefs():
 	if(a != None):
 		if hasUnlocked[a](userid):
 			if user["favourite_set"]==a:
-				 db.users.update({"_id":userid},{"$set":{"favourite_set":user["secondary_set"]}})
-			db.users.update({"_id":userid},{"$set":{"secondary_set":a}})
+				 db.users.update_one({"_id":userid},{"$set":{"favourite_set":user["secondary_set"]}})
+			db.users.update_one({"_id":userid},{"$set":{"secondary_set":a}})
 			return jsonify({"status":0})
 		else:
 			return jsonify({"status":1,"reason":"you have not met the requirements for this chess set"})
