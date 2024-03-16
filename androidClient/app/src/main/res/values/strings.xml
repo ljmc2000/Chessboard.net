@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Chessboard.Net</string>
-    <string name="HTTPAPIurl">https://chess.delilahsthings.ie/</string>
+    <string name="HTTPAPIurl">https://chessboardnet.delilahsthings.ie/</string>
     <!--string name="HTTPAPIurl">https://192.168.0.1:5000</string-->
     <string name="DB_NAME">LocalCache.db</string>
 
