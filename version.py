@@ -1,7 +1,14 @@
 #generate the version information files for all parts of the program
-version=5
-tag="v1.2.0"
-repo="gingerpi.ddns.net/chessrepo"
+import re
+applicationIdPattern=re.compile(r'applicationId "(.+)"')
+versionCodePattern=re.compile(r'versionCode (\d+)')
+versionNamePattern=re.compile(r'versionName "(.+)"')
+
+with open("androidClient/app/build.gradle") as buildfile:
+	data=buildfile.read()
+	version=int(next(versionCodePattern.finditer(data)).group(1))
+	tag=next(versionNamePattern.finditer(data)).group(1)
+	repo=next(applicationIdPattern.finditer(data)).group(1)
 
 java=open("androidClient/app/src/main/java/net/ddns/gingerpi/chessboardnetCommon/VersionInfo.java","w+")
 java.write('''package net.ddns.gingerpi.chessboardnetCommon;
