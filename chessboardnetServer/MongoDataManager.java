@@ -1,4 +1,4 @@
-package net.ddns.gingerpi.chessboardnetServer;
+package ie.delilahsthings.chessboardnetServer;
 
 import org.bson.types.ObjectId;
 import org.bson.*;

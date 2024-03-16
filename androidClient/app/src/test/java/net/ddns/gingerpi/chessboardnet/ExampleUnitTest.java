@@ -1,4 +1,4 @@
-package net.ddns.gingerpi.chessboardnet;
+package ie.delilahsthings.chessboardnet;
 
 import org.junit.Test;
 

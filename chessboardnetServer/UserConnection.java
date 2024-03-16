@@ -1,12 +1,12 @@
-package net.ddns.gingerpi.chessboardnetServer;
+package ie.delilahsthings.chessboardnetServer;
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
 
 import org.bson.types.ObjectId;
 
-import net.ddns.gingerpi.chessboardnetCommon.*;
-import static net.ddns.gingerpi.chessboardnetCommon.ChessPacket.messageType.*;
+import ie.delilahsthings.chessboardnetCommon.*;
+import static ie.delilahsthings.chessboardnetCommon.ChessPacket.messageType.*;
 
 class UserConnection extends Thread
 {

@@ -10,8 +10,8 @@ with open("androidClient/app/build.gradle") as buildfile:
 	tag=next(versionNamePattern.finditer(data)).group(1)
 	repo=next(applicationIdPattern.finditer(data)).group(1)
 
-java=open("androidClient/app/src/main/java/net/ddns/gingerpi/chessboardnetCommon/VersionInfo.java","w+")
-java.write('''package net.ddns.gingerpi.chessboardnetCommon;
+java=open("androidClient/app/src/main/java/ie/delilahsthings/chessboardnetCommon/VersionInfo.java","w+")
+java.write('''package ie.delilahsthings.chessboardnetCommon;
 
 public class VersionInfo
 {

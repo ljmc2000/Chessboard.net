@@ -1,5 +1,5 @@
 //cleanup when the application ends or crashes
-package net.ddns.gingerpi.chessboardnetServer;
+package ie.delilahsthings.chessboardnetServer;
 import org.bson.types.ObjectId;
 
 public class Cleaner extends Thread
